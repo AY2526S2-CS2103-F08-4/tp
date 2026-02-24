@@ -24,3 +24,4 @@ docs/_site/
 
 # VSCode configurations
 .vscode/
+bin/
