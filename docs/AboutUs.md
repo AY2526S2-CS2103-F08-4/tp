@@ -47,7 +47,7 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 * Role: Developer
 * Responsibilities: Dev Ops + Threading + Testing
 
-### James Doe
+### David
 
 <img src="images/breezuu.png" width="200px">
 
