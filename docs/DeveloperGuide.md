@@ -337,8 +337,15 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ### Glossary
 
+* **Contacts**: A person (fellow student, friend, classmate, schoolmate) that a user has saved in NAB. A contact is typically (but not necessarily) associated with an event.
+* **Tag**: A logical label attached to a contact for association-oriented lookups and logical groupings for easier management.
+* **Event**: A contact-linked commitment or arrangement that the user has with one or more contacts (e.g. a project meeting, training session).
+* **Unavailability**: A special type of event in NAB to indicate that a contact is unavailable during a time period, used to avoid scheduling conflicts.
+* **CLI**: Command Line Interface is a text-based user interface that primarily uses commands and typed-inputs for user interaction (with the application), as opposed to GUI. 
+* **GUI**: Graphic User Interface is a graphics-based user interface that primarily uses mouse-clicks for user interaction (with the application), as opposed to CLI. 
+* **Alias**: An alternate name a user can assign to a command that allows easier command execution while maintaining command functionality. 
+* **CSV**: Comma Separated Values, a plain-text file format used to store tabular data. Specifically, this is to store the application data including contact names, phone numbers, tags, etc.
 * **Mainstream OS**: Windows, Linux, Unix, MacOS
-* **Private contact detail**: A contact detail that is not meant to be shared with others
 
 --------------------------------------------------------------------------------------------------------------------
 
