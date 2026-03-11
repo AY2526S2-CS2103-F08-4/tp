@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
+import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 
 /**
@@ -143,6 +144,17 @@ public class ModelManager implements Model {
         return addressBook.equals(otherModelManager.addressBook)
                 && userPrefs.equals(otherModelManager.userPrefs)
                 && filteredPersons.equals(otherModelManager.filteredPersons);
+    }
+
+    // Assumption: valid inputs
+    @Override
+    public Person findPersonByName(Name nameToBeFind) {
+        for (Person p : this.filteredPersons) {
+            if (p.getName().equals(nameToBeFind)) {
+                return p;
+            }
+        }
+        return null;
     }
 
 }
