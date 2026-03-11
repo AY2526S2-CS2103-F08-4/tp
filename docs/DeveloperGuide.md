@@ -290,16 +290,38 @@ efficiently, while providing event management, tracking, and reminders.
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                                    | I want to …​                 | So that I can…​                                                        |
-|----------|--------------------------------------------|------------------------------|------------------------------------------------------------------------|
-| `* * *`  | new user                                   | see usage instructions       | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person             |                                                                        |
-| `* * *`  | user                                       | delete a person              | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name        | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name         | locate a person easily                                                 |
-
-*{More to be added}*
+| Priority | As a …​             | I want to …​                                                                                      | So that I can…​                                                                             |
+|----------|---------------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| `* * *`  | student             | add/save a peer's contact easily                                                                  | easily contact them in the future                                                           |
+| `* * *`  | student             | view a peer's contact details                                                                     | quickly access their information when I need to communicate or plan something with them     |
+| `* * *`  | student             | delete a peer's contact                                                                           | remove old information                                                                      |
+| `* * *`  | student             | search for a specific contact by their name                                                       | quickly find their details without scrolling through the whole list                         |
+| `* * *`  | organized student   | categorise my peers according to context (e.g. modules, tutorial class, CCA, orientation group)  | search for contacts in a specific grouping                                                  |
+| `* * *`  | organized student   | create an event for a commitment I have (e.g. module/project/CCA) linked to relevant contacts    | keep track of events and remind/contact involved individuals                                |
+| `* * *`  | organized student   | delete an existing event for a commitment I have                                                  | remove any old or cancelled events so I don't mix up confirmed arrangements                 |
+| `* * *`  | organized student   | view all events related to a specific contact                                                     | easily view my arranged commitments with the specified contact                              |
+| `* * *`  | efficient student   | filter my peers by context                                                                        | quickly find someone from a certain grouping (e.g. tutorial class)                         |
+| `* *`    | student             | update a peer's contact                                                                           | always keep my contact information up to date                                               |
+| `* *`    | student             | avoid contact duplication when adding                                                             | ensure I don't get confused from duplicate contacts                                         |
+| `* *`    | organized student   | update an existing event for a commitment I have                                                  | always keep events updated in the case the details are changed                              |
+| `* *`    | organized student   | view all upcoming events related to my logical grouping (using tags) in one organised list        | coordinate my group's schedule and make sure everyone knows what's coming next              |
+| `* *`    | proactive student   | record a teammate's stated unavailability                                                         | avoid proposing a meeting during times they already told me they are busy                   |
+| `* *`    | efficient student   | import my existing contacts from a local file                                                     | easily load my existing contacts into NAB without adding them manually                     |
+| `* *`    | efficient student   | group more than 1 contact at once                                                                 | efficiently group contacts all at once instead of 1 at a time                              |
+| `* *`    | careful student     | export the application's local data (contacts, details, commitments, etc.)                        | backup my data and transfer it between devices                                              |
+| `* *`    | forgetful student   | add/attach notes to a contact when saving them                                                    | remember important details about my peers without relying on memory                        |
+| `* *`    | forgetful student   | edit notes that are attached to a contact                                                         | keep that contact's notes updated                                                           |
+| `* *`    | forgetful student   | delete notes that are attached to a contact                                                       | remove old or unnecessary notes that may be misleading                                     |
+| `* *`    | lazy student        | pin contacts to the top of the list                                                               | easily access favourited contacts                                                           |
+| `* *`    | lazy student        | click on emails saved in my contacts                                                              | easily and quickly reach them via email without having to copy and paste their email address|
+| `* *`    | new user            | view all available commands                                                                       | use the product immediately without having to consult an external guide                    |
+| `* *`    | user                | know what went wrong with my command                                                              | rectify immediately and continue using the product                                         |
+| `*`      | organized student   | view my upcoming contact-linked events in chronological order                                     | plan my weekly schedule and quickly see what's next while spotting potential overlaps       |
+| `*`      | organized student   | archive contacts from the previous semester                                                       | keep my contact list clean after modules end                                               |
+| `*`      | lazy student        | easily copy phone numbers of a chosen contact                                                     | reach them fast during coordinations                                                        |
+| `*`      | seasoned student    | create aliases for commands                                                                       | customize my workflow and reduce repetitive command input                                   |
+| `*`      | seasoned student    | reuse my previous commands                                                                        | repeat actions quickly without retyping                                                     |
+| `*`      | seasoned student    | press Tab to autocomplete command keywords/prefixes                                               | type faster and make fewer syntax mistakes                                                  |
 
 ### Use cases
 
