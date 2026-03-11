@@ -329,9 +329,43 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ### Non-Functional Requirements
 
+###### Portability: 
 1.  Should work on any _mainstream OS_ as long as it has Java `17` or above installed.
-2.  Should be able to hold up to 1000 persons without a noticeable sluggishness in performance for typical usage.
-3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
+2.  Should be packaged as a single JAR file not exceeding size of 100MB.
+3.  Should be fully functional offline and must not depend on any remote server.
+
+###### Scalability:
+4.  NAB is intended for single-user use only and does not support multi-user scenarios.
+
+###### Usability:
+5.  GUI should work well, without resolution-related inconveniences, for standard screen resolutions 1980x1080 and higher, and for screens scaled by 100% to 125%.
+6.  GUI should remain usable for resolutions 1280x720 and higher, and for screens scaled by 150%.
+
+###### Performance:
+7. NAB should be able to hold up to 1000 persons without a noticeable sluggishness in performance for typical usage.
+
+###### Data Persistence:
+8.  The data file should be stored locally in a human-editable text file, allowing advanced users to manipulate data directly by editing the file.
+
+###### Data Synchronization:
+9.  All modifications to data should be propogated and reflected in local data storage within 3 seconds.
+
+###### Stability:
+10.  All exceptions and errors should be handled gracefully by the application, i.e. there should not be any application crashes.
+Fault Tolerance:
+11.  Should be able to recover at least uncorrupted portions of local storage file or from a backup file should data file be corrupted.
+
+###### Efficiency:
+12.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
+
+###### Response time:
+13.  Should not take more than 1 second to process commands and load data for up to 1000 persons and 30 tags cumulative in storage.
+
+###### Data Integrity:
+14.  When a contact is deleted, all events linked to that contact should also be removed to prevent orphaned data.
+
+###### Notes:
+15.  Does not require any internet connectivity to function.
 
 *{More to be added}*
 
