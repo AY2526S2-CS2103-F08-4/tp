@@ -4,7 +4,7 @@
   pageNav: 3
 ---
 
-# AB-3 Developer Guide
+# NAB Developer Guide
 
 <!-- * Table of Contents -->
 <page-nav-print />
@@ -322,32 +322,186 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `*`      | seasoned student    | reuse my previous commands                                                                        | repeat actions quickly without retyping                                                     |
 | `*`      | seasoned student    | press Tab to autocomplete command keywords/prefixes                                               | type faster and make fewer syntax mistakes                                                  |
 
-### Use cases
+### Use cases (UC)
 
-(For all use cases below, the **System** is the `AddressBook` and the **Actor** is the `user`, unless specified otherwise)
+(For all use cases below, the **System** is the `NAB` and the **Actor** is the `user`, unless specified otherwise)
 
-**Use case: Delete a person**
+<panel header="**UC1 - Add Contact**" type="light">
 
+**Use case:** `UC1` - Add Contact<br>
+**Guarantee:** New contact is successfully saved in the system.<br>
 **MSS**
-
-1.  User requests to list persons
-2.  AddressBook shows a list of persons
-3.  User requests to delete a specific person in the list
-4.  AddressBook deletes the person
-
-    Use case ends.
+1. User requests to add a contact.
+2. User enters the necessary contact information.
+3. NAB saves the contact into the contact list/database.
+<br> *Use case ends.*
 
 **Extensions**
 
-* 2a. The list is empty.
+* 2a. NAB detects an existing contact number entered.
+  * 2a1. NAB requests for a different contact number. 
+  * 2a2. User enters a new contact number. 
+  * Steps 2a1 - 2a2 are repeated until a unique contact number is entered. 
+<br> *Use case continues from step 3.*<br><br>
+* 2b. NAB detects invalid contact information.
+    * 2b1. NAB requests for the correct information.
+    * 2b2. User enters the correct contact information.
+    * Steps 2b1 - 2b2 are repeated until all contact information are valid entries. 
+<br> *Use case continues from step 3.*
+</panel>
 
-  Use case ends.
+<panel header="**UC2 - Find Contact**" type="light">
 
-* 3a. The given index is invalid.
+**Use case:** `UC2` - Find Contact<br>
+**MSS**
+1. User requests to find a contact. 
+2. User provides a keyword. 
+3. NAB checks whether the entered keyword is valid. 
+4. NAB identifies the specific contact matching the name. 
+5. NAB displays a list of contacts matching the user’s keyword.
+   <br> *Use case ends.*
 
-    * 3a1. AddressBook shows an error message.
+**Extensions**
 
-      Use case resumes at step 2.
+* 3a. NAB detects invalid characters in the provided keyword
+    * 3a1. NAB returns an error message
+    <br> *Use case ends.*<br><br>
+* 4a. NAB detects finds multiple possible contacts matching the keyword provided.
+  * 4a1. User provides more information to enrich the search.
+    <br> *Use case resumes from step 3.*<br><br>
+* 4b. NAB finds no available contacts matching the keyword provided.
+    * 4b1. NAB informs the user that no matches were found.
+      <br> *Use case ends.*
+</panel>
+
+<panel header="**UC3 - Delete Contact**" type="light">
+
+**Use case:** `UC3` - Delete Contact<br>
+**MSS**
+1. User requests to delete a specific contact by providing their name. 
+2. NAB checks whether the provided name is valid. 
+3. NAB identifies the specific contact matching the name. 
+4. NAB deletes the contact.
+   <br> *Use case ends.*
+
+**Extensions**
+
+* 2a. NAB detects invalid characters in the provided name.
+    * 2a1. NAB returns an error message.
+      <br> *Use case ends.*<br><br>
+* 3a. NAB finds multiple contacts that match the name provided.
+    * 3a1. User provides more information to enrich the search.
+      <br> *Use case resumes from step 2.*<br><br>
+* 3b. NAB finds no available contacts that match the name provided.
+    * 3b1. NAB informs the user that no matches were found.
+      <br> *Use case ends.*
+</panel>
+
+<panel header="**UC4 - Adding an Event for a Contact**" type="light">
+
+**Use case:** `UC4` - Adding an Event for a Contact<br>
+**Preconditions:** Contact that the event will be tagged to already exists in NAB.<br>
+**Guarantees:** Event is added to the system and is tagged to the specified contact.<br>
+**MSS**
+1. User requests to create a new event for a specific contact. 
+2. User enters the necessary event information and the information of the contact to be tagged to. 
+3. NAB saves the event into the event list/database.
+   <br> *Use case ends.*
+
+**Extensions**
+
+* 2a. NAB finds a duplicate event that has already been registered to the contact.
+    * 2a1. NAB rejects the event from being added.
+    <br> *Use case ends.*<br><br>
+* 2b. NAB is unable to find the specified contact.
+    * 2b1. NAB informs the user that the contact does not exist.
+    <br> *Use case ends.*
+</panel>
+
+<panel header="**UC5 - View Event**" type="light">
+
+**Use case:** `UC5` - View Event<br>
+**MSS**
+1. User requests to view the event list for a specific contact by providing their name. 
+2. NAB checks whether the provided name is valid. 
+3. NAB identifies the specific contact. 
+4. NAB retrieves the event list associated with the contact. 
+5. NAB displays the formatted event list to the user.
+   <br> *Use case ends.*
+
+**Extensions**
+
+* 1a. User requests to view events without specifying a contact name (i.e. view own events).
+    * 1a1. NAB returns the user’s own event list.
+      <br> *Use case resumes from step 5.*<br><br>
+* 2a. NAB detects invalid characters in the provided name.
+    * 2b1. NAB returns an error message.
+      <br> *Use case ends.*<br><br>
+* 3a. NAB is unable to find a contact matching the provided name.
+    * 3a1. NAB informs the user that contact does not exist.
+      <br> *Use case ends.*<br><br>
+* 4a. NAB finds no events associated with the contact.
+    * 4a1. NAB informs the user that there are no events associated with the contact.
+      <br> *Use case ends.*
+</panel>
+
+<panel header="**UC6 - Filter Contact by Tag**" type="light">
+
+**Use case:** `UC6` - Filter Contact by Tag<br>
+**MSS**
+1. User requests to find contacts with specific tag(s). 
+2. User enters the necessary tag(s). 
+3. NAB checks whether the provided tag(s) are valid. 
+4. NAB retrieves a list of contacts matching the tag(s). 
+5. NAB displays the list of contacts to the user.
+   <br> *Use case ends.*
+
+**Extensions**
+
+* 3a. NAB detects invalid characters in the provided tag
+    * 3a1. NAB returns an error message.
+      <br> *Use case ends.*<br><br>
+* 4a. NAB finds no available contacts matching the tag(s) provided.
+    * 4a1. NAB informs the user that no matches were found.
+      <br> *Use case ends.*
+</panel>
+
+<panel header="**UC7 - Export Contacts**" type="light">
+
+**Use case:** `UC7` - Export Contacts<br>
+**MSS**
+1. User requests to export all contacts out of NAB. 
+2. NAB saves a formatted file containing the list of contacts to a file directory.
+   <br> *Use case ends.*
+
+**Extensions**
+
+* 2a. NAB is unable to save the file to the user’s file directory.
+    * 2a1. NAB informs the user of the error.
+    <br> *Use case ends.*
+</panel>
+
+<panel header="**UC8 - Import Contacts**" type="light">
+
+**Use case:** `UC8` - Import Contacts<br>
+**Preconditions:** Only contact information from a specified file format can be imported<br>
+**MSS**
+1. User requests to import new contacts from an external contact list. 
+2. NAB adds the list of new contacts to the existing contact list/database.
+   <br> *Use case ends.*
+
+**Extensions**
+
+* 1a. NAB is unable to read the file.
+    * 1a1. NAB informs the user of the error.
+    <br> *Use case ends.*<br><br>
+* 1b. NAB finds a contact number that already exists in the database while reading the file.
+    * 1b1. NAB informs the user of the error.
+    * 1b2. User acknowledges the error.
+    * 1b3. NAB skips the contact information with the existing contact number and
+      continues reading the rest of the file.
+    <br> *Use case ends.*
+</panel>
 
 *{More to be added}*
 
