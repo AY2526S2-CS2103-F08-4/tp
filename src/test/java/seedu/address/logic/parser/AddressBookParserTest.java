@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddEventCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.EditCommand;
@@ -23,6 +24,7 @@ import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.person.Event;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
@@ -38,6 +40,19 @@ public class AddressBookParserTest {
         Person person = new PersonBuilder().build();
         AddCommand command = (AddCommand) parser.parseCommand(PersonUtil.getAddCommand(person));
         assertEquals(new AddCommand(person), command);
+    }
+
+    @Test
+    public void parseCommand_eventAdd() throws Exception {
+        Event expectedEvent = new Event("Complete feature list", "21-02-26 1100",
+            "21-02-26 1500");
+        AddEventCommand expectedCommand = new AddEventCommand("Lee eejoong", expectedEvent);
+
+        AddEventCommand command = (AddEventCommand) parser.parseCommand(
+                "event add l/CS2103 Meeting d/Complete feature list s/21-02-26 1100 "
+                        + "e/21-02-26 1500 to/Lee eejoong");
+
+        assertEquals(expectedCommand, command);
     }
 
     @Test

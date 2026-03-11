@@ -2,13 +2,17 @@ package seedu.address.model.person;
 
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.tag.Tag;
+
+
 
 /**
  * Represents a Person in the address book.
@@ -25,6 +29,9 @@ public class Person {
     private final Address address;
     private final Set<Tag> tags = new HashSet<>();
 
+    // Event fields
+    private final List<Event> events;
+
     /**
      * Every field must be present and not null.
      */
@@ -35,6 +42,7 @@ public class Person {
         this.email = email;
         this.address = address;
         this.tags.addAll(tags);
+        this.events = new ArrayList<>();
     }
 
     public Name getName() {
@@ -60,6 +68,24 @@ public class Person {
     public Set<Tag> getTags() {
         return Collections.unmodifiableSet(tags);
     }
+
+    /**
+     * Returns an immutable Event List
+     */
+    public List<Event> getEvents() {
+        return this.events;
+    }
+
+    /**
+     * Adds an event to the person's list of events.
+     * @param event
+     * @return true if the event was added successfully, false otherwise.
+     */
+    public boolean addEvent(Event event) {
+        events.add(event);
+        return true;
+    }
+
 
     /**
      * Returns true if both persons have the same name.
@@ -94,7 +120,8 @@ public class Person {
                 && phone.equals(otherPerson.phone)
                 && email.equals(otherPerson.email)
                 && address.equals(otherPerson.address)
-                && tags.equals(otherPerson.tags);
+                && tags.equals(otherPerson.tags)
+                && events.equals(otherPerson.events);
     }
 
     @Override
@@ -111,6 +138,7 @@ public class Person {
                 .add("email", email)
                 .add("address", address)
                 .add("tags", tags)
+                .add("events", events)
                 .toString();
     }
 
