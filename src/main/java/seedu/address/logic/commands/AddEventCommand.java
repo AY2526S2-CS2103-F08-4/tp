@@ -2,8 +2,6 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.List;
-
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Event;
@@ -25,6 +23,9 @@ public class AddEventCommand extends Command {
 
     public static final String MESSAGE_SUCCESS = "Added event for %1$s: %2$s";
 
+    public static final String MESSAGE_CONTACT_NOT_FOUND =
+            "Contact with name %1$s cannot be found in the address book.";
+
     private final Event toAdd;
     private final Name contact;
 
@@ -41,10 +42,11 @@ public class AddEventCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        List<Person> contacts = model.getFilteredPersonList();
-
         // Assumptions: Unique names
         Person personToEdit = model.findPersonByName(this.contact);
+        if (personToEdit == null) {
+            throw new CommandException(String.format(MESSAGE_CONTACT_NOT_FOUND, this.contact.fullName));
+        }
         Person editedPerson = createPersonWithEvent(personToEdit, toAdd);
 
         model.setPerson(personToEdit, editedPerson);
@@ -53,7 +55,7 @@ public class AddEventCommand extends Command {
     }
 
 
-    private static Person createPersonWithEvent(Person personToEdit, Event eventToAdd) {
+    private static Person createPersonWithEvent(Person personToEdit, Event eventToAdd) throws CommandException {
         Person editedPerson = new Person(personToEdit.getName(), personToEdit.getPhone(), personToEdit.getEmail(),
                 personToEdit.getAddress(), personToEdit.getTags());
 

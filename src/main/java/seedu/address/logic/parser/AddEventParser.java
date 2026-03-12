@@ -20,9 +20,6 @@ public class AddEventParser implements Parser<AddEventCommand> {
     private static final Prefix PREFIX_END = new Prefix("e/");
     private static final Prefix PREFIX_TO = new Prefix("to/");
 
-    private static final String MESSAGE_NAME_LOOKUP_UNSUPPORTED =
-            "Cannot resolve person by name in the parser. Use an index, or resolve name in the command.";
-
     /**
      * Parses the given {@code String} of arguments in the context of the AddEventCommand
      * and returns an AddEventCommand object for execution.
@@ -40,7 +37,7 @@ public class AddEventParser implements Parser<AddEventCommand> {
         }
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_LABEL, PREFIX_DESCRIPTION, PREFIX_START, PREFIX_END, PREFIX_TO);
         // TODO: More checks are required
-        String label = argMultimap.getValue(PREFIX_LABEL).get().trim();
+        // String label = argMultimap.getValue(PREFIX_LABEL).get().trim();
         String description = argMultimap.getValue(PREFIX_DESCRIPTION).orElse("").trim();
         String startDateTime = argMultimap.getValue(PREFIX_START).get().trim();
         String endDateTime = argMultimap.getValue(PREFIX_END).get().trim();
