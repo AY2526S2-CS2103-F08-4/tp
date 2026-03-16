@@ -17,6 +17,7 @@ import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.Event;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonInformation;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -210,6 +211,44 @@ public class ModelManager implements Model {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns a list of persons matching the provided {@link PersonInformation}.
+     * Name is required and must match (case-insensitive). Optional fields are applied as additional
+     * filters when present. Tags match if any provided tag is present on the person.
+     *
+     * @param info search criteria with required name and optional fields
+     * @return list of persons matching the criteria
+     */
+    public List<Person> findPersons(PersonInformation info) {
+        return addressBook
+                .getPersonList()
+                .stream()
+                .filter(person -> matchesInformation(person, info))
+                .toList();
+    }
+
+    private static boolean matchesInformation(Person p, PersonInformation info) {
+        if (!p.getName().equalsIgnoreCase(info.name)) {
+            return false;
+        }
+        // checking phone number:
+        if (!info.phone.map(ph -> ph.equals(p.getPhone())).orElse(true)) {
+            return false;
+        }
+        if (!info.email.map(em -> p.getEmail().map(e -> em.equals(e)).orElse(false))
+                .orElse(true)) {
+            return false;
+        }
+        if (!info.address.map(ad -> p.getAddress().map(a -> ad.equals(a)).orElse(false))
+                .orElse(true)) {
+            return false;
+        }
+        if (!info.tags.isEmpty() && !p.getTags().containsAll(info.tags)) {
+            return false;
+        }
+        return true;
     }
 
 }

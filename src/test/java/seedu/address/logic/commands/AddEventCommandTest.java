@@ -22,6 +22,7 @@ import seedu.address.model.ReadOnlyUserPrefs;
 import seedu.address.model.person.Event;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonInformation;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddEventCommandTest {
@@ -184,6 +185,11 @@ public class AddEventCommandTest {
 
         @Override
         public List<Person> findPersonsByName(Name name) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public List<Person> findPersons(PersonInformation info) {
             throw new AssertionError("This method should not be called.");
         }
     }

@@ -9,6 +9,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.Event;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonInformation;
 
 /**
  * The API of the Model component.
@@ -107,5 +108,10 @@ public interface Model {
      * Return a list of correct contact(s) based on the optional
      */
     List<Person> findPersonsByName(Name name);
+
+    /**
+     * Return a list of correct contact(s) based on the optional parameters provided
+     */
+    List<Person> findPersons(PersonInformation info);
 }
 
