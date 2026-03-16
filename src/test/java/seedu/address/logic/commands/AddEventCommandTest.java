@@ -184,11 +184,6 @@ public class AddEventCommandTest {
         }
 
         @Override
-        public List<Person> findPersonsByName(Name name) {
-            throw new AssertionError("This method should not be called.");
-        }
-
-        @Override
         public List<Person> findPersons(PersonInformation info) {
             throw new AssertionError("This method should not be called.");
         }

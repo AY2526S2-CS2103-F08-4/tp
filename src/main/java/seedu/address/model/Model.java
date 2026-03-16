@@ -105,11 +105,6 @@ public interface Model {
     void updateFilteredEventList(Predicate<Event> predicate);
 
     /**
-     * Return a list of correct contact(s) based on the optional
-     */
-    List<Person> findPersonsByName(Name name);
-
-    /**
      * Return a list of correct contact(s) based on the optional parameters provided
      */
     List<Person> findPersons(PersonInformation info);

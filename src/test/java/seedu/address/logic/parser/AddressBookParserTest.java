@@ -29,6 +29,7 @@ import seedu.address.model.person.Event;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonInformation;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 import seedu.address.testutil.PersonUtil;
@@ -68,7 +69,7 @@ public class AddressBookParserTest {
         Person personToDelete = new PersonBuilder().withName("John Doe").build();
         DeleteCommand command = (DeleteCommand) parser.parseCommand(
                 DeleteCommand.COMMAND_WORD + " " + PREFIX_NAME + personToDelete.getName());
-        assertEquals(new DeleteCommand(new Name("John Doe")), command);
+        assertEquals(new DeleteCommand(new PersonInformation(new Name("John Doe"), null, null, null, null)), command);
     }
 
     @Test

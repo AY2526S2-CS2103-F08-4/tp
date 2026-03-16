@@ -38,4 +38,16 @@ public class PersonInformation {
         this.address = Optional.ofNullable(address);
         this.tags = (tags == null) ? Set.of() : Set.copyOf(tags);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PersonInformation otherInfo) {
+            return name.equals(otherInfo.name)
+                    && phone.equals(otherInfo.phone)
+                    && email.equals(otherInfo.email)
+                    && address.equals(otherInfo.address)
+                    && tags.equals(otherInfo.tags);
+        }
+        return false;
+    }
 }

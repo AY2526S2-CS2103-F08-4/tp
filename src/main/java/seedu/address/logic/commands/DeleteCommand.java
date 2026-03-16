@@ -8,14 +8,15 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonInformation;
 
 /**
  * Deletes a person identified using it's displayed name from the address book.
@@ -39,16 +40,23 @@ public class DeleteCommand extends Command {
 
     public static final String MESSAGE_DELETE_PERSON_SUCCESS = "Deleted Person: %1$s";
 
-    private final Name targetName;
 
-    public DeleteCommand(Name targetName) {
-        this.targetName = targetName;
+    private final PersonInformation targetInfo;
+
+    /**
+     * Creates a {@code DeleteCommand} that targets contacts matching the provided information.
+     *
+     * @param targetInfo matching criteria with required name and optional fields
+     */
+    public DeleteCommand(PersonInformation targetInfo) {
+        requireNonNull(targetInfo);
+        this.targetInfo = targetInfo;
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        List<Person> listOfPersonToDelete = model.findPersonsByName(this.targetName);
+        List<Person> listOfPersonToDelete = model.findPersons(this.targetInfo);
 
         // Scenario : No matching name
         if (listOfPersonToDelete.isEmpty()) {
@@ -57,8 +65,9 @@ public class DeleteCommand extends Command {
 
         // Scenario : Multiple contact match name, duplicate handling, returns all matched contacts
         if (listOfPersonToDelete.size() > 1) {
-            Predicate<Person> showMatchingNames = person -> person.getName().equalsIgnoreCase(this.targetName);
-            model.updateFilteredPersonList(showMatchingNames);
+            Set<Person> matchingPersons = Set.copyOf(listOfPersonToDelete);
+            Predicate<Person> showMatchingPersons = matchingPersons::contains;
+            model.updateFilteredPersonList(showMatchingPersons);
             throw new CommandException(Messages.MESSAGE_MULTIPLE_MATCH);
         }
 
@@ -68,24 +77,17 @@ public class DeleteCommand extends Command {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
+    public boolean equals(Object obj) {
+        if (obj instanceof DeleteCommand otherDeleteCommand) {
+            return targetInfo.equals(otherDeleteCommand.targetInfo);
         }
-
-        // instanceof handles nulls
-        if (!(other instanceof DeleteCommand)) {
-            return false;
-        }
-
-        DeleteCommand otherDeleteCommand = (DeleteCommand) other;
-        return targetName.equals(otherDeleteCommand.targetName);
+        return false;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("targetName", targetName)
+                .add("targetName", targetInfo.name)
                 .toString();
     }
 }

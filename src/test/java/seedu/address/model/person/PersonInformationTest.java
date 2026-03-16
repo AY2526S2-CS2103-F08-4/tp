@@ -55,4 +55,40 @@ public class PersonInformationTest {
         tags.add(new Tag("colleagues"));
         assertFalse(info.tags.contains(new Tag("colleagues")));
     }
+
+    @Test
+    public void equals_sameValues_returnsTrue() {
+        PersonInformation first = new PersonInformation(
+                new Name("Delwyn"),
+                new Phone("91234567"),
+                new Email("delwyn@example.com"),
+                new Address("1, Clementi Ave 3"),
+                Set.of(new Tag("CS2103")));
+        PersonInformation second = new PersonInformation(
+                new Name("Delwyn"),
+                new Phone("91234567"),
+                new Email("delwyn@example.com"),
+                new Address("1, Clementi Ave 3"),
+                Set.of(new Tag("CS2103")));
+
+        assertTrue(first.equals(second));
+    }
+
+    @Test
+    public void equals_differentPhone_returnsFalse() {
+        PersonInformation first = new PersonInformation(
+                new Name("Delwyn"),
+                new Phone("91234567"),
+                new Email("delwyn@example.com"),
+                new Address("1, Clementi Ave 3"),
+                Set.of(new Tag("CS2103")));
+        PersonInformation second = new PersonInformation(
+                new Name("Delwyn"),
+                new Phone("97654321"),
+                new Email("delwyn@example.com"),
+                new Address("1, Clementi Ave 3"),
+                Set.of(new Tag("CS2103")));
+
+        assertFalse(first.equals(second));
+    }
 }

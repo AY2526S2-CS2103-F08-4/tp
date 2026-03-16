@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.model.person.Name;
+import seedu.address.model.person.PersonInformation;
 
 /**
  * As we are only doing white-box testing, our test cases do not cover path variations
@@ -23,7 +24,8 @@ public class DeleteCommandParserTest {
 
     @Test
     public void parse_validArgs_returnsDeleteCommand() {
-        assertParseSuccess(parser, " " + PREFIX_NAME + "John Doe", new DeleteCommand(new Name("John Doe")));
+        assertParseSuccess(parser, " " + PREFIX_NAME + "John Doe",
+                new DeleteCommand(new PersonInformation(new Name("John Doe"), null, null, null, null)));
     }
 
     @Test

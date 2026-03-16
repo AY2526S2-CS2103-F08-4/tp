@@ -201,18 +201,6 @@ public class ModelManager implements Model {
         allEvents.setAll(rebuiltEvents);
     }
 
-    // Assumption: valid inputs
-    @Override
-    public List<Person> findPersonsByName(Name nameToBeFind) {
-        List<Person> result = new ArrayList<>();
-        for (Person p : this.addressBook.getPersonList()) {
-            if (p.getName().equalsIgnoreCase(nameToBeFind)) {
-                result.add(p);
-            }
-        }
-        return result;
-    }
-
     /**
      * Returns a list of persons matching the provided {@link PersonInformation}.
      * Name is required and must match (case-insensitive). Optional fields are applied as additional

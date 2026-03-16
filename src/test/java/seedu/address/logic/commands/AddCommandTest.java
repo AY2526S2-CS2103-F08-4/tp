@@ -176,10 +176,6 @@ public class AddCommandTest {
             throw new AssertionError("This method should not be called.");
         }
 
-        public List<Person> findPersonsByName(Name name) {
-            throw new AssertionError("This method should not be called.");
-        }
-
         public List<Person> findPersons(PersonInformation info) {
             throw new AssertionError("This method should not be called.");
         }
