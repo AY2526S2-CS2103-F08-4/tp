@@ -1,7 +1,7 @@
 ---
-  layout: default.md
-  title: "Developer Guide"
-  pageNav: 3
+layout: default.md
+title: "Developer Guide"
+pageNav: 3
 ---
 
 # NAB Developer Guide
@@ -13,8 +13,12 @@
 
 ## **Acknowledgements**
 
+### **Original Source**
 * This project is based on the AddressBook-Level3 project created by the [SE-EDU initiative](https://se-education.org).
 * Libraries used: [JavaFX](https://openjfx.io/), [Jackson](https://github.com/FasterXML/jackson), [JUnit5](https://github.com/junit-team/junit5)
+
+### **AI-Assisted Work**
+* Google Gemini was used to generate the NAB logo for the application and the GUI window.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -344,10 +348,10 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
   * Steps 2a1 - 2a2 are repeated until a unique contact number is entered.
 <br> *Use case continues from step 3.*<br><br>
 * 2b. NAB detects invalid contact information.
-    * 2b1. NAB requests for the correct information.
-    * 2b2. User enters the correct contact information.
-    * Steps 2b1 - 2b2 are repeated until all contact information are valid entries.
-<br> *Use case continues from step 3.*
+  * 2b1. NAB requests for the correct information.
+  * 2b2. User enters the correct contact information.
+  * Steps 2b1 - 2b2 are repeated until all contact information are valid entries.
+  <br> *Use case continues from step 3.*
 </panel>
 
 <panel header="**UC2 - Find Contact**" type="light">
@@ -365,10 +369,10 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * 3a. NAB detects invalid characters in the provided keyword
     * 3a1. NAB returns an error message
-    <br> *Use case ends.*<br><br>
+      <br> *Use case ends.*<br><br>
 * 4a. NAB detects finds multiple possible contacts matching the keyword provided.
-  * 4a1. User provides more information to enrich the search.
-    <br> *Use case resumes from step 3.*<br><br>
+    * 4a1. User provides more information to enrich the search.
+      <br> *Use case resumes from step 3.*<br><br>
 * 4b. NAB finds no available contacts matching the keyword provided.
     * 4b1. NAB informs the user that no matches were found.
       <br> *Use case ends.*
@@ -433,16 +437,16 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * 1a. User requests to view events without specifying a contact name (i.e. view own events).
     * 1a1. NAB returns the user’s own event list.
-      <br> *Use case resumes from step 5.*<br><br>
+    <br> *Use case resumes from step 5.*<br><br>
 * 2a. NAB detects invalid characters in the provided name.
     * 2b1. NAB returns an error message.
-      <br> *Use case ends.*<br><br>
+    <br> *Use case ends.*<br><br>
 * 3a. NAB is unable to find a contact matching the provided name.
     * 3a1. NAB informs the user that contact does not exist.
-      <br> *Use case ends.*<br><br>
+    <br> *Use case ends.*<br><br>
 * 4a. NAB finds no events associated with the contact.
     * 4a1. NAB informs the user that there are no events associated with the contact.
-      <br> *Use case ends.*
+    <br> *Use case ends.*
 </panel>
 
 <panel header="**UC6 - Filter Contact by Tag**" type="light">
@@ -460,10 +464,10 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * 3a. NAB detects invalid characters in the provided tag
     * 3a1. NAB returns an error message.
-      <br> *Use case ends.*<br><br>
+    <br> *Use case ends.*<br><br>
 * 4a. NAB finds no available contacts matching the tag(s) provided.
     * 4a1. NAB informs the user that no matches were found.
-      <br> *Use case ends.*
+    <br> *Use case ends.*
 </panel>
 
 <panel header="**UC7 - Export Contacts**" type="light">
@@ -556,7 +560,9 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * **GUI**: Graphic User Interface is a graphics-based user interface that primarily uses mouse-clicks for user interaction (with the application), as opposed to CLI.
 * **Alias**: An alternate name a user can assign to a command that allows easier command execution while maintaining command functionality.
 * **CSV**: Comma Separated Values, a plain-text file format used to store tabular data. Specifically, this is to store the application data including contact names, phone numbers, tags, etc.
-* **Mainstream OS**: Windows, Linux, Unix, MacOS
+* **Mainstream OS**: Windows, Linux, Unix, macOS
+* **JavaScript Object Notation (JSON)**: A file format used to store and send data in a human-readable format.
+* **Java Archive (JAR)**: A file format used to compress multiple Java-related files into a single file for ease of distribution, deployment and execution.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -577,16 +583,16 @@ testers are expected to do more *exploratory* testing.
 
    1. Download the jar file and copy into an empty folder
 
-   1. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
+   2. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
 
-1. Saving window preferences
+2. Saving window preferences
 
    1. Resize the window to an optimum size. Move the window to a different location. Close the window.
 
-   1. Re-launch the app by double-clicking the jar file.<br>
-       Expected: The most recent window size and location is retained.
+   2. Re-launch the app by double-clicking the jar file.<br>
+      Expected: The most recent window size and location is retained.
 
-1. _{ more test cases …​ }_
+3. _{ more test cases …​ }_
 
 ### Deleting a person
 
@@ -594,16 +600,16 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: List all persons using the `list` command. Multiple persons in the list.
 
-   1. Test case: `delete 1`<br>
+   2. Test case: `delete 1`<br>
       Expected: First contact is deleted from the list. Details of the deleted contact shown in the status message. Timestamp in the status bar is updated.
 
-   1. Test case: `delete 0`<br>
+   2. Test case: `delete 0`<br>
       Expected: No person is deleted. Error details shown in the status message. Status bar remains the same.
 
-   1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
+   3. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
       Expected: Similar to previous.
 
-1. _{ more test cases …​ }_
+2. _{ more test cases …​ }_
 
 ### Saving data
 
@@ -611,5 +617,4 @@ testers are expected to do more *exploratory* testing.
 
    1. _{explain how to simulate a missing/corrupted file, and the expected behavior}_
 
-1. _{ more test cases …​ }_
-
+2. _{ more test cases …​ }_
