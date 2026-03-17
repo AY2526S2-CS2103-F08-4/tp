@@ -104,10 +104,10 @@ Edits an existing person in the address book.
 
 Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 
-* Edits the person at the specified `INDEX`. The index refers to the index number shown in the displayed person list. The index **must be a positive integer** 1, 2, 3, …​
+* Edits the person at the specified `INDEX`. The index refers to the index number shown in the displayed person list. The index **must be a positive integer** 1, 2, 3, ...
 * At least one of the optional fields must be provided.
 * Existing values will be updated to the input values.
-* When editing tags, the existing tags of the person will be removed i.e adding of tags is not cumulative.
+* When editing tags, the existing tags of the person will be removed i.e. adding of tags is not cumulative.
 * You can remove all the person’s tags by typing `t/` without
     specifying any tags after it.
 
@@ -128,19 +128,16 @@ search to a specific contact.
 </box>
 
 * The search is case-insensitive. e.g. `hans` will match `Hans`
-* The order of the keywords does not matter. e.g. `Hans Bo` will match `Bo Hans`
 * Only full words will be matched e.g. `Han` will not match `Hans`
-* Persons matching at least one keyword will be returned (i.e. `OR` search).
-  e.g. `Hans Bo` will return `Hans Gruber`, `Bo Yang`
+* Order of parameters does not matter.
 
 Examples:
-* `find John` returns `john` and `John Doe`
-* `find alex david` returns `Alex Yeoh`, `David Li`<br>
-  ![result for 'find alex david'](images/findAlexDavidResult.png)
+* `find n/John` returns contact(s) named `John`
+* `find n/John t/cs2106` returns contact(s) named `John` with tag `cs2106`
 
 ### Filtering persons by context : `filter`
 
-Finds persons with the given tag(s)
+Finds persons with the given tag(s).
 
 Format: `filter t/TAG[, TAG]...`
 
@@ -163,13 +160,13 @@ Format: `delete n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 deletion of the correct contact.
 </box>
 
-* Deletes the person with the specified `NAME`.
-* The `NAME` is case-insensitive. e.g `aLeX YeOH` will match `Alex Yeoh`
+* The `NAME` is case-insensitive. e.g. `aLeX YeOH` will match `Alex Yeoh`
 * Only full words will be matched e.g. `Alex Yeo` will not match `Alex Yeoh`
+* Order of parameters does not matter.
 
 Examples:
 * `delete n/Alex Yeoh` deletes the contact with a matching name.
-* Suppose there are multiple `Alex Yeoh`, a enriched search would be `delete n/Alex Yeoh t/cs2103 t/cs2105`
+* Suppose there are multiple `Alex Yeoh`, an enriched search would be `delete n/Alex Yeoh t/cs2103 t/cs2105`
 
 ### Clearing all entries : `clear`
 
