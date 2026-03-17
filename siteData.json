@@ -42,6 +42,8 @@
       "headings": {
         "nab-developer-guide": "NAB Developer Guide",
         "acknowledgements": "Acknowledgements",
+        "original-source": "Original Source",
+        "ai-assisted-work": "AI-Assisted Work",
         "setting-up-getting-started": "Setting up, getting started",
         "design": "Design",
         "architecture": "Architecture",
