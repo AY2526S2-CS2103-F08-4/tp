@@ -63,6 +63,7 @@ public class FindCommandTest {
         PersonInformation info = new PersonInformation(new Name("Nobody Here"), null, null, null, null);
         FindCommand command = new FindCommand(info);
         expectedModel.updateFilteredPersonList(p -> false);
+        expectedModel.updateFilteredEventList(event -> false);
 
         assertCommandSuccess(command, model, MESSAGE_NO_PERSONS, expectedModel);
         assertTrue(model.getFilteredPersonList().isEmpty());
@@ -81,6 +82,7 @@ public class FindCommandTest {
         PersonInformation info = new PersonInformation(new Name("Elle Meyer"), null, null, null, null);
         FindCommand command = new FindCommand(info);
         expectedModel.updateFilteredPersonList(p -> p.equals(target));
+        expectedModel.updateFilteredEventList(event -> target.getEvents().contains(event));
 
         assertCommandSuccess(command, model, MESSAGE_ONE_PERSON_LISTED_OVERVIEW, expectedModel);
         assertEquals(1, model.getFilteredPersonList().size());
@@ -97,6 +99,7 @@ public class FindCommandTest {
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.updateFilteredPersonList(p -> p.equals(firstMatch) || p.equals(secondMatch));
+        expectedModel.updateFilteredEventList(event -> false);
 
         FindCommand command = new FindCommand(new PersonInformation(new Name("Alex Tan"), null, null, null, null));
         String expectedMessage = String.format(MESSAGE_PERSONS_LISTED_OVERVIEW, 2);
@@ -119,6 +122,7 @@ public class FindCommandTest {
         PersonInformation info = new PersonInformation(new Name("Alex Tan"), new Phone("90002222"),
                 null, null, null);
         FindCommand command = new FindCommand(info);
+        expectedModel.updateFilteredEventList(event -> secondMatch.getEvents().contains(event));
 
         assertCommandSuccess(command, model, MESSAGE_ONE_PERSON_LISTED_OVERVIEW, expectedModel);
         assertEquals(1, model.getFilteredPersonList().size());
