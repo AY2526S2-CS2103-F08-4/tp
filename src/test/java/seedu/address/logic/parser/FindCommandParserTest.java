@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
@@ -41,6 +42,28 @@ public class FindCommandParserTest {
     public void parse_invalidOptionalField_throwsParseException() {
         assertParseFailure(parser, " " + PREFIX_NAME + "Alex Tan " + PREFIX_PHONE + "not-a-phone",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE));
+    }
+
+    @Test
+    public void parse_repeatedNonTagValue_failure() {
+        String validExpectedPersonString = " " + PREFIX_NAME + "Alex Tan"
+                + " " + PREFIX_PHONE + "98765432"
+                + " " + PREFIX_EMAIL + "alex@example.com"
+                + " " + PREFIX_ADDRESS + "Block 123, NUS Street 1"
+                + " " + PREFIX_TAG + "CS2103";
+
+        // multiple names
+        assertParseFailure(parser, " " + PREFIX_NAME + "Alice" + validExpectedPersonString,
+                Messages.getErrorMessageForDuplicatePrefixes(PREFIX_NAME));
+
+        // multiple fields repeated
+        assertParseFailure(parser,
+                validExpectedPersonString
+                        + " " + PREFIX_PHONE + "91234567"
+                        + " " + PREFIX_EMAIL + "alex2@example.com"
+                        + " " + PREFIX_NAME + "Alex2"
+                        + " " + PREFIX_ADDRESS + "Block 456, NUS Street 2",
+                Messages.getErrorMessageForDuplicatePrefixes(PREFIX_NAME, PREFIX_ADDRESS, PREFIX_EMAIL, PREFIX_PHONE));
     }
 
     @Test

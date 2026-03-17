@@ -1,13 +1,17 @@
 package seedu.address.logic.parser;
 
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.PersonInformation;
@@ -46,5 +50,27 @@ public class DeleteCommandParserTest {
     public void parse_invalidPhone_throwsParseException() {
         assertParseFailure(parser, " " + PREFIX_NAME + "John Doe " + PREFIX_PHONE + "abc",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
+    }
+
+    @Test
+    public void parse_repeatedNonTagValue_failure() {
+        String validExpectedPersonString = " " + PREFIX_NAME + "John Doe"
+                + " " + PREFIX_PHONE + "98765432"
+                + " " + PREFIX_EMAIL + "john@example.com"
+                + " " + PREFIX_ADDRESS + "Block 123, NUS Street 1"
+                + " " + PREFIX_TAG + "CS2103";
+
+        // multiple names
+        assertParseFailure(parser, " " + PREFIX_NAME + "Jane Doe" + validExpectedPersonString,
+                Messages.getErrorMessageForDuplicatePrefixes(PREFIX_NAME));
+
+        // multiple fields repeated
+        assertParseFailure(parser,
+                validExpectedPersonString
+                        + " " + PREFIX_PHONE + "91234567"
+                        + " " + PREFIX_EMAIL + "john2@example.com"
+                        + " " + PREFIX_NAME + "John2"
+                        + " " + PREFIX_ADDRESS + "Block 456, NUS Street 2",
+                Messages.getErrorMessageForDuplicatePrefixes(PREFIX_NAME, PREFIX_ADDRESS, PREFIX_EMAIL, PREFIX_PHONE));
     }
 }
