@@ -54,6 +54,8 @@ public class DeleteEventCommand extends Command {
 
         // Case 1: No matching contact
         if (matches.isEmpty()) {
+            model.updateFilteredPersonList(p -> false);
+            model.updateFilteredEventList(event -> false);
             throw new CommandException(Messages.MESSAGE_NO_MATCH);
         }
 
