@@ -43,7 +43,7 @@ public class AddEventParser implements Parser<AddEventCommand> {
         requireNonNull(args);
 
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args,
-                PREFIX_DESCRIPTION, PREFIX_START, PREFIX_END, PREFIX_TO,
+                PREFIX_DESCRIPTION, PREFIX_START, PREFIX_END, PREFIX_TO, PREFIX_EMAIL,
                 PREFIX_NAME, PREFIX_PHONE, PREFIX_ADDRESS, PREFIX_TAG);
 
         if (!arePrefixesPresent(argMultimap, PREFIX_DESCRIPTION, PREFIX_START, PREFIX_END, PREFIX_TO)

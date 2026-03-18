@@ -60,11 +60,15 @@ public class AddEventParserTest {
     }
 
     @Test
-    public void parse_withOptionalEmail_failure() {
-        assertParseFailure(parser,
+    public void parse_withOptionalEmail_success() {
+        PersonInformation expectedInfo = new PersonInformation(new Name(VALID_NAME), null, null, null, null);
+        Event expectedEvent = new Event("Complete feature list", VALID_START, VALID_END);
+        AddEventCommand expectedCommand = new AddEventCommand(expectedInfo, expectedEvent);
+
+        assertParseSuccess(parser,
                 " d/Complete feature list start/" + VALID_START + " end/" + VALID_END
                         + " to/" + VALID_NAME + " e/amy@example.com",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddEventCommand.MESSAGE_USAGE));
+                expectedCommand);
     }
 
     @Test
