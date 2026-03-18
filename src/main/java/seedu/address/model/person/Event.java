@@ -36,6 +36,21 @@ public class Event {
         return this.endTime;
     }
 
+    /**
+     * Returns true if both events have the same start and end times.
+     * This defines a weaker notion of equality between events but is
+     * sufficient in uniquely distinguishing events.
+     */
+    public boolean isSameEvent(Event otherEvent) {
+        if (otherEvent == this) {
+            return true;
+        }
+
+        return otherEvent != null
+            && otherEvent.getStartTime().equals(this.getStartTime())
+            && otherEvent.getEndTime().equals(this.getEndTime());
+    }
+
     @Override
     public String toString() {
         return String.format("%s from %s to %s.", this.description, this.startTime, this.endTime);

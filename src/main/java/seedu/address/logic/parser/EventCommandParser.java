@@ -22,10 +22,9 @@ public class EventCommandParser implements Parser<Command> {
         String[] parts = trimmedArgs.split("\\s+", 2);
         String subcommand = parts[0];
 
-        // need to
         switch (subcommand) {
         case AddEventCommand.COMMAND_WORD:
-            return new AddEventParser().parse(args);
+            return new AddEventParser().parse(parts.length > 1 ? " " + parts[1] : "");
         case FindEventCommand.COMMAND_WORD:
             return new FindEventParser().parse(parts.length > 1 ? " " + parts[1] : "");
         default:

@@ -2,11 +2,15 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
+import java.util.Set;
+
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Event;
-import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonInformation;
 import seedu.address.model.person.exceptions.DuplicateEventException;
 
 /**
@@ -18,8 +22,9 @@ public class AddEventCommand extends Command {
 
     public static final String MESSAGE_USAGE = "event " + COMMAND_WORD
             + ": Allows the user to add an event and tag it to a specific contact\n"
-            + "Command Format: event add <l/LABEL> [d/DESCRIPTION] <s/START> <e/END> <to/NAME>\n"
-            + "Example Command: event " + COMMAND_WORD + " CS2103 Meeting d/Complete feature list "
+            + "Command Format: event add <l/LABEL> [d/DESCRIPTION] <s/START> <e/END> <to/NAME> "
+            + "[p/PHONE] [e/EMAIL] [a/ADDRESS]...\n"
+            + "Example Command: event " + COMMAND_WORD + " l/CS2103 Meeting d/Complete feature list "
             + "s/21-02-26 1100 e/21-02-26 1500 to/yikleong";
 
     public static final String MESSAGE_SUCCESS = "Added event for %1$s: %2$s";
@@ -30,26 +35,36 @@ public class AddEventCommand extends Command {
             "This contact already has this event: %1$s";
 
     private final Event toAdd;
-    private final Name contact;
+    private final PersonInformation targetInfo;
 
     /**
      * Creates an AddEventCommand to add the specified {@code Event} to a person at {@code index}.
      */
-    public AddEventCommand(String contact, Event event) {
+    public AddEventCommand(PersonInformation targetInfo, Event event) {
         requireNonNull(event);
+        requireNonNull(targetInfo);
         this.toAdd = event;
-        this.contact = new Name(contact);
+        this.targetInfo = targetInfo;
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        // Assumptions: Unique names
-        Person personToEdit = model.findPersonByName(this.contact);
-        if (personToEdit == null) {
-            throw new CommandException(String.format(MESSAGE_CONTACT_NOT_FOUND, this.contact.fullName));
+        List<Person> matches = model.findPersons(targetInfo);
+
+        if (matches.isEmpty()) {
+            throw new CommandException(Messages.MESSAGE_NO_MATCH);
         }
+
+        if (matches.size() > 1) {
+            Set<Person> matchingPersons = Set.copyOf(matches);
+            model.updateFilteredPersonList(matchingPersons::contains);
+            model.updateFilteredEventList(event -> false);
+            throw new CommandException(Messages.MESSAGE_MULTIPLE_MATCH);
+        }
+
+        Person personToEdit = matches.get(0);
 
         Person editedPerson;
         try {
@@ -59,8 +74,9 @@ public class AddEventCommand extends Command {
         }
 
         model.setPerson(personToEdit, editedPerson);
-        return new CommandResult(String.format(MESSAGE_SUCCESS,
-                this.contact.fullName, toAdd.toString()));
+        model.updateFilteredPersonList(p -> p.equals(editedPerson));
+        model.updateFilteredEventList(event -> editedPerson.getEvents().contains(event));
+        return new CommandResult(String.format(MESSAGE_SUCCESS, personToEdit.getName(), toAdd));
     }
 
 
@@ -78,7 +94,6 @@ public class AddEventCommand extends Command {
         return editedPerson;
     }
 
-    // TODO: Implementation the equals() by checking the tagged person and the newly added event
     @Override
     public boolean equals(Object other) {
         if (other == this) {
@@ -90,7 +105,7 @@ public class AddEventCommand extends Command {
         }
 
         AddEventCommand otherCommand = (AddEventCommand) other;
-        return toAdd.equals(otherCommand.toAdd);
+        return toAdd.equals(otherCommand.toAdd) && targetInfo.equals(otherCommand.targetInfo);
     }
 
     @Override

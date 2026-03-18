@@ -13,14 +13,13 @@ import seedu.address.model.person.exceptions.EventNotFoundException;
 
 /**
  * A list of events that enforces uniqueness between its elements and does not allow nulls.
- * An event is considered unique by comparing using {@code Event#equals(Object)}. As such, adding and updating of
- * events uses Event#equals(Object) for equality so as to ensure that the event being added or updated is
- * unique in terms of identity in the UniqueEventList. However, the removal of an event uses Event#equals(Object) so
- * as to ensure that the event with exactly the same fields will be removed.
+ * An event is considered unique by comparing using {@code Event#isSameEvent(Event)}, which checks
+ * start and end datetime only. Adding and updating of events uses Event#isSameEvent(Event) to ensure
+ * no two events occupy the same time slot. Removal uses Event#equals(Object) for exact-match removal.
  *
  * Supports a minimal set of list operations.
  *
- * @see Event#equals(Object)
+ * @see Event#isSameEvent(Event)
  */
 public class UniqueEventList implements Iterable<Event> {
 
@@ -33,7 +32,7 @@ public class UniqueEventList implements Iterable<Event> {
      */
     public boolean contains(Event toCheck) {
         requireNonNull(toCheck);
-        return internalList.stream().anyMatch(toCheck::equals);
+        return internalList.stream().anyMatch(toCheck::isSameEvent);
     }
 
     /**
@@ -61,7 +60,7 @@ public class UniqueEventList implements Iterable<Event> {
             throw new EventNotFoundException();
         }
 
-        if (!target.equals(editedEvent) && contains(editedEvent)) {
+        if (!target.isSameEvent(editedEvent) && contains(editedEvent)) {
             throw new DuplicateEventException();
         }
 
@@ -139,7 +138,7 @@ public class UniqueEventList implements Iterable<Event> {
     private boolean eventsAreUnique(List<Event> events) {
         for (int i = 0; i < events.size() - 1; i++) {
             for (int j = i + 1; j < events.size(); j++) {
-                if (events.get(i).equals(events.get(j))) {
+                if (events.get(i).isSameEvent(events.get(j))) {
                     return false;
                 }
             }
