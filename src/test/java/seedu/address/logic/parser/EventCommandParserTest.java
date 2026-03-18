@@ -4,15 +4,14 @@ import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddEventCommand;
 import seedu.address.logic.commands.FindEventCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.model.person.Event;
-import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.person.Name;
+import seedu.address.model.person.PersonInformation;
 
 public class EventCommandParserTest {
 
@@ -45,7 +44,7 @@ public class EventCommandParserTest {
     @Test
     public void parse_viewSubcommand_success() {
         FindEventCommand expectedCommand =
-                new FindEventCommand(new NameContainsKeywordsPredicate(Arrays.asList("Amy", "Bee")));
+                new FindEventCommand(new PersonInformation(new Name("Amy Bee"), null, null, null, null));
 
         assertParseSuccess(parser, "view n/Amy Bee", expectedCommand);
     }
