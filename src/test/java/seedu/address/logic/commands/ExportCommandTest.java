@@ -1,28 +1,41 @@
 package seedu.address.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
+import static seedu.address.commons.util.CsvUtil.splitCsvLine;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
+import static seedu.address.logic.commands.ImportCommand.FILENAME_SUFFIX;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.Person;
+import seedu.address.testutil.PersonBuilder;
 
 public class ExportCommandTest {
     private Model model;
     private Model expectedModel;
     private final String testFileName = "test_export";
+
+    @TempDir
+    public Path testFolder;
+
+    private void createCsvFile(String filename, String content) throws Exception {
+        Path filePath = testFolder.resolve(filename + FILENAME_SUFFIX);
+        Files.writeString(filePath, content, StandardCharsets.UTF_8);
+    }
 
     @BeforeEach
     public void setUp() {
@@ -59,38 +72,60 @@ public class ExportCommandTest {
     }
 
     @Test
-    public void execute_csvContentIntegrity_success() throws Exception {
-        ExportCommand command = new ExportCommand("all", testFileName);
-        command.execute(model);
+    public void splitCsvLine_complexAddress_integrityMaintained() {
+        String line = "David,91234567,,\"Blk 123, Jurong West, #01-01\",friends,";
+        String[] columns = splitCsvLine(line);
 
-        Path path = model.getAddressBookFilePath().getParent().resolve(testFileName + ".csv");
-        List<String> lines = Files.readAllLines(path);
+        // Check the integrity of the total number of columns
+        assertEquals(6, columns.length);
 
-        String header = lines.get(0);
-        assertEquals("Name,Phone,Email,Address,Tags,Events", header);
-        assertEquals(5, countCommas(header), "Header should have exactly 5 commas");
+        // Check the integrity of the address column
+        assertEquals("\"Blk 123, Jurong West, #01-01\"", columns[3]);
 
-        for (int i = 1; i < lines.size(); i++) {
-            String line = lines.get(i);
-            assertEquals(5, countCommas(line), "Row " + i + " has shifted columns!");
-        }
-    }
-
-    private long countCommas(String s) {
-        return s.chars().filter(ch -> ch == ',').count();
+        // Check the integrity of the empty tag column
+        assertEquals("", columns[2]);
     }
 
     @Test
-    public void execute_ioException_throwsCommandException() throws IOException {
-        ExportCommand commandWithInvalidPath = new ExportCommand("all", "testFile") {
+    public void execute_exportImport_dataIntegrityMaintained() throws Exception {
+        Person originalPerson = new PersonBuilder()
+                .withName("David Ng")
+                .withPhone("91234567")
+                .withEmail("david@u.nus.edu")
+                .withAddress("Blk 123, Clementi Ave 2, #10-10")
+                .withTags("friends", "nus")
+                .build();
+
+        Model model = new ModelManager();
+        model.addPerson(originalPerson);
+
+        String filename = "exportImport";
+        Path sharedFilePath = testFolder.resolve(filename + FILENAME_SUFFIX);
+
+        ExportCommand exportCommand = new ExportCommand("all", filename) {
             @Override
             protected Path getExportPath(Model model) {
-                return Path.of("invalid\0path");
+                return sharedFilePath;
             }
         };
+        exportCommand.execute(model);
 
-        String expectedMessage = String.format(ExportCommand.MESSAGE_FAILURE, "testFile.csv");
-        assertCommandFailure(commandWithInvalidPath, model, expectedMessage);
+        model.setAddressBook(new AddressBook());
+        assertFalse(model.hasPerson(originalPerson));
+
+        ImportCommand importCommand = new ImportCommand("add", filename) {
+            @Override
+            protected Path getImportPath(Model model) {
+                return sharedFilePath;
+            }
+        };
+        importCommand.execute(model);
+
+        assertTrue(model.hasPerson(originalPerson), "Test person was not reconstructed correctly.");
+
+        Person importedPerson = model.getFilteredPersonList().get(0);
+        assertEquals(originalPerson.getAddress(), importedPerson.getAddress(),
+                "Address with commas failed round-trip integrity!");
     }
 
     @Test
