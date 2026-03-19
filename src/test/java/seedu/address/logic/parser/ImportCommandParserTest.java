@@ -4,13 +4,11 @@ import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 import static seedu.address.logic.parser.ExportCommandParser.MESSAGE_EMPTY_FILENAME;
-import static seedu.address.logic.parser.ExportCommandParser.MESSAGE_INVALID_EXPORT_TYPE;
 import static seedu.address.logic.parser.ExportCommandParser.MESSAGE_INVALID_FILENAME;
 import static seedu.address.logic.parser.ImportCommandParser.MESSAGE_INVALID_IMPORT_TYPE;
 
 import org.junit.jupiter.api.Test;
 
-import seedu.address.logic.commands.ExportCommand;
 import seedu.address.logic.commands.ImportCommand;
 
 public class ImportCommandParserTest {
