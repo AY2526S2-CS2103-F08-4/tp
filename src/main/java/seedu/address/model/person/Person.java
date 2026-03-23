@@ -27,7 +27,9 @@ public class Person {
     // Optional Data fields
     private final Optional<Email> email;
     private final Optional<Address> address;
+    private final Optional<Photo> photo;
     private final Set<Tag> tags = new HashSet<>();
+
 
     // Event fields
     private final UniqueEventList events;
@@ -35,14 +37,16 @@ public class Person {
     /**
      * Name and phone are compulsory. Email and address are optional.
      */
-    public Person(Name name, Phone phone, Optional<Email> email, Optional<Address> address, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, tags);
+    public Person(Name name, Phone phone, Optional<Email> email, Optional<Address> address, Set<Tag> tags,
+                  Optional<Photo> photo) {
+        requireAllNonNull(name, phone, email, address, tags, photo);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.tags.addAll(tags);
         this.events = new UniqueEventList();
+        this.photo = Optional.of(photo.orElse(new Photo("")));
     }
 
     /**
@@ -50,13 +54,14 @@ public class Person {
      * UniqueEventList is compulsory
      */
     public Person(Name name, Phone phone, Optional<Email> email, Optional<Address> address,
-        Set<Tag> tags, UniqueEventList events) {
+        Set<Tag> tags, UniqueEventList events, Optional<Photo> photo) {
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.tags.addAll(tags);
         this.events = events;
+        this.photo = Optional.of(photo.orElse(new Photo("")));
     }
 
     public Name getName() {
@@ -74,6 +79,8 @@ public class Person {
     public Optional<Address> getAddress() {
         return address;
     }
+
+    public Optional<Photo> getPhoto() {return photo;}
 
     /**
      * Returns an immutable tag set, which throws {@code UnsupportedOperationException}
