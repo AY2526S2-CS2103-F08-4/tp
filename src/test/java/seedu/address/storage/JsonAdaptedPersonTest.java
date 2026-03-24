@@ -161,6 +161,6 @@ public class JsonAdaptedPersonTest {
                 VALID_TAGS,
                 VALID_EVENTS);
 
-        assertEquals(Photo.DEFAULT_PHOTO_PATH, person.toModelType().getPhoto().get().value);
+        assertEquals(Optional.empty(), person.toModelType().getPhoto());
     }
 }

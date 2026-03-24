@@ -44,7 +44,7 @@ public class PersonBuilder {
         address = Optional.of(new Address(DEFAULT_ADDRESS));
         tags = new HashSet<>();
         events = new ArrayList<>();
-        photo = Optional.of(new Photo());
+        photo = Optional.empty();
     }
 
     /**

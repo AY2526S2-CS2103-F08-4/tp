@@ -46,7 +46,7 @@ public class Person {
         this.address = address;
         this.tags.addAll(tags);
         this.events = new UniqueEventList();
-        this.photo = Optional.of(photo.orElse(new Photo()));
+        this.photo = photo;
     }
 
     /**
@@ -61,7 +61,7 @@ public class Person {
         this.address = address;
         this.tags.addAll(tags);
         this.events = events;
-        this.photo = Optional.of(photo.orElse(new Photo()));
+        this.photo = photo;
     }
 
     public Name getName() {
@@ -145,13 +145,14 @@ public class Person {
                 && email.equals(otherPerson.email)
                 && address.equals(otherPerson.address)
                 && tags.equals(otherPerson.tags)
-                && events.equals(otherPerson.events);
+                && events.equals(otherPerson.events)
+                && photo.equals(otherPerson.photo);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, tags);
+        return Objects.hash(name, phone, email, address, tags, photo);
     }
 
     @Override
@@ -163,6 +164,7 @@ public class Person {
                 .add("address", address.map(Address::toString).orElse(""))
                 .add("tags", tags)
                 .add("events", events)
+                .add("photo", photo.isPresent() ? photo.get().getPath() : "")
                 .toString();
     }
 

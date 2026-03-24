@@ -12,7 +12,6 @@ import seedu.address.commons.util.PhotoStorageUtil;
 public class Photo {
 
     public static final String MESSAGE_CONSTRAINTS = "Photos should only be in .png, .jpg, .jpeg format";
-    public static final String DEFAULT_PHOTO_PATH = "/images/pepe-default.png";
     /**
      * Path to photo must end with the extension any of the extensions .png, .jpg or .jpeg
      */
@@ -28,22 +27,9 @@ public class Photo {
     public Photo(String path) {
         requireNonNull(path);
 
-        // Check if provided file exists
-        if (path.trim().isEmpty() || path.equals(DEFAULT_PHOTO_PATH)) {
-            this.value = DEFAULT_PHOTO_PATH;
-            return;
-        }
-
         // Check Extension is .png, .jpg or .jpeg
         checkArgument(isValidPhoto(path), MESSAGE_CONSTRAINTS);
         this.value = path;
-    }
-
-    /**
-     * Constructs an {@code Photo} that points to the default image.
-     */
-    public Photo() {
-        this.value = DEFAULT_PHOTO_PATH;
     }
 
     /**
@@ -51,13 +37,6 @@ public class Photo {
      */
     public static boolean isValidPhoto(String test) {
         return test.matches(VALIDATION_REGEX);
-    }
-
-    /**
-     * Returns true if the photo is the default placeholder.
-     */
-    public boolean isDefault() {
-        return this.value.equals(DEFAULT_PHOTO_PATH);
     }
 
     /**

@@ -11,7 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Circle;
 import seedu.address.model.person.Person;
-import seedu.address.model.person.Photo;
 
 /**
  * An UI component that displays information of a {@code Person}.
@@ -19,6 +18,7 @@ import seedu.address.model.person.Photo;
 public class PersonCard extends UiPart<Region> {
 
     private static final String FXML = "PersonListCard.fxml";
+    private static final String DEFAULT_IMAGE = "/images/pepe-default.png";
 
     /**
      * Note: Certain keywords such as "location" and "resources" are reserved keywords in JavaFX.
@@ -71,17 +71,16 @@ public class PersonCard extends UiPart<Region> {
      * @param person is the Person we need to extract the Photo object from to display on the card.
      */
     public void handlePhoto(Person person) {
-        Photo photoObject = person.getPhoto().orElse(new Photo());
         Image profilePicture = null;
 
         try {
-            if (photoObject.isDefault()) {
-                java.io.InputStream stream = this.getClass().getResourceAsStream(photoObject.getPath());
+            if (person.getPhoto().isEmpty()) {
+                java.io.InputStream stream = this.getClass().getResourceAsStream(DEFAULT_IMAGE);
                 if (stream != null) {
                     profilePicture = new Image(stream);
                 }
             } else {
-                String fileUri = Paths.get(photoObject.getPath()).toUri().toString();
+                String fileUri = Paths.get(person.getPhoto().get().getPath()).toUri().toString();
                 profilePicture = new Image(fileUri);
             }
         } catch (Exception e) {

@@ -67,13 +67,6 @@ public class PhotoStorageUtilTest {
     }
 
     @Test
-    public void copyPhotoToDirectory_defaultPhoto_returnsSamePhoto() throws IOException {
-        Photo defaultPhoto = new Photo();
-        Photo result = PhotoStorageUtil.copyPhotoToDirectory(defaultPhoto);
-        assertEquals(defaultPhoto.getPath(), result.getPath());
-    }
-
-    @Test
     public void deletePhoto_validUserPhoto_success() throws IOException {
         Path sourceFile = testFolder.resolve("mock-uuid-1234.jpg");
         Files.createFile(sourceFile);
@@ -84,6 +77,45 @@ public class PhotoStorageUtilTest {
 
         PhotoStorageUtil.deletePhoto(imageFile);
         assertFalse(Files.exists(sourceFile));
+    }
+
+    @Test
+    public void deletePhoto_validUserPhoto_throwIoException() throws IOException {
+        // Create a folder that resembles a .jpg
+        Path dummyDir = testFolder.resolve("to_be_deleted.jpg");
+        Files.createDirectory(dummyDir);
+
+        // Put a dummy file within this folder, OS will fail to delete this
+        Files.createFile(dummyDir.resolve("dummy.jpg"));
+        Photo dummyPhoto = new Photo(dummyDir.toString().replace("\\", "/"));
+
+        assertTrue(dummyPhoto.isSavedLocally());
+        assertTrue(Files.exists(dummyDir));
+
+        assertThrows(IOException.class, () -> PhotoStorageUtil.deletePhoto(dummyPhoto));
+    }
+
+    @Test
+    public void deletePhoto_userPhotoNotSavedLocally_throwIoException() throws IOException {
+        Path dummyFile = userFolder.resolve("do_not_delete_me.jpg");
+        Files.createDirectory(dummyFile);
+        Photo dummyPhoto = new Photo(dummyFile.toString().replace("\\", "/"));
+
+        assertFalse(dummyPhoto.isSavedLocally());
+        assertTrue(Files.exists(dummyFile));
+
+        PhotoStorageUtil.deletePhoto(dummyPhoto);
+        assertTrue(Files.exists(dummyFile));
+    }
+
+    @Test
+    public void copyPhotoToDirectory_alreadySavedPhoto_returnsSamePhoto() throws IOException {
+        Photo localPhoto = new Photo(testFolder.resolve("existing-uuid.jpg")
+                        .toString().replace("\\", "/"));
+        Photo result = PhotoStorageUtil.copyPhotoToDirectory(localPhoto);
+
+        // 3. Assert that it bypassed the copy logic and returned the exact same object
+        assertEquals(localPhoto.getPath(), result.getPath());
     }
 
     @Test
@@ -104,5 +136,25 @@ public class PhotoStorageUtilTest {
         assertFalse(Files.exists(photoOne));
         assertFalse(Files.exists(photoTwo));
         assertFalse(Files.exists(photoThree));
+    }
+
+    @Test
+    public void clearDirectory_deletionFail_throwIOException() throws IOException {
+        Path dummyFile = testFolder.resolve("cannot_delete_me.jpg");
+        Files.createFile(dummyFile);
+
+        // Temporarily change permissions
+        testFolder.toFile().setReadable(false);
+        testFolder.toFile().setWritable(false);
+        testFolder.toFile().setExecutable(false);
+
+        // Temporarily open a stream to file, so cannot delete
+        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(dummyFile.toFile())) {
+            assertThrows(IOException.class, () -> PhotoStorageUtil.clearDirectory());
+        } finally {
+            testFolder.toFile().setReadable(true);
+            testFolder.toFile().setWritable(true);
+            testFolder.toFile().setExecutable(true);
+        }
     }
 }

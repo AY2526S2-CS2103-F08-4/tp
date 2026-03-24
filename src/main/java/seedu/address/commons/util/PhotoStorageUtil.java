@@ -35,7 +35,7 @@ public class PhotoStorageUtil {
      */
     public static Photo copyPhotoToDirectory(Photo photo) throws IOException {
         // Check if the copying operation is needed
-        if (photo.isDefault() || photo.isSavedLocally()) {
+        if (photo.isSavedLocally()) {
             return photo;
         }
 
@@ -78,8 +78,8 @@ public class PhotoStorageUtil {
      * @param photo is the photo object to be deleted.
      */
     public static void deletePhoto(Photo photo) throws IOException {
-        // Do not delete default photos and photos outside /data/images
-        if (photo.isDefault() || !photo.isSavedLocally()) {
+        // Do not delete photos outside /data/images
+        if (!photo.isSavedLocally()) {
             return;
         }
 
@@ -105,9 +105,14 @@ public class PhotoStorageUtil {
 
         try (java.util.stream.Stream<Path> paths = Files.walk(toBeDeleted)) {
             paths.sorted(java.util.Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(java.io.File::delete);
-        } catch (IOException e) {
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            throw new java.io.UncheckedIOException(e);
+                        }
+                    });
+        } catch (java.io.UncheckedIOException | IOException e) {
             throw new IOException(Messages.MESSAGE_DELETE_PHOTO_FAIL + e.getMessage());
         }
     }

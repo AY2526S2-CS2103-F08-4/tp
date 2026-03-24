@@ -126,8 +126,7 @@ class JsonAdaptedPerson {
 
         final Optional<Photo> modelPhoto;
         if (photo == null) {
-            // Scenario: No photo supplied, default to pepe
-            modelPhoto = Optional.of(new Photo());
+            modelPhoto = Optional.empty();
         } else if (!Photo.isValidPhoto(photo)) {
             // Scenario: Invalid format,
             modelPhoto = Optional.of(new Photo("data/images/corrupted_data.jpg"));

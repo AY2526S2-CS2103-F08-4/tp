@@ -105,7 +105,8 @@ public class PersonTest {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail().map(email -> email.toString()).orElse("")
                 + ", address=" + ALICE.getAddress().map(addr -> addr.toString()).orElse("")
-                + ", tags=" + ALICE.getTags() + ", events=" + ALICE.getEvents() + "}";
+                + ", tags=" + ALICE.getTags() + ", events=" + ALICE.getEvents()
+                + ", photo=" + ALICE.getPhoto().map(Object::toString).orElse("") + "}";
         assertEquals(expected, ALICE.toString());
     }
 }
