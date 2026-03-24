@@ -13,7 +13,7 @@ NAB is a **desktop app for NUS students to manage contacts across multiple modul
 
 --------------------------------------------------------------------------------------------------------------------
 
-## Quick start
+## Quick Start
 
 1. Ensure you have Java `17` or above installed in your Computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
@@ -27,7 +27,7 @@ NAB is a **desktop app for NUS students to manage contacts across multiple modul
    ![Ui](images/Ui.png)
 
 1. Type the command in the command box and press Enter to execute it. <br>e.g. typing **`help`** and pressing Enter will open the help window.<br>
-   
+
     Some example commands you can try:
 
    * `list` : Lists all contacts.
