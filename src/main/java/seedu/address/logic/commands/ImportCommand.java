@@ -26,6 +26,7 @@ import seedu.address.model.person.Event;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Photo;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -192,7 +193,7 @@ public class ImportCommand extends Command {
      * @throws IllegalArgumentException If the column count is less than the expected format (6).
      */
     private void validateColumnCount(String[] columns) {
-        if (columns.length < 6) {
+        if (columns.length < 7) {
             throw new IllegalArgumentException(MESSAGE_INVALID_COLUMNS_CSV);
         }
     }
@@ -211,7 +212,10 @@ public class ImportCommand extends Command {
         Optional<Address> address = Optional.of(new Address(unwrapValue(columns[3])));
         Set<Tag> tags = parseTags(unwrapValue(columns[4]));
 
-        return new Person(name, phone, email, address, tags);
+        String photoStr = unwrapValue(columns[6]);
+        Optional<Photo> photo = photoStr.isEmpty() ? Optional.empty() : Optional.of(new Photo(photoStr));
+
+        return new Person(name, phone, email, address, tags, photo);
     }
 
     /**

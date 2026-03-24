@@ -94,6 +94,7 @@ public class ExportCommandTest {
                 .withEmail("david@u.nus.edu")
                 .withAddress("Blk 123, Clementi Ave 2, #10-10")
                 .withTags("friends", "nus")
+                .withoutPhoto()
                 .build();
 
         Model model = new ModelManager();
