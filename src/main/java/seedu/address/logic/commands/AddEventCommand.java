@@ -82,7 +82,7 @@ public class AddEventCommand extends Command {
 
     private static Person createPersonWithEvent(Person personToEdit, Event eventToAdd) {
         Person editedPerson = new Person(personToEdit.getName(), personToEdit.getPhone(), personToEdit.getEmail(),
-                personToEdit.getAddress(), personToEdit.getTags());
+                personToEdit.getAddress(), personToEdit.getTags(), personToEdit.getPhoto());
 
         // Adding back the events from old person to new person
         for (Event existingEvent : personToEdit.getEvents()) {

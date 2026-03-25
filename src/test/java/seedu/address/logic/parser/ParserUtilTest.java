@@ -18,6 +18,7 @@ import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Photo;
 import seedu.address.model.tag.Tag;
 
 public class ParserUtilTest {
@@ -26,6 +27,7 @@ public class ParserUtilTest {
     private static final String INVALID_ADDRESS = " ";
     private static final String INVALID_EMAIL = "example.com";
     private static final String INVALID_TAG = "#friend";
+    private static final String INVALID_PHOTO = "virus.exe";
 
     private static final String VALID_NAME = "Rachel Walker";
     private static final String VALID_PHONE = "1234567";
@@ -33,6 +35,7 @@ public class ParserUtilTest {
     private static final String VALID_EMAIL = "rachel@example.com";
     private static final String VALID_TAG_1 = "friend";
     private static final String VALID_TAG_2 = "neighbour";
+    private static final String VALID_PHOTO = "valid.jpg";
 
     private static final String WHITESPACE = " \t\r\n";
 
@@ -193,4 +196,28 @@ public class ParserUtilTest {
 
         assertEquals(expectedTagSet, actualTagSet);
     }
+
+    @Test
+    public void parsePhoto_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parsePhoto((String) null));
+    }
+
+    @Test
+    public void parsePhoto_invalidValue_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parsePhoto(INVALID_PHOTO));
+    }
+
+    @Test
+    public void parsePhoto_validValueWithoutWhitespace_returnsPhoto() throws Exception {
+        Photo expectedPhoto = new Photo(VALID_PHOTO);
+        assertEquals(expectedPhoto, ParserUtil.parsePhoto(VALID_PHOTO));
+    }
+
+    @Test
+    public void parsePhoto_validValueWithWhitespace_returnsTrimmedPhoto() throws Exception {
+        String photoWithWhitespace = WHITESPACE + VALID_PHOTO + WHITESPACE;
+        Photo expectedPhoto = new Photo(VALID_PHOTO);
+        assertEquals(expectedPhoto, ParserUtil.parsePhoto(photoWithWhitespace));
+    }
+
 }

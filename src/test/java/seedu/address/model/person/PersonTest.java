@@ -7,6 +7,7 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_ADDRESS_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_EMAIL_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_NAME_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_PHONE_BOB;
+import static seedu.address.logic.commands.CommandTestUtil.VALID_PHOTO;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
@@ -42,6 +43,7 @@ public class PersonTest {
         // different phone, all other attributes same -> returns false
         editedAlice = new PersonBuilder(ALICE).withPhone(VALID_PHONE_BOB).build();
         assertFalse(ALICE.isSamePerson(editedAlice));
+
     }
 
     @Test
@@ -87,6 +89,10 @@ public class PersonTest {
                 .withEvents("Project meeting,21-02-26 1100,21-02-26 1200")
                 .build();
         assertFalse(ALICE.equals(editedAlice));
+
+        // different photo -> return false
+        editedAlice = new PersonBuilder(ALICE).withPhoto(VALID_PHOTO).build();
+        assertFalse(ALICE.equals(editedAlice));
     }
 
     @Test
@@ -95,7 +101,7 @@ public class PersonTest {
         Event event = new Event("Meeting", "21-02-26 1100", "21-02-26 1500");
         events.add(event);
         Person person = new Person(ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), Collections.emptySet(), events);
+                ALICE.getEmail(), ALICE.getAddress(), Collections.emptySet(), events, ALICE.getPhoto());
         assertEquals(ALICE.getName(), person.getName());
         assertTrue(person.getEvents().contains(event));
     }
@@ -105,7 +111,8 @@ public class PersonTest {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail().map(email -> email.toString()).orElse("")
                 + ", address=" + ALICE.getAddress().map(addr -> addr.toString()).orElse("")
-                + ", tags=" + ALICE.getTags() + ", events=" + ALICE.getEvents() + "}";
+                + ", tags=" + ALICE.getTags() + ", events=" + ALICE.getEvents()
+                + ", photo=" + ALICE.getPhoto().map(Object::toString).orElse("") + "}";
         assertEquals(expected, ALICE.toString());
     }
 }

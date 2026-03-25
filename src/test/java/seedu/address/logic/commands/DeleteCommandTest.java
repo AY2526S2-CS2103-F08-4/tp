@@ -10,8 +10,13 @@ import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
-import org.junit.jupiter.api.Test;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
@@ -189,5 +194,58 @@ public class DeleteCommandTest {
         model.updateFilteredPersonList(p -> false);
 
         assertTrue(model.getFilteredPersonList().isEmpty());
+    }
+
+    @Test
+    public void execute_deletesPersonAndPhoto_success(@TempDir Path tempDir) throws Exception {
+        // Set up the temp directories for simulation
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        String tempDirPath = tempDir.toString().replace("\\", "/") + "/";
+        PhotoStorageUtil.setImageDirectory(tempDirPath);
+
+        try {
+            Path photoFile = tempDir.resolve("delete_me.jpg");
+            Files.createFile(photoFile);
+            String photoPath = photoFile.toString().replace("\\", "/");
+
+            Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
+            model.addPerson(personToDelete);
+
+            DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(personToDelete.getName()));
+            deleteCommand.execute(model);
+
+            assertFalse(model.hasPerson(personToDelete));
+            assertFalse(Files.exists(photoFile));
+
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
+    }
+
+    @Test
+    public void execute_deletesPersonAndPhoto_throwsCommandException(@TempDir Path tempDir) throws Exception {
+        // Set up the temp directories for simulation
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        String tempDirPath = tempDir.toString().replace("\\", "/") + "/";
+        PhotoStorageUtil.setImageDirectory(tempDirPath);
+
+        try {
+            // Create a structure where /to_be_deleted.jpg/dummy.txt
+            // Prevent to_be_deleted.jpg from getting deleted
+            Path dummyDir = tempDir.resolve("to_be_deleted.jpg");
+            Files.createDirectory(dummyDir);
+
+            Files.createFile(dummyDir.resolve("dummy.txt"));
+            String photoPath = dummyDir.toString().replace("\\", "/");
+
+            Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
+            model.addPerson(personToDelete);
+
+            DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(personToDelete.getName()));
+            assertThrows(CommandException.class, () -> deleteCommand.execute(model));
+
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
     }
 }

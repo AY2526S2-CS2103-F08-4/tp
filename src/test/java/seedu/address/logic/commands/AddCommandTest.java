@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,9 +16,11 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
+import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
@@ -30,6 +34,61 @@ import seedu.address.model.person.PersonInformation;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddCommandTest {
+
+    @Test
+    public void execute_addPersonWithPhoto_success(@TempDir Path tempDir) throws Exception {
+        ModelStubAcceptingPersonAdded modelStub = new ModelStubAcceptingPersonAdded();
+
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        String tempDirPath = tempDir.toString().replace("\\", "/") + "/";
+        PhotoStorageUtil.setImageDirectory(tempDirPath);
+
+        try {
+            Path sourceFile = tempDir.resolve("test.jpg");
+            Files.createFile(sourceFile);
+            String pathToSourceFile = sourceFile.toString().replace("\\", "/");
+
+            Person validPersonWithPhoto = new PersonBuilder().withPhoto(pathToSourceFile).build();
+            CommandResult commandResult = new AddCommand(validPersonWithPhoto).execute(modelStub);
+            Person addedPerson = modelStub.personsAdded.get(0);
+
+            assertEquals(String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(addedPerson)),
+                    commandResult.getFeedbackToUser());
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
+    }
+
+    @Test
+    public void execute_photoCopyFails_throwsCommandException(@TempDir Path tempDir) throws IOException {
+        ModelStubAcceptingPersonAdded modelStub = new ModelStubAcceptingPersonAdded();
+
+        Path appFolder = tempDir.resolve("app_storage");
+        Path userFolder = tempDir.resolve("user_desktop");
+        Files.createDirectory(appFolder);
+        Files.createDirectory(userFolder);
+
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        String tempDirPath = appFolder.toString().replace("\\", "/") + "/";
+        PhotoStorageUtil.setImageDirectory(tempDirPath);
+
+        try {
+            String dummyFile = userFolder.resolve("does_not_exist.jpg")
+                    .toString().replace("\\", "/");
+            Person personWithInvalidPhoto = new PersonBuilder().withPhoto(dummyFile).build();
+            AddCommand addCommand = new AddCommand(personWithInvalidPhoto);
+
+            // Photo does not exist
+            assertThrows(CommandException.class, () -> addCommand.execute(modelStub));
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
+    }
+
+    @Test
+    public void parse_personWithPhoto_success() {
+
+    }
 
     @Test
     public void constructor_nullPerson_throwsNullPointerException() {

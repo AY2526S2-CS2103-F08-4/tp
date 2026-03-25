@@ -11,21 +11,29 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
+import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.commons.core.index.Index;
+import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
+import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Event;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Photo;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 
@@ -192,4 +200,142 @@ public class EditCommandTest {
         assertEquals(expected, editCommand.toString());
     }
 
+    @Test
+    public void execute_editPersonWithPhoto_success(@TempDir Path tempDir) throws Exception {
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        String tempDirPath = tempDir.toString().replace("\\", "/") + "/";
+        PhotoStorageUtil.setImageDirectory(tempDirPath);
+
+
+        try {
+            Path sourceFile = tempDir.resolve("test.jpg");
+            Files.createFile(sourceFile);
+            String pathToSourceFile = sourceFile.toString().replace("\\", "/");
+
+            Photo expectedPhoto = PhotoStorageUtil.copyPhotoToDirectory(new Photo(pathToSourceFile));
+
+            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+            Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+            PersonBuilder personInList = new PersonBuilder(lastPerson);
+
+            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                    .withName(VALID_NAME_BOB)
+                    .withPhoto(pathToSourceFile)
+                    .withPhone(VALID_PHONE_BOB).withTags(VALID_TAG_HUSBAND).build();
+
+            Person editedPerson = personInList.withName(VALID_NAME_BOB)
+                    .withPhone(VALID_PHONE_BOB)
+                    .withPhoto(expectedPhoto.getPath())
+                    .withTags(VALID_TAG_HUSBAND).build();
+
+            EditCommand editCommand = new EditCommand(indexLastPerson, descriptor);
+            String expectedMessage = String.format(EditCommand.MESSAGE_EDIT_PERSON_SUCCESS,
+                    Messages.format(editedPerson));
+
+            Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), new UserPrefs());
+            expectedModel.setPerson(lastPerson, editedPerson);
+
+            assertCommandSuccess(editCommand, model, expectedMessage, expectedModel);
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
+    }
+
+    @Test
+    public void execute_editPersonWithInvalidPhoto_throwsCommandException(@TempDir Path tempDir) throws Exception {
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        Path appFolder = tempDir.resolve("app_storage");
+        Path userFolder = tempDir.resolve("user_desktop");
+        Files.createDirectory(appFolder);
+        Files.createDirectory(userFolder);
+
+        String tempDirPath = appFolder.toString().replace("\\", "/") + "/";
+        PhotoStorageUtil.setImageDirectory(tempDirPath);
+
+        try {
+            String missingFilePath = userFolder.resolve("does_not_exist.jpg")
+                    .toString().replace("\\", "/");
+            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+
+            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                    .withName(VALID_NAME_BOB)
+                    .withPhoto(missingFilePath)
+                    .withPhone(VALID_PHONE_BOB).withTags(VALID_TAG_HUSBAND).build();
+
+            EditCommand editCommand = new EditCommand(indexLastPerson, descriptor);
+            assertThrows(CommandException.class, () -> editCommand.execute(model));
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
+    }
+
+    @Test
+    public void execute_editPersonWithSamePhoto_success(@TempDir Path tempDir) throws Exception {
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        Path appFolder = tempDir.resolve("app_storage");
+        Files.createDirectory(appFolder);
+
+        String tempDirPath = appFolder.toString().replace("\\", "/") + "/";
+        PhotoStorageUtil.setImageDirectory(tempDirPath);
+
+        try {
+            Path existingPhoto = appFolder.resolve("i_exists.jpg");
+            Files.createFile(existingPhoto);
+            String existingPhotoPath = existingPhoto.toString().replace("\\", "/");
+
+            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+            Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+            Person personWithPhoto = new PersonBuilder(lastPerson).withPhoto(existingPhotoPath).build();
+            model.setPerson(lastPerson, personWithPhoto);
+
+            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                    .withPhoto(existingPhotoPath)
+                    .build();
+
+            EditCommand editCommand = new EditCommand(indexLastPerson, descriptor);
+            String expectedMessage = String.format(EditCommand.MESSAGE_EDIT_PERSON_SUCCESS,
+                    Messages.format(personWithPhoto));
+
+            Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), new UserPrefs());
+            expectedModel.setPerson(personWithPhoto, personWithPhoto);
+            assertCommandSuccess(editCommand, model, expectedMessage, expectedModel);
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
+    }
+
+    @Test
+    public void execute_editPersonPhotoDeletion_throwsCommandException(@TempDir Path tempDir) throws Exception {
+        String originalDir = PhotoStorageUtil.getImageDirectory();
+        Path appFolder = tempDir.resolve("app_storage");
+        Files.createDirectory(appFolder);
+        PhotoStorageUtil.setImageDirectory(appFolder.toString().replace("\\", "/") + "/");
+
+        try {
+            // cannot_delete.jpg/locked.txt to prevent cannot_delete.jpg from being deleted trick
+            Path undeletableOldPhoto = appFolder.resolve("cannot_delete.jpg");
+            Files.createDirectory(undeletableOldPhoto);
+            Files.createFile(undeletableOldPhoto.resolve("locked.txt"));
+            String oldPhotoPath = undeletableOldPhoto.toString().replace("\\", "/");
+
+            // Give the person "cannot_delete.jpg"
+            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+            Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+            Person personWithOldPhoto = new PersonBuilder(lastPerson).withPhoto(oldPhotoPath).build();
+            model.setPerson(lastPerson, personWithOldPhoto);
+
+            // Create file to replace "cannot_delete.jpg" with
+            Path newPhotoFile = tempDir.resolve("new_photo.jpg");
+            Files.createFile(newPhotoFile);
+            String newPhotoPath = newPhotoFile.toString().replace("\\", "/");
+
+            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                    .withPhoto(newPhotoPath)
+                    .build();
+            EditCommand editCommand = new EditCommand(indexLastPerson, descriptor);
+            assertThrows(CommandException.class, () -> editCommand.execute(model));
+        } finally {
+            PhotoStorageUtil.setImageDirectory(originalDir);
+        }
+    }
 }

@@ -8,8 +8,20 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.image.ImageView?>
 
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.layout.StackPane?>
 <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <VBox alignment="CENTER" minWidth="80">
+    <padding>
+      <Insets top="10" right="10" bottom="10" left="10" />
+    </padding>
+    <StackPane>
+      <Circle fx:id="photo" radius="40" />
+      <Label fx:id="altText" text="?" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+    </StackPane>
+  </VBox>
   <GridPane HBox.hgrow="ALWAYS">
     <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="150" />

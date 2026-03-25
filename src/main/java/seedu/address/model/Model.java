@@ -108,5 +108,7 @@ public interface Model {
      * Return a list of correct contact(s) based on the optional parameters provided
      */
     List<Person> findPersons(PersonInformation info);
+
+
 }
 

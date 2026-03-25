@@ -12,6 +12,7 @@ import seedu.address.model.person.Event;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Photo;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.util.SampleDataUtil;
 
@@ -31,6 +32,7 @@ public class PersonBuilder {
     private Optional<Address> address;
     private Set<Tag> tags;
     private List<Event> events;
+    private Optional<Photo> photo;
 
     /**
      * Creates a {@code PersonBuilder} with the default details.
@@ -42,6 +44,7 @@ public class PersonBuilder {
         address = Optional.of(new Address(DEFAULT_ADDRESS));
         tags = new HashSet<>();
         events = new ArrayList<>();
+        photo = Optional.empty();
     }
 
     /**
@@ -54,6 +57,7 @@ public class PersonBuilder {
         address = personToCopy.getAddress();
         tags = new HashSet<>(personToCopy.getTags());
         events = new ArrayList<>(personToCopy.getEvents());
+        photo = personToCopy.getPhoto();
     }
 
     /**
@@ -125,11 +129,27 @@ public class PersonBuilder {
     }
 
     /**
+     * Sets the {@code Photo} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withPhoto(String photoPath) {
+        this.photo = Optional.of(new Photo(photoPath));
+        return this;
+    }
+
+    /**
+     * Removes the {@code Photo} from the {@code Person} that we are building.
+     */
+    public PersonBuilder withoutPhoto() {
+        this.photo = Optional.empty();
+        return this;
+    }
+
+    /**
      * Return the person after parsing the JSON
      * @return Person
      */
     public Person build() {
-        Person person = new Person(name, phone, email, address, tags);
+        Person person = new Person(name, phone, email, address, tags, photo);
         for (Event event : events) {
             person.addEvent(event);
         }

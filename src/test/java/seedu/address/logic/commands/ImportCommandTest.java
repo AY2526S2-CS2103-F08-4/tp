@@ -34,7 +34,7 @@ public class ImportCommandTest {
     private Model model;
     private Model expectedModel;
     private final String testFileName = "test_import";
-    private final String header = "Name,Phone,Email,Address,Tags,Events";
+    private final String header = "Name,Phone,Email,Address,Tags,Events,Photo";
 
     private void createCsvFile(String fileName, String content) throws Exception {
         Path filePath = testFolder.resolve(fileName + FILENAME_SUFFIX);
@@ -71,6 +71,7 @@ public class ImportCommandTest {
                 .withAddress("Blk 123")
                 .withTags()
                 .withEvents()
+                .withPhoto("hello_world.jpg")
                 .build();
 
         Person expectedTest2 = new PersonBuilder()
@@ -80,11 +81,12 @@ public class ImportCommandTest {
                 .withAddress("Blk 456")
                 .withTags()
                 .withEvents()
+                .withPhoto("this_is_another.jpg")
                 .build();
 
         model.addPerson(expectedTest1);
 
-        createCsvFile("valid", header + "\nDavid,91234567,david@u.nus.edu,Blk 456,,");
+        createCsvFile("valid", header + "\nDavid,91234567,david@u.nus.edu,Blk 456,,,");
 
         ImportCommand command = createTestCommand("overwrite", "valid");
         CommandResult result = command.execute(model);
@@ -99,7 +101,8 @@ public class ImportCommandTest {
         Person alice = new PersonBuilder().withName("Alice Pauline").withPhone("12345678").build();
         model.addPerson(alice);
 
-        String testString = "\nAlice Pauline,12345678,alice@u.nus.edu,Blk 123,,\nBob,88662211,bob@u.nus.edu,Blk 123,,";
+        String testString = "\nAlice Pauline,12345678,alice@u.nus.edu,Blk 123,,,"
+                + "\nBob,88662211,bob@u.nus.edu,Blk 123,,,";
 
         createCsvFile("merge", header + testString);
 
@@ -140,7 +143,7 @@ public class ImportCommandTest {
 
     @Test
     public void execute_invalidDataRow_skipsAndReports() throws Exception {
-        String testString = "\nValid,91234567,valid@u.nus.edu,Blk 123,,\nInvalid,abcd,invalid@u.nus.edu,Blk 123,,";
+        String testString = "\nValid,91234567,valid@u.nus.edu,Blk 123,,,\nInvalid,abcd,invalid@u.nus.edu,Blk 123,,,";
 
         createCsvFile("invalidRow", header + testString);
 
@@ -161,7 +164,7 @@ public class ImportCommandTest {
     @Test
     public void execute_headerOnlyFile_returnsEmptyFileMessage() throws Exception {
         Path filePath = testFolder.resolve("empty.csv");
-        Files.writeString(filePath, "Name,Phone,Email,Address,Tags,Events");
+        Files.writeString(filePath, "Name,Phone,Email,Address,Tags,Events,Photo");
 
         ImportCommand importCommand = new ImportCommand("add", "empty") {
             @Override
@@ -197,7 +200,7 @@ public class ImportCommandTest {
     public void processImportedLines_invalidColumnCount_skipsRow() throws Exception {
         Path filePath = testFolder.resolve("malformed.csv");
         List<String> lines = List.of(
-                "Name,Phone,Email,Address,Tags,Events",
+                "Name,Phone,Email,Address,Tags,Events,Photo",
                 "John Doe,91234567"
         );
         Files.write(filePath, lines);

@@ -99,7 +99,7 @@ public class DeleteEventCommand extends Command {
         }
 
         Person editedPerson = new Person(person.getName(), person.getPhone(),
-                person.getEmail(), person.getAddress(), person.getTags());
+                person.getEmail(), person.getAddress(), person.getTags(), person.getPhoto());
 
         for (Event existingEvent : person.getEvents()) {
             if (!existingEvent.equals(eventToRemove)) {

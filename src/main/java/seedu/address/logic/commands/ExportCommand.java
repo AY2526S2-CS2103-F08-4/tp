@@ -15,6 +15,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Event;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Photo;
 
 /**
  * Exports a list of contacts into a CSV formatted file for future use.
@@ -43,6 +44,7 @@ public class ExportCommand extends Command {
     private static final String ADDRESS_COLUMN_HEADER = "Address";
     private static final String TAG_COLUMN_HEADER = "Tags";
     private static final String EVENT_COLUMN_HEADER = "Events";
+    private static final String PHOTO_COLUMN_HEADER = "Photo";
 
     private final String exportType;
     private final String filename;
@@ -142,7 +144,8 @@ public class ExportCommand extends Command {
                 .append(EMAIL_COLUMN_HEADER).append(",")
                 .append(ADDRESS_COLUMN_HEADER).append(",")
                 .append(TAG_COLUMN_HEADER).append(",")
-                .append(EVENT_COLUMN_HEADER).append("\n");
+                .append(EVENT_COLUMN_HEADER).append(",")
+                .append(PHOTO_COLUMN_HEADER).append("\n");
 
         for (Person p : exportedList) {
             csvBuilder.append(formatPersonToRow(p)).append("\n");
@@ -159,13 +162,14 @@ public class ExportCommand extends Command {
      * @return A comma-separated string representing the person's data.
      */
     public String formatPersonToRow(Person p) {
-        return String.format("%s,%s,%s,%s,%s,%s",
+        return String.format("%s,%s,%s,%s,%s,%s,%s",
                 p.getName().fullName,
                 p.getPhone().value,
                 sanitizeAndWrapValue(getEmailValue(p)),
                 sanitizeAndWrapValue(getAddressValue(p)),
                 sanitizeAndWrapValue(formatTags(p)),
-                sanitizeAndWrapValue(formatEvents(p))
+                sanitizeAndWrapValue(formatEvents(p)),
+                sanitizeAndWrapValue(getPhotoValue(p))
         );
     }
 
@@ -234,6 +238,17 @@ public class ExportCommand extends Command {
         return p.getEvents().stream()
                 .map(this::formatSingleEvent)
                 .collect(Collectors.joining(";"));
+    }
+
+    /**
+     * Retrieves the photo string from a {@code Person}. Returns an empty string
+     * if the photo is not present.
+     *
+     * @param p The {@code Person} object.
+     * @return The string representation of the photo path, or an empty string.
+     */
+    private String getPhotoValue(Person p) {
+        return p.getPhoto().map(Photo::getPath).orElse("");
     }
 
     /**
