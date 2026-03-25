@@ -30,6 +30,7 @@ public class Messages {
     public static final String MESSAGE_CLEAR_USER_IMAGE_FAIL = "Address book cleared, "
             + "but some images could not be deleted: ";
     public static final String MESSAGE_FAILED_OFFLINE_GUIDE = "Something went wrong with loading the offline guide: ";
+    public static final String MESSAGE_MISSING_INTERNAL_RESOURCE = "Missing internal application resource: ";
 
     /**
      * Returns an error message indicating the duplicate prefixes.

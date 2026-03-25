@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +65,10 @@ public class HelpStorageUtilTest {
         targetFile.setWritable(false);
 
         try {
-            HelpStorageUtil.copyOverOfflineHelp();
+            IOException thrown = assertThrows(IOException.class, () -> {
+                HelpStorageUtil.copyFiles(List.of(targetFile.getPath()));
+            });
+            assertTrue(thrown.getMessage().contains(Messages.MESSAGE_FAILED_OFFLINE_GUIDE));
         } finally {
             targetFile.setWritable(true);
         }
@@ -90,5 +94,14 @@ public class HelpStorageUtilTest {
             dirFile.setWritable(true);
             targetFile.setWritable(true);
         }
+    }
+
+    @Test
+    public void copyFiles_missingInternalFile_throwsIoException() {
+        List<String> dummyFileList = List.of("this_is_a_fake_file_for_testing.txt");
+        IOException thrown = assertThrows(IOException.class, () -> {
+            HelpStorageUtil.copyFiles(dummyFileList);
+        });
+        assertTrue(thrown.getMessage().contains(Messages.MESSAGE_MISSING_INTERNAL_RESOURCE));
     }
 }

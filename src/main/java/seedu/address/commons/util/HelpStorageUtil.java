@@ -24,6 +24,13 @@ public class HelpStorageUtil {
      */
     public static void copyOverOfflineHelp() throws IOException {
         List<String> fileNames = List.of("index.html", "index.css", "nab_app_logo.ico");
+        copyFiles(fileNames);
+    }
+
+    /**
+     * Copies the files required from the resource directory to the user's data/help directory
+     */
+    static void copyFiles(List<String> fileNames) throws IOException {
         Path userHelpDir = Paths.get(HELP_DIR_STRING);
 
         if (!Files.exists(userHelpDir)) {
@@ -33,9 +40,10 @@ public class HelpStorageUtil {
 
         for (String file : fileNames) {
             try (InputStream inputStream = HelpStorageUtil.class.getResourceAsStream("/help/" + file)) {
+                // Now we can trigger this by passing a fake file name in our test!
                 if (inputStream == null) {
                     logger.severe("Could not find internal help file: /help/" + file);
-                    throw new IOException("Missing internal application resource: " + file);
+                    throw new IOException(Messages.MESSAGE_MISSING_INTERNAL_RESOURCE + file);
                 }
 
                 Path copyTo = userHelpDir.resolve(file);
@@ -43,6 +51,7 @@ public class HelpStorageUtil {
                 logger.info("Copied " + file + " to " + copyTo.toAbsolutePath());
             } catch (IOException e) {
                 logger.warning("Failed to copy " + file + ": " + e.getMessage());
+                throw new IOException(Messages.MESSAGE_FAILED_OFFLINE_GUIDE + e.getMessage());
             }
         }
     }
