@@ -180,7 +180,7 @@ Format: `clear`
 
 Create a new event for a specified person.
 
-Format: `event add d/DESCRIPTION start/START_DATE end/END_DATE to/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
+Format: `event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE to/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 
 * The `NAME` is case-insensitive. e.g. `aLeX YeOH` will match `Alex Yeoh`
 * Only full words will be matched e.g. `Alex Yeo` will not match `Alex Yeoh`
@@ -188,8 +188,8 @@ Format: `event add d/DESCRIPTION start/START_DATE end/END_DATE to/NAME [p/PHONE]
 * The date time format for start/ and end/ is YYYY-MM-DD HHmm or DD-MM-YYYY HHmm
 
 Examples:
-* `event add d/Complete Quiz 4 start/12-03-2026 1100 end/12-04-2026 2359 to/Bernice Yu` adds an event to Bernice Yu.
-* Suppose there are multiple `Bernice Yu`, an enriched search would be `event add d/Complete Quiz 4 start/12-03-2026 1100 end/12-04-2026 2359 to/Bernice Yu p/99272758`
+* `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 to/David Li` adds an event to David Li.
+* Suppose there are multiple `David Li`, an enriched search would be `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 to/David Li p/99272758`
 
 ### View an event : `event view`
 
@@ -216,8 +216,8 @@ Format: `event delete n/NAME start/START_TIME end/END_TIME [p/PHONE] [e/EMAIL] [
 * The date time format for start/ and end/ is YYYY-MM-DD HHmm or DD-MM-YYYY HHmm
 
 Examples:
-* `event delete n/Bernice Yu start/12-03-2026 1100 end/12-04-2026 2359` deletes the event that starts at 12 March 2026 1100 and ends at 12 April 2026 2359 assigned to Bernice Yu.
-* Suppose there are multiple `Bernice Yu`, an enriched search would be `event delete n/Bernice Yu start/12-03-2026 1100 end/12-04-2026 2359 a/Blk 30 Lorong 3 Serangoon Gardens, #07-18`
+* `event delete title/Meeting start/2026-03-12 1100 end/2026-03-12 2359 n/David Li` deletes the event that titled Meeting which starts at 12 March 2026 1100 and ends at 12 April 2026 2359 assigned to David Li.
+* Suppose there are multiple `David Li`, an enriched search would be `event delete title/Meeting start/2026-03-12 1100 end/2026-03-12 2359 n/David Li p/99272758`
 
 ### Exiting the program : `exit`
 
