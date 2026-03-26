@@ -50,13 +50,14 @@
         <HBox spacing="3" VBox.vgrow="ALWAYS">
           <VBox fx:id="personList" styleClass="pane-with-border" HBox.hgrow="ALWAYS">
             <padding>
-              <Insets top="10" right="10" bottom="10" left="10" />
+              <Insets top="10" right="0" bottom="10" left="10" />
             </padding>
             <StackPane fx:id="personListPanelPlaceholder" VBox.vgrow="ALWAYS"/>
           </VBox>
+
           <VBox fx:id="eventList" styleClass="pane-with-border" HBox.hgrow="ALWAYS">
             <padding>
-              <Insets top="10" right="10" bottom="10" left="10" />
+              <Insets top="10" right="10" bottom="10" left="0" />
             </padding>
             <StackPane fx:id="eventListPanelPlaceholder" VBox.vgrow="ALWAYS"/>
           </VBox>

@@ -41,7 +41,9 @@ public class PersonListPanel extends UiPart<Region> {
                 setGraphic(null);
                 setText(null);
             } else {
-                setGraphic(new PersonCard(person, getIndex() + 1).getRoot());
+                PersonCard card = new PersonCard(person, getIndex() + 1);
+                card.getAccentBar().visibleProperty().bind(this.selectedProperty());
+                setGraphic(card.getRoot());
             }
         }
     }
