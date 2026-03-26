@@ -80,6 +80,7 @@ public class AddEventCommand extends Command {
         logger.info("AddEvent: person updated " + personToEdit.getName()
                 + ", total events=" + editedPerson.getEvents().size());
 
+        model.showEventsForPerson(personToEdit);
         return new CommandResult(String.format(MESSAGE_SUCCESS, personToEdit.getName(), toAdd));
     }
 
@@ -91,8 +92,7 @@ public class AddEventCommand extends Command {
 
         if (matches.size() > 1) {
             Set<Person> matchingPersons = Set.copyOf(matches);
-            model.updateFilteredPersonList(matchingPersons::contains);
-            model.updateFilteredEventList(event -> false);
+            model.showMatchingPersons(matchingPersons);
             throw new CommandException(Messages.MESSAGE_MULTIPLE_MATCH);
         }
 

@@ -10,7 +10,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.commons.util.ToStringBuilder;
@@ -68,8 +67,7 @@ public class DeleteCommand extends Command {
         // Scenario : Multiple contact match name, duplicate handling, returns all matched contacts
         if (listOfPersonToDelete.size() > 1) {
             Set<Person> matchingPersons = Set.copyOf(listOfPersonToDelete);
-            Predicate<Person> showMatchingPersons = matchingPersons::contains;
-            model.updateFilteredPersonList(showMatchingPersons);
+            model.showMatchingPersons(matchingPersons);
             throw new CommandException(Messages.MESSAGE_MULTIPLE_MATCH);
         }
 
