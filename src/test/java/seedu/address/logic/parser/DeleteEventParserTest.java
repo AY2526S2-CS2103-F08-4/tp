@@ -159,4 +159,12 @@ public class DeleteEventParserTest {
                 " title/Project review n/" + VALID_NAME + " start/" + VALID_START + " end/" + VALID_START,
                 MESSAGE_END_NOT_AFTER_START);
     }
+
+    @Test
+    public void parse_invalidEndDateTimeFormat_failure() {
+        // Start is valid; only end is invalid — exercises second operand of the || condition
+        assertParseFailure(parser,
+                " title/Project review n/" + VALID_NAME + " start/" + VALID_START + " end/25-03-2026 1000",
+                MESSAGE_INVALID_DATETIME_FORMAT);
+    }
 }

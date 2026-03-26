@@ -182,4 +182,24 @@ public class AddEventParserTest {
                 " title/Meeting start/2026-02-30 0900 end/2026-02-30 1000 to/" + VALID_NAME,
                 MESSAGE_INVALID_DATETIME_FORMAT);
     }
+
+    @Test
+    public void parse_invalidEndDateTimeFormat_failure() {
+        // Start is valid; only end is invalid — exercises second operand of the || condition
+        assertParseFailure(parser,
+                " title/Meeting start/" + VALID_START + " end/25-03-2026 1000 to/" + VALID_NAME,
+                MESSAGE_INVALID_DATETIME_FORMAT);
+    }
+
+    @Test
+    public void parse_emptyDescription_treatedAsNoDescription_success() {
+        // desc/ present but whitespace-only — should be treated as absent (Optional.empty())
+        PersonInformation expectedInfo = new PersonInformation(new Name(VALID_NAME), null, null, null, null);
+        Event expectedEvent = new Event(new Title("Meeting"), Optional.empty(), new TimeRange(VALID_START, VALID_END));
+        AddEventCommand expectedCommand = new AddEventCommand(expectedInfo, expectedEvent);
+
+        assertParseSuccess(parser,
+                " title/Meeting desc/   start/" + VALID_START + " end/" + VALID_END + " to/" + VALID_NAME,
+                expectedCommand);
+    }
 }
