@@ -157,4 +157,29 @@ public class AddEventParserTest {
                 " title/Meeting start/" + VALID_END + " end/" + VALID_START + " to/" + VALID_NAME,
                 MESSAGE_END_NOT_AFTER_START);
     }
+
+    @Test
+    public void parse_invalidTitle_failure() {
+        // Title contains '/' which violates Title constraints
+        assertParseFailure(parser,
+                " title/Meeting/Extra desc/All tasks start/" + VALID_START + " end/" + VALID_END
+                        + " to/" + VALID_NAME,
+                Title.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_invalidDescription_failure() {
+        // Description contains '/' which violates Description constraints
+        assertParseFailure(parser,
+                " title/Meeting desc/invalid/desc start/" + VALID_START + " end/" + VALID_END
+                        + " to/" + VALID_NAME,
+                Description.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_nonExistentDate_failure() {
+        assertParseFailure(parser,
+                " title/Meeting start/2026-02-30 0900 end/2026-02-30 1000 to/" + VALID_NAME,
+                MESSAGE_INVALID_DATETIME_FORMAT);
+    }
 }

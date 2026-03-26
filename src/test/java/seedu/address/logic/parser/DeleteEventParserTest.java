@@ -4,6 +4,8 @@ import static seedu.address.logic.Messages.MESSAGE_DUPLICATE_FIELDS;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
+import static seedu.address.model.event.TimeRange.MESSAGE_END_NOT_AFTER_START;
+import static seedu.address.model.event.TimeRange.MESSAGE_INVALID_DATETIME_FORMAT;
 
 import java.util.Optional;
 
@@ -127,5 +129,34 @@ public class DeleteEventParserTest {
         assertParseFailure(parser,
                 " title/Project review n/" + VALID_NAME + " e/not-an-email start/" + VALID_START + " end/" + VALID_END,
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteEventCommand.MESSAGE_USAGE));
+    }
+
+    @Test
+    public void parse_invalidTitle_failure() {
+        // Title contains '/' which violates Title constraints
+        assertParseFailure(parser,
+                " title/Project review desc/optional n/" + VALID_NAME + " start/" + VALID_START + " end/" + VALID_END,
+                Title.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
+    public void parse_invalidDateTimeFormat_failure() {
+        assertParseFailure(parser,
+                " title/Project review n/" + VALID_NAME + " start/25-03-2026 0900 end/25-03-2026 1000",
+                MESSAGE_INVALID_DATETIME_FORMAT);
+    }
+
+    @Test
+    public void parse_nonExistentDate_failure() {
+        assertParseFailure(parser,
+                " title/Project review n/" + VALID_NAME + " start/2026-02-30 0900 end/2026-02-30 1000",
+                MESSAGE_INVALID_DATETIME_FORMAT);
+    }
+
+    @Test
+    public void parse_endNotAfterStart_failure() {
+        assertParseFailure(parser,
+                " title/Project review n/" + VALID_NAME + " start/" + VALID_START + " end/" + VALID_START,
+                MESSAGE_END_NOT_AFTER_START);
     }
 }

@@ -25,6 +25,13 @@ public class TimeRangeTest {
     }
 
     @Test
+    public void constructor_nonExistentDate_throwsIllegalArgumentException() {
+        // Feb 30 does not exist — should be rejected, not coerced to Feb 28
+        assertThrows(IllegalArgumentException.class, () ->
+                new TimeRange("2026-02-30 0900", "2026-02-30 1000"));
+    }
+
+    @Test
     public void constructor_endBeforeStart_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () ->
                 new TimeRange("2026-03-25 1000", "2026-03-25 0900"));
@@ -84,6 +91,7 @@ public class TimeRangeTest {
         assertFalse(TimeRange.isValidDateTimeFormat("2026/03/25 0900"));
         assertFalse(TimeRange.isValidDateTimeFormat("not-a-date"));
         assertFalse(TimeRange.isValidDateTimeFormat(""));
+        assertFalse(TimeRange.isValidDateTimeFormat("2026-02-30 0900")); // non-existent date
     }
 
     @Test
