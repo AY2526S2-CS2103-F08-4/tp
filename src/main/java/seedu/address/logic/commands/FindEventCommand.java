@@ -51,8 +51,7 @@ public class FindEventCommand extends Command {
         requireNonNull(model);
         Person matchedPerson = targetPerson(model, targetInfo);
 
-        model.updateFilteredPersonList(person -> person.equals(matchedPerson));
-        model.updateFilteredEventList(event -> matchedPerson.getEvents().contains(event));
+        model.showEventsForPerson(matchedPerson);
         logger.info("FindEvent: matched " + matchedPerson.getName()
                 + ", events=" + model.getFilteredEventList().size());
         return new CommandResult(
@@ -69,8 +68,7 @@ public class FindEventCommand extends Command {
         if (matches.size() > 1) {
             logger.info("FindEvent: multiple matches (" + matches.size() + ") for " + targetInfo.name);
             Set<Person> matchingPersons = Set.copyOf(matches);
-            model.updateFilteredPersonList(matchingPersons::contains);
-            model.updateFilteredEventList(event -> false);
+            model.showMatchingPersons(matchingPersons);
             throw new CommandException(Messages.MESSAGE_MULTIPLE_MATCH);
         }
 

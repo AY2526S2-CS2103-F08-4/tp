@@ -9,7 +9,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
@@ -58,20 +57,18 @@ public class FindCommand extends Command {
 
         List<Person> matches = model.findPersons(targetInfo);
         Set<Person> matchingPersons = Set.copyOf(matches);
-        Predicate<Person> showMatchingPersons = matchingPersons::contains;
-        model.updateFilteredPersonList(showMatchingPersons);
+        int count = matches.size();
 
-        int count = model.getFilteredPersonList().size();
+        // Case 1: Only 1 matching
         if (count == 1) {
-            Person matchedPerson = model.getFilteredPersonList().get(0);
-            model.updateFilteredEventList(event -> matchedPerson.getEvents().contains(event));
+            model.showEventsForPerson(matches.get(0));
             return new CommandResult(Messages.MESSAGE_ONE_PERSON_LISTED_OVERVIEW);
         }
 
-        // No events in the panel if there is no confirmed match.
-        model.updateFilteredEventList(event -> false);
+        // Zero or Multiple matches: show matching persons, but do not show events
+        model.showMatchingPersons(matchingPersons);
 
-        if (count == 0) {
+        if (matches.isEmpty()) {
             return new CommandResult(Messages.MESSAGE_NO_PERSONS);
         }
         return new CommandResult(String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, count));

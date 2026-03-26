@@ -29,7 +29,7 @@ public class FilterCommand extends Command {
     @Override
     public CommandResult execute(Model model) {
         requireNonNull(model);
-        model.updateFilteredPersonList(predicate);
+        model.showPersons(predicate);
 
         if (model.getFilteredPersonList().isEmpty()) {
             return new CommandResult(String.format(Messages.MESSAGE_NO_PERSONS));

@@ -239,6 +239,22 @@ public class AddEventCommandTest {
             throw new AssertionError("This method should not be called.");
         }
         @Override
+        public void showAllPersons() {
+            throw new AssertionError("This method should not be called.");
+        }
+        @Override
+        public void showPersons(Predicate<Person> predicate) {
+            throw new AssertionError("This method should not be called.");
+        }
+        @Override
+        public void showMatchingPersons(java.util.Set<Person> persons) {
+            throw new AssertionError("This method should not be called.");
+        }
+        @Override
+        public void showEventsForPerson(Person person) {
+            throw new AssertionError("This method should not be called.");
+        }
+        @Override
         public ObservableList<Event> getFilteredEventList() {
             throw new AssertionError("This method should not be called.");
         }
@@ -315,6 +331,9 @@ public class AddEventCommandTest {
         public void updateFilteredEventList(Predicate<Event> predicate) {}
 
         @Override
+        public void showEventsForPerson(Person person) {}
+
+        @Override
         public ReadOnlyAddressBook getAddressBook() {
             return new AddressBook();
         }
@@ -372,6 +391,9 @@ public class AddEventCommandTest {
 
         @Override
         public void updateFilteredEventList(Predicate<Event> predicate) {}
+
+        @Override
+        public void showEventsForPerson(Person person) {}
 
         @Override
         public ReadOnlyAddressBook getAddressBook() {
@@ -459,6 +481,12 @@ public class AddEventCommandTest {
         @Override
         public List<Person> findPersons(PersonInformation info) {
             return persons;
+        }
+
+        @Override
+        public void showMatchingPersons(java.util.Set<Person> persons) {
+            filteredPersonsUpdated = true;
+            filteredEventsUpdated = true;
         }
 
         @Override

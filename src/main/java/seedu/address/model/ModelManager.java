@@ -106,15 +106,12 @@ public class ModelManager implements Model {
     @Override
     public void addPerson(Person person) {
         addressBook.addPerson(person);
-        updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
     }
 
     @Override
     public void setPerson(Person target, Person editedPerson) {
         requireAllNonNull(target, editedPerson);
         addressBook.setPerson(target, editedPerson);
-        updateFilteredPersonList(person -> person.equals(editedPerson));
-        updateFilteredEventList(event -> editedPerson.getEvents().contains(event));
     }
 
     @Override
@@ -175,6 +172,24 @@ public class ModelManager implements Model {
     }
 
     @Override
+    public void showAllPersons() {
+        updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+    }
+
+    @Override
+    public void showPersons(Predicate<Person> predicate) {
+        requireNonNull(predicate);
+        updateFilteredPersonList(predicate);
+    }
+
+    @Override
+    public void showMatchingPersons(java.util.Set<Person> persons) {
+        requireNonNull(persons);
+        updateFilteredPersonList(persons::contains);
+        updateFilteredEventList(event -> false);
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other instanceof ModelManager otherModelManager) {
             return addressBook.equals(otherModelManager.addressBook)
@@ -199,6 +214,13 @@ public class ModelManager implements Model {
     public void updateFilteredEventList(Predicate<Event> predicate) {
         requireNonNull(predicate);
         filteredEvents.setPredicate(predicate);
+    }
+
+    @Override
+    public void showEventsForPerson(Person person) {
+        requireNonNull(person);
+        updateFilteredPersonList(p -> p.equals(person));
+        updateFilteredEventList(person::hasEvent);
     }
 
     /**

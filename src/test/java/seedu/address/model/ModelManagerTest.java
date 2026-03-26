@@ -269,6 +269,58 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void showAllPersons_resetsPersonFilter() {
+        modelManager.addPerson(ALICE);
+        modelManager.addPerson(BENSON);
+        modelManager.updateFilteredPersonList(p -> p.equals(ALICE));
+        assertEquals(1, modelManager.getFilteredPersonList().size());
+
+        modelManager.showAllPersons();
+        assertEquals(2, modelManager.getFilteredPersonList().size());
+    }
+
+    @Test
+    public void showPersons_filtersByPredicate() {
+        modelManager.addPerson(ALICE);
+        modelManager.addPerson(BENSON);
+
+        modelManager.showPersons(p -> p.equals(ALICE));
+        assertEquals(1, modelManager.getFilteredPersonList().size());
+        assertEquals(ALICE, modelManager.getFilteredPersonList().get(0));
+    }
+
+    @Test
+    public void showMatchingPersons_showsOnlyMatchingPersonsAndClearsEvents() {
+        modelManager.addPerson(ALICE);
+        modelManager.addPerson(BENSON);
+        Event event = newEvent("Meeting", null, "2026-03-25 0900", "2026-03-25 1000");
+        modelManager.addEvent(event);
+
+        modelManager.showMatchingPersons(Set.of(ALICE));
+
+        assertEquals(1, modelManager.getFilteredPersonList().size());
+        assertEquals(ALICE, modelManager.getFilteredPersonList().get(0));
+        assertEquals(0, modelManager.getFilteredEventList().size());
+    }
+
+    @Test
+    public void showEventsForPerson_filtersPersonAndTheirEvents() {
+        Person personWithEvent = new PersonBuilder().withName("Eve Tan").withPhone("91110000").build();
+        modelManager.addPerson(personWithEvent);
+        modelManager.addPerson(BENSON);
+        Event event = newEvent("Consult", null, "2026-03-27 0900", "2026-03-27 1000");
+        modelManager.addEvent(event);
+        personWithEvent.addEvent(event);
+
+        modelManager.showEventsForPerson(personWithEvent);
+
+        assertEquals(1, modelManager.getFilteredPersonList().size());
+        assertEquals(personWithEvent, modelManager.getFilteredPersonList().get(0));
+        assertEquals(1, modelManager.getFilteredEventList().size());
+        assertTrue(modelManager.getFilteredEventList().contains(event));
+    }
+
+    @Test
     public void findPersons_matchesByNameOnly_returnsMatchingPersons() {
         modelManager.addPerson(ALICE);
         modelManager.addPerson(BENSON);

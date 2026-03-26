@@ -2,6 +2,7 @@ package seedu.address.model;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
@@ -90,6 +91,22 @@ public interface Model {
     void updateFilteredPersonList(Predicate<Person> predicate);
 
     /**
+     * Resets the filtered person list to show all persons.
+     */
+    void showAllPersons();
+
+    /**
+     * Filters the person list to persons matching {@code predicate}.
+     * Does not modify the event list.
+     */
+    void showPersons(Predicate<Person> predicate);
+
+    /**
+     * Filters the person list to show only {@code persons} and clears the event list.
+     */
+    void showMatchingPersons(Set<Person> persons);
+
+    /**
      * Return a list of correct contact(s) based on the optional parameters provided
      */
     List<Person> findPersons(PersonInformation info);
@@ -134,6 +151,12 @@ public interface Model {
     Event linkPersonToEvent(Event eventToAdd);
 
     Event unlinkPersonFromEvent(Event eventToUnlink);
+
+    /**
+     * Updates the filtered event list to show only events linked to {@code person},
+     * and the filtered person list to show only {@code person}.
+     */
+    void showEventsForPerson(Person person);
 
 }
 
