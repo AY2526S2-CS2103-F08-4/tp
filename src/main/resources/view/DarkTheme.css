@@ -479,3 +479,13 @@
     -fx-arc-width: 5;
     -fx-arc-height: 5;
 }
+
+.person-profile-photo {
+    -fx-stroke: #EF7C00;
+    -fx-stroke-width: 2.0;
+    -fx-stroke-type: inside;
+}
+
+.person-profile-photo.empty {
+    -fx-fill: #424242;
+}

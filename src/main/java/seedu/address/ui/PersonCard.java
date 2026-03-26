@@ -159,12 +159,9 @@ public class PersonCard extends UiPart<Region> {
             photo.setFill(new javafx.scene.paint.ImagePattern(profilePicture));
             altText.setVisible(false);
         } else {
-            photo.setFill(javafx.scene.paint.Color.valueOf("#424242"));
+            photo.getStyleClass().add("empty");
             altText.setVisible(true);
         }
-
-        photo.setStroke(javafx.scene.paint.Color.valueOf("#EF7C00")); // NUS Gold color
-        photo.setStrokeWidth(2.0); // Thickness of Border
     }
     /**
      * Retrieves the accent bar associated with the person card UI component.

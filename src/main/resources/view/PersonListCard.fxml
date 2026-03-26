@@ -20,7 +20,7 @@
         <Insets top="10" right="10" bottom="10" left="10" />
       </padding>
       <StackPane>
-        <Circle fx:id="photo" radius="40" />
+        <Circle fx:id="photo" radius="40" styleClass="person-profile-photo" />
         <Label fx:id="altText" text="?" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
       </StackPane>
     </VBox>
