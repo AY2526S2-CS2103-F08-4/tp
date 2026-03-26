@@ -13,6 +13,10 @@ import seedu.address.model.person.PersonInformation;
  * Utilities for event-related command operations.
  */
 public final class EventUtil {
+    private EventUtil() {
+        // utility class
+    }
+
     /**
      * Resolves the target person from the model based on the provided info.
      *
