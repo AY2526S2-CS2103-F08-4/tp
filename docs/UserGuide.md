@@ -104,18 +104,31 @@ Format: `list`
 
 Edits an existing person in the address book.
 
-Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
+Format: `edit NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... -- [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG][pfp/PHOTO_PATH]...`
 
-* Edits the person at the specified `INDEX`. The index refers to the index number shown in the displayed person list. The index **must be a positive integer** 1, 2, 3, ...
-* At least one of the optional fields must be provided.
+**Tip:** If there are multiple contacts with the same `NAME`, utilize the other optional parameters to narrow down the updating of the correct contact. This can be done by supplying
+any of the following information just after `edit NAME`: Phone number, Email, Address or Tag.
+
+* The segment before `--` identifies which contact to edit.
+* The segment after `--` specifies fields to be updated.
+  * Updatable fields: `n/NAME`, `p/PHONE_NUMBER`, `e/EMAIL`, `a/ADDRESS`, `t/TAG`, `pfp/PHOTO_PATH`.
+* `NAME` in the preamble is required.
 * Existing values will be updated to the input values.
-* When editing tags, the existing tags of the person will be removed i.e. adding of tags is not cumulative.
-* You can remove all the person’s tags by typing `t/` without
-    specifying any tags after it.
+* To add tags, you can specify new tags by typing `t/<tag>` in the updated field.
+* To delete a specific tag, type an existing tag in the updated field.
+* You can remove all the person’s tags by typing `t/` without specifying any tags after it.
+* Tags are case-insensitive.
+
+Additional information for updating profile picture:
+* For `pfp/PHOTO_PATH`, accepted file extensions are `.png`, `.jpg`, and `.jpeg`.
+* `PHOTO_PATH` can be absolute (e.g., `C:/Users/Alex/Pictures/me.jpg`) or relative to the app folder (e.g., `images/me.png`).
+* The file must exist; NAB will copy it into `data/images/`.
 
 Examples:
-*  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st person to be `91234567` and `johndoe@example.com` respectively.
-*  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd person to be `Betsy Crower` and clears all existing tags.
+*  `edit John Doe -- p/91234567 e/johndoe@example.com` edits John Doe's phone and email.
+*  `edit John Doe p/98765432 -- n/Johnathan Doe t/teammate` uniquely identifies John Doe by phone, then updates name and tags.
+*  `edit Betsy Crower -- t/` clears all tags for Betsy Crower.
+*  `edit Alex Yeoh -- pfp/C:/Users/Alex/Pictures/profile.jpg` updates Alex Yeoh's profile picture.
 
 ### Locating persons by name: `find`
 
@@ -267,7 +280,7 @@ Action     | Format, Examples
 **Add**    | `add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]...` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
 **Clear**  | `clear`
 **Delete** | `delete n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `delete n/Alex Yeoh t/cs2103 t/cs2105`
-**Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
+**Edit**   | `edit NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]... -- [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG] [pfp/PHOTO_PATH]...`<br> e.g.,`edit James Lee e/jameslee@example.com -- t/CS2100 pfp/images/james.jpg`
 **Event Add** | `event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE to/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]`<br> e.g., `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 to/David Li`
 **Event Delete** | `event delete title/TITLE start/START_TIME end/END_TIME n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]`<br> e.g., `event delete title/Meeting start/2026-03-12 1100 end/2026-03-12 2359 n/David Li`
 **Event View** | `event view n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `event view n/Bernice Yu`
