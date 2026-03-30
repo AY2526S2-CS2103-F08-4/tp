@@ -198,6 +198,11 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void parseTags_collectionWithDuplicateTags_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseTags(Arrays.asList(VALID_TAG_1, VALID_TAG_1)));
+    }
+
+    @Test
     public void parsePhoto_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> ParserUtil.parsePhoto((String) null));
     }

@@ -45,6 +45,12 @@ public class FindCommandParserTest {
     }
 
     @Test
+    public void parse_duplicateTags_failure() {
+        assertParseFailure(parser, " " + PREFIX_NAME + "Alex Tan " + PREFIX_TAG + "cs2030s " + PREFIX_TAG + "cs2030s",
+                ParserUtil.MESSAGE_DUPLICATE_TAGS);
+    }
+
+    @Test
     public void parse_repeatedNonTagValue_failure() {
         String validExpectedPersonString = " " + PREFIX_NAME + "Alex Tan"
                 + " " + PREFIX_PHONE + "98765432"

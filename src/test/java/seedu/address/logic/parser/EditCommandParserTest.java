@@ -316,4 +316,19 @@ public class EditCommandParserTest {
 
         assertParseSuccess(parser, userInput, expectedCommand);
     }
+
+    @Test
+    public void parse_duplicateTags_failure() {
+        // duplicate update tags are rejected directly
+        String userInput = TARGET_IDENTIFIER_AMY + DELIMITER + TAG_DESC_FRIEND.trim() + TAG_DESC_FRIEND;
+        assertParseFailure(parser, userInput, ParserUtil.MESSAGE_DUPLICATE_TAGS);
+
+        // duplicate update tags are case-insensitive
+        userInput = TARGET_IDENTIFIER_AMY + DELIMITER + TAG_DESC_FRIEND.trim() + " t/FRIEND";
+        assertParseFailure(parser, userInput, ParserUtil.MESSAGE_DUPLICATE_TAGS);
+
+        // duplicate target tags are wrapped as invalid command format
+        userInput = TARGET_IDENTIFIER_BENSON + TAG_DESC_HUSBAND + " t/HUSBAND" + DELIMITER + PHONE_DESC_AMY.trim();
+        assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
+    }
 }
