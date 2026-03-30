@@ -72,6 +72,7 @@ public class PinCommand extends Command {
         //Case 3: Single match found
         Person personToPin = personsToPin.get(0);
         model.pinPerson(personToPin);
+        model.showAllPersonsPinnedFirst();
         return new CommandResult(String.format(MESSAGE_PIN_PERSON_SUCCESS, Messages.format(personToPin)));
     }
 
