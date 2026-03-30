@@ -206,8 +206,8 @@ public class EditCommandTest {
         assertCommandFailure(editCommand, model, Messages.MESSAGE_NO_MATCH);
     }
 
-        @Test
-        public void execute_multipleMatchingPersonsUnfilteredList_failure() {
+    @Test
+    public void execute_multipleMatchingPersonsUnfilteredList_failure() {
         Person firstPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         Person duplicateNamePerson = new PersonBuilder(firstPerson)
             .withPhone("81234567")
@@ -222,10 +222,10 @@ public class EditCommandTest {
         assertEquals(2, model.getFilteredPersonList().size());
         assertTrue(model.getFilteredPersonList().contains(firstPerson));
         assertTrue(model.getFilteredPersonList().contains(duplicateNamePerson));
-        }
+    }
 
-        @Test
-        public void execute_findPersonsMiss_caseInsensitiveTagFallback_success() {
+    @Test
+    public void execute_filterCaseInsensitiveTagFallback_success() {
         Person personToEdit = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withPhone("85556666").build();
 
@@ -246,7 +246,7 @@ public class EditCommandTest {
         expectedModel.updateFilteredPersonList(p -> p.equals(editedPerson));
 
         assertCommandSuccess(editCommand, model, expectedMessage, expectedModel);
-        }
+    }
 
     /**
          * Edit still matches against the full address book even when current list is filtered.
