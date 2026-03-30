@@ -28,6 +28,7 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_FRIEND;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
@@ -58,6 +59,9 @@ public class EditCommandParserTest {
     private static final String TARGET_NAME_AMY = "Amy Bee";
     private static final String TARGET_NAME_BENSON = "Benson Meier";
     private static final String TARGET_NAME_CARL = "Carl Kurz";
+    private static final String TARGET_IDENTIFIER_AMY = PREFIX_NAME + TARGET_NAME_AMY;
+    private static final String TARGET_IDENTIFIER_BENSON = PREFIX_NAME + TARGET_NAME_BENSON;
+    private static final String TARGET_IDENTIFIER_CARL = PREFIX_NAME + TARGET_NAME_CARL;
 
     private EditCommandParser parser = new EditCommandParser();
 
@@ -66,8 +70,11 @@ public class EditCommandParserTest {
         // no target name specified
         assertParseFailure(parser, DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
+        // no target name prefix specified
+        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+
         // no field specified
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER, MESSAGE_INVALID_FORMAT);
 
         // no target name and no field specified
         assertParseFailure(parser, "", MESSAGE_INVALID_FORMAT);
@@ -86,83 +93,93 @@ public class EditCommandParserTest {
 
         // only whitespace preamble
         assertParseFailure(parser, "   " + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+
+        // non-empty preamble before prefixed target name
+        assertParseFailure(parser, "oops " + TARGET_IDENTIFIER_AMY + DELIMITER + NAME_DESC_AMY,
+            MESSAGE_INVALID_FORMAT);
     }
 
     @Test
     public void parse_invalidDelimiterSpacing_failure() {
         // no space before delimiter
-        assertParseFailure(parser, TARGET_NAME_AMY + "-- " + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + "-- " + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // no space after delimiter
-        assertParseFailure(parser, TARGET_NAME_AMY + " --" + NAME_DESC_AMY.trim(), MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + " --" + NAME_DESC_AMY.trim(), MESSAGE_INVALID_FORMAT);
     }
 
     @Test
     public void parse_multipleSpacesAroundDelimiter_failure() {
-        String userInput = TARGET_NAME_AMY + "   --    " + PHONE_DESC_AMY;
+        String userInput = TARGET_IDENTIFIER_AMY + "   --    " + PHONE_DESC_AMY;
         assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
     }
 
     @Test
     public void parse_duplicateTargetSingleValuedPrefixes_failure() {
-        String userInput = TARGET_NAME_AMY + PHONE_DESC_AMY + PHONE_DESC_BOB + DELIMITER + EMAIL_DESC_AMY.trim();
+        String userInput = TARGET_IDENTIFIER_AMY + PHONE_DESC_AMY + PHONE_DESC_BOB + DELIMITER
+            + EMAIL_DESC_AMY.trim();
         assertParseFailure(parser, userInput, Messages.getErrorMessageForDuplicatePrefixes(PREFIX_PHONE));
 
-        userInput = TARGET_NAME_AMY + EMAIL_DESC_AMY + EMAIL_DESC_BOB + DELIMITER + PHONE_DESC_AMY.trim();
+        userInput = TARGET_IDENTIFIER_AMY + EMAIL_DESC_AMY + EMAIL_DESC_BOB + DELIMITER + PHONE_DESC_AMY.trim();
         assertParseFailure(parser, userInput, Messages.getErrorMessageForDuplicatePrefixes(PREFIX_EMAIL));
 
-        userInput = TARGET_NAME_AMY + ADDRESS_DESC_AMY + ADDRESS_DESC_BOB + DELIMITER + PHONE_DESC_AMY.trim();
+        userInput = TARGET_IDENTIFIER_AMY + ADDRESS_DESC_AMY + ADDRESS_DESC_BOB + DELIMITER
+            + PHONE_DESC_AMY.trim();
         assertParseFailure(parser, userInput, Messages.getErrorMessageForDuplicatePrefixes(PREFIX_ADDRESS));
     }
 
     @Test
     public void parse_nonPrefixedUpdatePreamble_failure() {
-        String userInput = TARGET_NAME_AMY + DELIMITER + "oops " + PHONE_DESC_AMY.trim();
+        String userInput = TARGET_IDENTIFIER_AMY + DELIMITER + "oops " + PHONE_DESC_AMY.trim();
         assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
     }
 
     @Test
     public void parse_invalidValue_failure() {
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + INVALID_NAME_DESC.trim(), Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + INVALID_PHONE_DESC.trim(), Phone.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + INVALID_EMAIL_DESC.trim(), Email.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + INVALID_ADDRESS_DESC.trim(),
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_NAME_DESC.trim(),
+            Name.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_PHONE_DESC.trim(),
+            Phone.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_EMAIL_DESC.trim(),
+            Email.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_ADDRESS_DESC.trim(),
             Address.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + INVALID_TAG_DESC.trim(), Tag.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_TAG_DESC.trim(),
+            Tag.MESSAGE_CONSTRAINTS);
 
         // invalid phone followed by valid email
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + INVALID_PHONE_DESC.trim() + EMAIL_DESC_AMY,
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_PHONE_DESC.trim() + EMAIL_DESC_AMY,
                 Phone.MESSAGE_CONSTRAINTS);
 
         // while parsing {@code PREFIX_TAG} alone will reset the tags of the {@code Person} being edited,
         // parsing it together with a valid tag results in error
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + TAG_DESC_FRIEND.trim()
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + TAG_DESC_FRIEND.trim()
             + TAG_DESC_HUSBAND + TAG_EMPTY,
             Tag.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + TAG_DESC_FRIEND.trim()
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + TAG_DESC_FRIEND.trim()
             + TAG_EMPTY + TAG_DESC_HUSBAND,
             Tag.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + TAG_EMPTY.trim()
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + TAG_EMPTY.trim()
             + TAG_DESC_FRIEND + TAG_DESC_HUSBAND,
             Tag.MESSAGE_CONSTRAINTS);
 
         // multiple invalid values, but only the first invalid value is captured
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + INVALID_NAME_DESC.trim() + INVALID_EMAIL_DESC
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_NAME_DESC.trim() + INVALID_EMAIL_DESC
                 + VALID_ADDRESS_AMY + VALID_PHONE_AMY,
                 Name.MESSAGE_CONSTRAINTS);
 
         // invalid values in target segment are wrapped as invalid command format
-        assertParseFailure(parser, TARGET_NAME_AMY + INVALID_PHONE_DESC + DELIMITER + NAME_DESC_AMY.trim(),
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_PHONE_DESC + DELIMITER + NAME_DESC_AMY.trim(),
             MESSAGE_INVALID_FORMAT);
-        assertParseFailure(parser, TARGET_NAME_AMY + INVALID_EMAIL_DESC + DELIMITER + NAME_DESC_AMY.trim(),
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_EMAIL_DESC + DELIMITER + NAME_DESC_AMY.trim(),
             MESSAGE_INVALID_FORMAT);
-        assertParseFailure(parser, TARGET_NAME_AMY + INVALID_ADDRESS_DESC + DELIMITER + NAME_DESC_AMY.trim(),
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_ADDRESS_DESC + DELIMITER + NAME_DESC_AMY.trim(),
             MESSAGE_INVALID_FORMAT);
     }
 
     @Test
     public void parse_allFieldsSpecified_success() {
-        String userInput = TARGET_NAME_BENSON + PHONE_DESC_BOB + TAG_DESC_HUSBAND + DELIMITER
+        String userInput = TARGET_IDENTIFIER_BENSON + PHONE_DESC_BOB + TAG_DESC_HUSBAND + DELIMITER
             + PHONE_DESC_BOB.trim() + EMAIL_DESC_AMY + ADDRESS_DESC_AMY + NAME_DESC_AMY + TAG_DESC_FRIEND;
 
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withName(VALID_NAME_AMY)
@@ -174,7 +191,7 @@ public class EditCommandParserTest {
 
         assertParseSuccess(parser, userInput, expectedCommand);
 
-        userInput = TARGET_NAME_AMY + PHONE_DESC_BOB + EMAIL_DESC_BOB + ADDRESS_DESC_BOB + TAG_DESC_HUSBAND
+        userInput = TARGET_IDENTIFIER_AMY + PHONE_DESC_BOB + EMAIL_DESC_BOB + ADDRESS_DESC_BOB + TAG_DESC_HUSBAND
             + DELIMITER + NAME_DESC_AMY.trim();
         descriptor = new EditPersonDescriptorBuilder().withName(VALID_NAME_AMY).build();
         expectedCommand = new EditCommand(
@@ -187,7 +204,7 @@ public class EditCommandParserTest {
 
     @Test
     public void parse_someFieldsSpecified_success() {
-        String userInput = TARGET_NAME_AMY + DELIMITER + PHONE_DESC_BOB.trim() + EMAIL_DESC_AMY;
+        String userInput = TARGET_IDENTIFIER_AMY + DELIMITER + PHONE_DESC_BOB.trim() + EMAIL_DESC_AMY;
 
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withPhone(VALID_PHONE_BOB)
                 .withEmail(VALID_EMAIL_AMY).build();
@@ -200,42 +217,42 @@ public class EditCommandParserTest {
     @Test
     public void parse_oneFieldSpecified_success() {
         // name
-        String userInput = TARGET_NAME_CARL + DELIMITER + NAME_DESC_AMY.trim();
+        String userInput = TARGET_IDENTIFIER_CARL + DELIMITER + NAME_DESC_AMY.trim();
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withName(VALID_NAME_AMY).build();
         EditCommand expectedCommand = new EditCommand(
             new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
         assertParseSuccess(parser, userInput, expectedCommand);
 
         // phone
-        userInput = TARGET_NAME_CARL + DELIMITER + PHONE_DESC_AMY.trim();
+        userInput = TARGET_IDENTIFIER_CARL + DELIMITER + PHONE_DESC_AMY.trim();
         descriptor = new EditPersonDescriptorBuilder().withPhone(VALID_PHONE_AMY).build();
         expectedCommand = new EditCommand(
             new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
         assertParseSuccess(parser, userInput, expectedCommand);
 
         // email
-        userInput = TARGET_NAME_CARL + DELIMITER + EMAIL_DESC_AMY.trim();
+        userInput = TARGET_IDENTIFIER_CARL + DELIMITER + EMAIL_DESC_AMY.trim();
         descriptor = new EditPersonDescriptorBuilder().withEmail(VALID_EMAIL_AMY).build();
         expectedCommand = new EditCommand(
             new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
         assertParseSuccess(parser, userInput, expectedCommand);
 
         // address
-        userInput = TARGET_NAME_CARL + DELIMITER + ADDRESS_DESC_AMY.trim();
+        userInput = TARGET_IDENTIFIER_CARL + DELIMITER + ADDRESS_DESC_AMY.trim();
         descriptor = new EditPersonDescriptorBuilder().withAddress(VALID_ADDRESS_AMY).build();
         expectedCommand = new EditCommand(
             new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
         assertParseSuccess(parser, userInput, expectedCommand);
 
         // tags
-        userInput = TARGET_NAME_CARL + DELIMITER + TAG_DESC_FRIEND.trim();
+        userInput = TARGET_IDENTIFIER_CARL + DELIMITER + TAG_DESC_FRIEND.trim();
         descriptor = new EditPersonDescriptorBuilder().withTags(VALID_TAG_FRIEND).build();
         expectedCommand = new EditCommand(
             new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
         assertParseSuccess(parser, userInput, expectedCommand);
 
         // photo
-        userInput = TARGET_NAME_CARL + DELIMITER + PHOTO_DESC.trim();
+        userInput = TARGET_IDENTIFIER_CARL + DELIMITER + PHOTO_DESC.trim();
         descriptor = new EditPersonDescriptorBuilder().withPhoto(VALID_PHOTO).build();
         expectedCommand = new EditCommand(
             new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
@@ -248,17 +265,17 @@ public class EditCommandParserTest {
         // AddCommandParserTest#parse_repeatedNonTagValue_failure()
 
         // valid followed by invalid
-        String userInput = TARGET_NAME_AMY + DELIMITER + INVALID_PHONE_DESC.trim() + PHONE_DESC_BOB;
+        String userInput = TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_PHONE_DESC.trim() + PHONE_DESC_BOB;
 
         assertParseFailure(parser, userInput, Messages.getErrorMessageForDuplicatePrefixes(PREFIX_PHONE));
 
         // invalid followed by valid
-        userInput = TARGET_NAME_AMY + DELIMITER + PHONE_DESC_BOB.trim() + INVALID_PHONE_DESC;
+        userInput = TARGET_IDENTIFIER_AMY + DELIMITER + PHONE_DESC_BOB.trim() + INVALID_PHONE_DESC;
 
         assertParseFailure(parser, userInput, Messages.getErrorMessageForDuplicatePrefixes(PREFIX_PHONE));
 
         // mulltiple valid fields repeated
-        userInput = TARGET_NAME_AMY + DELIMITER + PHONE_DESC_AMY.trim() + ADDRESS_DESC_AMY + EMAIL_DESC_AMY
+        userInput = TARGET_IDENTIFIER_AMY + DELIMITER + PHONE_DESC_AMY.trim() + ADDRESS_DESC_AMY + EMAIL_DESC_AMY
                 + TAG_DESC_FRIEND + PHONE_DESC_AMY + ADDRESS_DESC_AMY + EMAIL_DESC_AMY + TAG_DESC_FRIEND
                 + PHONE_DESC_BOB + ADDRESS_DESC_BOB + EMAIL_DESC_BOB + TAG_DESC_HUSBAND;
 
@@ -266,7 +283,7 @@ public class EditCommandParserTest {
                 Messages.getErrorMessageForDuplicatePrefixes(PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS));
 
         // multiple invalid values
-        userInput = TARGET_NAME_AMY + DELIMITER + INVALID_PHONE_DESC.trim()
+        userInput = TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_PHONE_DESC.trim()
             + INVALID_ADDRESS_DESC + INVALID_EMAIL_DESC
                 + INVALID_PHONE_DESC + INVALID_ADDRESS_DESC + INVALID_EMAIL_DESC;
 
@@ -276,7 +293,7 @@ public class EditCommandParserTest {
 
     @Test
     public void parse_resetTags_success() {
-        String userInput = TARGET_NAME_CARL + DELIMITER + TAG_EMPTY.trim();
+        String userInput = TARGET_IDENTIFIER_CARL + DELIMITER + TAG_EMPTY.trim();
 
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withTags().build();
         EditCommand expectedCommand = new EditCommand(
@@ -289,7 +306,8 @@ public class EditCommandParserTest {
     public void parse_mixedCaseTagValues_success() {
         String mixedCaseTargetTag = "HuSbAnD";
         String mixedCaseUpdateTag = "FrIeNd";
-        String userInput = TARGET_NAME_BENSON + " t/" + mixedCaseTargetTag + DELIMITER + "t/" + mixedCaseUpdateTag;
+        String userInput = TARGET_IDENTIFIER_BENSON + " t/" + mixedCaseTargetTag
+            + DELIMITER + "t/" + mixedCaseUpdateTag;
 
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withTags(mixedCaseUpdateTag).build();
         EditCommand expectedCommand = new EditCommand(
