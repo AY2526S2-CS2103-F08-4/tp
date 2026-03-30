@@ -19,6 +19,9 @@ import seedu.address.model.person.Photo;
 public class PhotoStorageUtil {
     private static final Logger logger = LogsCenter.getLogger(PhotoStorageUtil.class);
     private static String imageDirectory = "data/images/";
+    private static final String MESSAGE_MANAGED_DIRECTORY_SOURCE_NOT_ALLOWED =
+            "Direct linking from managed image directory is not allowed."
+            + " Please provide a source image outside data/images/.";
 
     public static String getImageDirectory() {
         return imageDirectory;
@@ -34,13 +37,13 @@ public class PhotoStorageUtil {
      * @return a photo object that contains the encoded UUID file path for usage by NAB.
      */
     public static Photo copyPhotoToDirectory(Photo photo) throws IOException {
-        // Check if the copying operation is needed
-        if (photo.isSavedLocally()) {
-            return photo;
-        }
-
         // Returns a file object
         Path srcPath = Paths.get(photo.getPath());
+
+        Path destDir = Paths.get(imageDirectory);
+        if (isPathWithinManagedDirectory(srcPath, destDir)) {
+            throw new IOException(MESSAGE_MANAGED_DIRECTORY_SOURCE_NOT_ALLOWED);
+        }
 
         // Check existence of file and is regular file
         if (!Files.exists(srcPath) || !Files.isRegularFile(srcPath)) {
@@ -48,7 +51,6 @@ public class PhotoStorageUtil {
         }
 
         // Check if data/images directory exists, otherwise create directory
-        Path destDir = Paths.get(imageDirectory);
         if (!Files.exists(destDir)) {
             Files.createDirectories(destDir);
             logger.info("Created default image directory at: " + destDir.toAbsolutePath());
@@ -73,6 +75,12 @@ public class PhotoStorageUtil {
         return new Photo(relativePath);
     }
 
+    private static boolean isPathWithinManagedDirectory(Path sourcePath, Path managedDirectoryPath) {
+        Path normalizedManagedDirectory = managedDirectoryPath.toAbsolutePath().normalize();
+        Path normalizedSourcePath = sourcePath.toAbsolutePath().normalize();
+        return normalizedSourcePath.startsWith(normalizedManagedDirectory);
+    }
+
     /**
      * Deletes a specified photo object from data/images.
      * @param photo is the photo object to be deleted.
@@ -91,7 +99,6 @@ public class PhotoStorageUtil {
             throw new IOException("The old image file cannot be deleted: " + pathToDelete);
         }
     }
-
 
     /**
      * Clears the entire data/images directory.
