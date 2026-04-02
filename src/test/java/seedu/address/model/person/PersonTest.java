@@ -12,6 +12,7 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
+import static seedu.address.testutil.TypicalPersons.CARL;
 
 import java.util.Collections;
 import java.util.List;
@@ -154,5 +155,16 @@ public class PersonTest {
                 + ", tags=" + ALICE.getTags() + ", events=" + ALICE.getEvents()
                 + ", photo=" + ALICE.getPhoto().map(Object::toString).orElse("") + "}";
         assertEquals(expected, ALICE.toString());
+    }
+
+    @Test
+    public void delegatorMethod() {
+        assertEquals("Alice Pauline", ALICE.getNameString());
+        assertEquals("94351253", ALICE.getPhoneString());
+        assertEquals(Optional.of("123, Jurong West Ave 6, #08-111"), ALICE.getAddressString());
+        assertEquals(Optional.of("alice@example.com"), ALICE.getEmailString());
+        System.out.println(ALICE.getTagsString());
+        assertEquals("Tags: friends", ALICE.getTagsString());
+        assertEquals("", CARL.getTagsString());
     }
 }
