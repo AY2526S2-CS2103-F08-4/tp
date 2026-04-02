@@ -183,7 +183,9 @@
             <p>Format: <code>filter t/TAG[, TAG]...</code></p>
             <ul>
                 <li> The search is case-insensitive. e.g. <code>friend</code> will match <code>Friend</code> tag.</li>
-                <li> The search matches partial words. e.g. <code>frie</code> will match <code>friend</code> tag.</li>
+                <li> The search does not match partial words. e.g. <code>frie</code> will not match <code>friend</code>
+                    tag.
+                </li>
             </ul>
             <div class="command-box">
                 <span class="code-comment"># Finds all contacts that are tagged friends.<br></span>
