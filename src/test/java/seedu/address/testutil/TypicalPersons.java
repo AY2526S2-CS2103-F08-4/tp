@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import seedu.address.model.AddressBook;
+import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
 
 /**
@@ -98,9 +99,12 @@ public class TypicalPersons {
      */
     public static AddressBook getTypicalAddressBook() {
         AddressBook ab = new AddressBook();
+        List<Event> allEvents = new ArrayList<>();
         for (Person person : getTypicalPersons()) {
             ab.addPerson(person);
+            allEvents.addAll(person.getEvents());
         }
+        ab.setEvents(allEvents);
         return ab;
     }
 

@@ -69,7 +69,6 @@ public class FindEventCommandTest {
                 .filter(p -> p.getName().equalsIgnoreCase(new Name("Alice Pauline")))
                 .findFirst()
                 .orElseThrow();
-        matchedPerson.getEvents().forEach(model::addEvent);
         FindEventCommand command = new FindEventCommand(
                 new PersonInformation(new Name("Alice Pauline"), null, null, null, null));
 
@@ -87,9 +86,9 @@ public class FindEventCommandTest {
     public void execute_singleMatchingPersonByOptionalField_returnsEventsOverview() throws CommandException {
         Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
         Person first = new PersonBuilder().withName("Ryan Lim").withPhone("81111111")
-                .withEvents("Consult,2026-02-21 0900,2026-02-21 1000").build();
+                .withEvents("Consult,2026-04-01 0900,2026-04-01 1000").build();
         Person second = new PersonBuilder().withName("Ryan Lim").withPhone("82222222")
-                .withEvents("Demo,2026-02-21 1100,2026-02-21 1200").build();
+                .withEvents("Demo,2026-04-01 1100,2026-04-01 1200").build();
         model.addPerson(first);
         model.addPerson(second);
         first.getEvents().forEach(model::addEvent);
