@@ -17,4 +17,10 @@ public interface ReadOnlyAddressBook {
 
     ObservableList<Event> getEventList();
 
+    /**
+     * Returns an unmodifiable view of the pinned persons list.
+     * This list will not contain any duplicate persons.
+     */
+    ObservableList<Person> getPinnedPersonList();
+
 }
