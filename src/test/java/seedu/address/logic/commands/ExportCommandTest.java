@@ -18,13 +18,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
-import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.testutil.PersonBuilder;
 
 public class ExportCommandTest {
@@ -128,7 +128,7 @@ public class ExportCommandTest {
     }
 
     @Test
-    public void execute_exportImport_multipleEvents_roundTripIntegrityMaintained() throws Exception {
+    public void execute_exportImportMultipleEvents_roundTripIntegrityMaintained() throws Exception {
         Person originalPerson = new PersonBuilder()
                 .withName("Eve Tan")
                 .withPhone("81234567")

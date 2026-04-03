@@ -519,7 +519,7 @@ public class ImportCommandTest {
         ImportCommand importFirst = new ImportCommand("overwrite", "file1");
         ImportCommand importSecond = new ImportCommand("overwrite", "file1");
         ImportCommand importDifferentFile = new ImportCommand("overwrite", "file2");
-        ImportCommand importDifferentType= new ImportCommand("add", "file1");
+        ImportCommand importDifferentType = new ImportCommand("add", "file1");
         ImportCommand importDifferentTypeAndFile = new ImportCommand("add", "file3");
 
         assertEquals(importFirst, importFirst);
