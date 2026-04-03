@@ -60,6 +60,8 @@
             <li><a href="#editing-person">Editing a person</a></li>
             <li><a href="#finding-person">Finding persons by name</a></li>
             <li><a href="#filtering-person">Filtering persons by context</a></li>
+            <li><a href="#pinning-person">Pinning a person</a></li>
+            <li><a href="#unpinning-person">Unpinning a person</a></li>
             <li><a href="#deleting-person">Deleting a person</a></li>
             <li><a href="#adding-event">Adding an event</a></li>
             <li><a href="#viewing-event">Viewing an event</a></li>
@@ -192,6 +194,41 @@
                 > filter t/friends<br><br>
                 <span class="code-comment"># Finds all contacts that have any of these tags.<br></span>
                 > filter t/cs2103, cs2105, cs2109s
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h2 class="feature-header" id="pinning-person">Pinning a person: <code>pin</code></h2>
+            <p>Pins the person identified by their name.</p>
+            <p>Format: <code>pin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <ul>
+                <li>Pinned persons are shown first when the <code>list</code> command is used.</li>
+                <li>The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
+                <li>Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
+                <li>Order of parameters does not matter.</li>
+            </ul>
+            <div class="command-box">
+                <span class="code-comment"># Pins John Doe when the name uniquely identifies the contact.<br></span>
+                > pin n/John Doe<br><br>
+                <span class="code-comment"># Pins the matching John Doe contact by name and phone number.<br></span>
+                > pin n/John Doe p/91234567
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h2 class="feature-header" id="unpinning-person">Unpinning a person: <code>unpin</code></h2>
+            <p>Unpins the person identified by their name.</p>
+            <p>Format: <code>unpin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <ul>
+                <li>The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
+                <li>Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
+                <li>Order of parameters does not matter.</li>
+            </ul>
+            <div class="command-box">
+                <span class="code-comment"># Unpins John Doe when the name uniquely identifies the contact.<br></span>
+                > unpin n/John Doe<br><br>
+                <span class="code-comment"># Unpins the matching John Doe contact by name and phone number.<br></span>
+                > unpin n/John Doe p/91234567
             </div>
         </div>
 
@@ -431,6 +468,22 @@
                 <td>
                     <code>filter t/TAG[, TAG]...</code><br>
                     <span class="example-text">e.g., <code>filter t/friends</code></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Pin</td>
+                <td>
+                    <code>pin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <span class="example-text">e.g., <code>pin n/John Doe p/91234567</code></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Unpin</td>
+                <td>
+                    <code>unpin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <span class="example-text">e.g., <code>unpin n/John Doe p/91234567</code></span>
                 </td>
             </tr>
 
