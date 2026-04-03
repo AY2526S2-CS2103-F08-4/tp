@@ -5,9 +5,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -31,8 +29,6 @@ public class ModelManager implements Model {
     private final FilteredList<Person> filteredPersons;
     private final SortedList<Person> sortedPersons;
     private final FilteredList<Event> filteredEvents;
-    private final Map<Person, Integer> pinnedPersons;
-    private int nextPinSequence;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -46,9 +42,8 @@ public class ModelManager implements Model {
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
         sortedPersons = new SortedList<>(filteredPersons);
+        sortedPersons.setComparator(createPinnedComparator());
         filteredEvents = new FilteredList<>(this.addressBook.getEventList());
-        pinnedPersons = new HashMap<>();
-        nextPinSequence = 0;
     }
 
     public ModelManager() {
@@ -95,8 +90,6 @@ public class ModelManager implements Model {
     @Override
     public void setAddressBook(ReadOnlyAddressBook addressBook) {
         this.addressBook.resetData(addressBook);
-        pinnedPersons.clear();
-        nextPinSequence = 0;
     }
 
     @Override
@@ -113,7 +106,6 @@ public class ModelManager implements Model {
     @Override
     public void deletePerson(Person target) {
         addressBook.removePerson(target);
-        pinnedPersons.remove(target);
     }
 
     @Override
@@ -125,11 +117,6 @@ public class ModelManager implements Model {
     public void setPerson(Person target, Person editedPerson) {
         requireAllNonNull(target, editedPerson);
         addressBook.setPerson(target, editedPerson);
-        if (pinnedPersons.containsKey(target)) {
-            int pinSequence = pinnedPersons.get(target);
-            pinnedPersons.remove(target);
-            pinnedPersons.put(editedPerson, pinSequence);
-        }
     }
 
     @Override
@@ -219,10 +206,19 @@ public class ModelManager implements Model {
     @Override
     public void pinPerson(Person person) {
         requireNonNull(person);
-        if (!addressBook.hasPerson(person)) {
-            return;
-        }
-        pinnedPersons.putIfAbsent(person, nextPinSequence++);
+        addressBook.pinPerson(person);
+    }
+
+    @Override
+    public boolean isPersonPinned(Person person) {
+        requireNonNull(person);
+        return addressBook.isPersonPinned(person);
+    }
+
+    @Override
+    public void unpinPerson(Person person) {
+        requireNonNull(person);
+        addressBook.unpinPerson(person);
     }
 
     @Override
@@ -298,10 +294,15 @@ public class ModelManager implements Model {
         return true;
     }
 
+    /**
+     * Creates a comparator that orders pinned persons first.
+     * Pinned persons are ordered by pin sequence (list index), while unpinned persons
+     * retain their relative order from the address book list.
+     */
     private Comparator<Person> createPinnedComparator() {
         return (p1, p2) -> {
-            boolean p1Pinned = pinnedPersons.containsKey(p1);
-            boolean p2Pinned = pinnedPersons.containsKey(p2);
+            boolean p1Pinned = findPinnedPersonByIdentity(p1) != null;
+            boolean p2Pinned = findPinnedPersonByIdentity(p2) != null;
 
             if (p1Pinned && !p2Pinned) {
                 return -1;
@@ -310,12 +311,34 @@ public class ModelManager implements Model {
                 return 1;
             }
             if (p1Pinned) {
-                return Integer.compare(pinnedPersons.get(p1), pinnedPersons.get(p2));
+                return Integer.compare(getPinIndexByIdentity(p1), getPinIndexByIdentity(p2));
             }
 
             List<Person> personList = addressBook.getPersonList();
             return Integer.compare(personList.indexOf(p1), personList.indexOf(p2));
         };
+    }
+
+    /**
+     * Returns the pinned person with the same identity as {@code person}, if present.
+     */
+    private Person findPinnedPersonByIdentity(Person person) {
+        return addressBook.getPinnedPersonList().stream()
+                .filter(pinnedPerson -> pinnedPerson.isSamePerson(person))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Returns the pin index for the person with the same identity as {@code person}.
+     * Returns {@code Integer.MAX_VALUE} when the person is not pinned.
+     */
+    private int getPinIndexByIdentity(Person person) {
+        Person pinnedPerson = findPinnedPersonByIdentity(person);
+        if (pinnedPerson == null) {
+            return Integer.MAX_VALUE;
+        }
+        return addressBook.getPinnedPersonList().indexOf(pinnedPerson);
     }
 
 }

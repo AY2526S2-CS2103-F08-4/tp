@@ -117,6 +117,16 @@ public interface Model {
     void pinPerson(Person person);
 
     /**
+     * Unpins the given person for this application session.
+     */
+    void unpinPerson(Person person);
+
+    /**
+     * Returns true if the given person is currently pinned.
+     */
+    boolean isPersonPinned(Person person);
+
+    /**
      * Return a list of correct contact(s) based on the optional parameters provided
      */
     List<Person> findPersons(PersonInformation info);
