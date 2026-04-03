@@ -239,14 +239,14 @@ public class ParserUtilTest {
 
     @Test
     public void parsePersons_validMultiplePersons_success() throws Exception {
-        String personsSection = " n/Alice n/Joe t/Family n/Chloe p/87268609 e/chloe@example.com a/NUS";
+        String personsSection = " n/Alice n/Joe t/Family n/Bob p/81234567 e/bob@example.com a/NUS";
         List<PersonInformation> actual = ParserUtil.parsePersons(personsSection);
 
         List<PersonInformation> expected = List.of(
                 new PersonInformation(new Name("Alice"), null, null, null, null),
                 new PersonInformation(new Name("Joe"), null, null, null, Set.of(new Tag("Family"))),
-                new PersonInformation(new Name("Chloe"), new Phone("87268609"),
-                        new Email("chloe@example.com"), new Address("NUS"), null)
+                new PersonInformation(new Name("Bob"), new Phone("81234567"),
+                        new Email("bob@example.com"), new Address("NUS"), null)
         );
         assertEquals(expected, actual);
     }

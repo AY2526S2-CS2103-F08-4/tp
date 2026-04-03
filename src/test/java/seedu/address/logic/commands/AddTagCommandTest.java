@@ -98,9 +98,12 @@ public class AddTagCommandTest {
         AddTagCommand first = new AddTagCommand(List.of(info("Alice")), Set.of(new Tag("CS2103")));
         AddTagCommand second = new AddTagCommand(List.of(info("Bob")), Set.of(new Tag("CS2030S")));
         AddTagCommand firstCopy = new AddTagCommand(List.of(info("Alice")), Set.of(new Tag("CS2103")));
+        AddTagCommand sameTargetDifferentTags = new AddTagCommand(
+                List.of(info("Alice")), Set.of(new Tag("CS2040")));
 
         assertTrue(first.equals(first));
         assertTrue(first.equals(firstCopy));
+        assertFalse(first.equals(sameTargetDifferentTags));
         assertFalse(first.equals(1));
         assertFalse(first.equals(null));
         assertFalse(first.equals(second));

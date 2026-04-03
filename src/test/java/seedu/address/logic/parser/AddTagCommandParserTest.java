@@ -32,7 +32,7 @@ public class AddTagCommandParserTest {
         String input = " " + PREFIX_TAG_ASSIGN + "CS2103 " + PREFIX_TAG_ASSIGN + "CS2030S "
                 + PREFIX_NAME + "Alice "
                 + PREFIX_NAME + "Joe " + PREFIX_TAG + "Family "
-                + PREFIX_NAME + "Chloe " + PREFIX_PHONE + "87268609 " + PREFIX_EMAIL + "chloe@example.com "
+                + PREFIX_NAME + "Bob " + PREFIX_PHONE + "81234567 " + PREFIX_EMAIL + "bob@example.com "
                 + PREFIX_ADDRESS + "NUS";
 
         AddTagCommand expected = new AddTagCommand(
@@ -40,9 +40,9 @@ public class AddTagCommandParserTest {
                         new PersonInformation(new Name("Alice"), null, null, null, null),
                         new PersonInformation(new Name("Joe"), null, null, null, Set.of(new Tag("Family"))),
                         new PersonInformation(
-                                new Name("Chloe"),
-                                new Phone("87268609"),
-                                new Email("chloe@example.com"),
+                                new Name("Bob"),
+                                new Phone("81234567"),
+                                new Email("bob@example.com"),
                                 new Address("NUS"),
                                 null)
                 ),
