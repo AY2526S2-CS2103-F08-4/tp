@@ -8,8 +8,8 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 
 import java.util.List;
-import java.util.Set;
 
+import seedu.address.commons.util.CommandUtil;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
@@ -55,22 +55,13 @@ public class PinCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        List<Person> personsToPin = model.findPersons(this.targetInfo);
+        // Get the list of currently unpinned matches
+        List<Person> unpinnedMatches = model.findPersons(this.targetInfo).stream()
+                .filter(person -> !model.isPersonPinned(person))
+                .toList();
+        // Resolve the target person from the unpinned matches
+        Person personToPin = CommandUtil.targetPersonFromMatches(model, unpinnedMatches);
 
-        //Case 1: No matches found
-        if (personsToPin.isEmpty()) {
-            throw new CommandException(Messages.MESSAGE_NO_MATCH);
-        }
-
-        //Case 2: Multiple matches found
-        if (personsToPin.size() > 1) {
-            Set<Person> matchingPersons = Set.copyOf(personsToPin);
-            model.showMatchingPersons(matchingPersons);
-            throw new CommandException(Messages.MESSAGE_MULTIPLE_MATCH);
-        }
-
-        //Case 3: Single match found
-        Person personToPin = personsToPin.get(0);
         model.pinPerson(personToPin);
         model.showAllPersonsPinnedFirst();
         return new CommandResult(String.format(MESSAGE_PIN_PERSON_SUCCESS, Messages.format(personToPin)));
