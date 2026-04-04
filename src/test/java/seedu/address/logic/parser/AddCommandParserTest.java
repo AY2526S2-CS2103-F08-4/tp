@@ -69,6 +69,15 @@ public class AddCommandParserTest {
     }
 
     @Test
+    public void parse_duplicateTags_failure() {
+        assertParseFailure(parser, NAME_DESC_BOB + PHONE_DESC_BOB + TAG_DESC_FRIEND + TAG_DESC_FRIEND,
+                ParserUtil.MESSAGE_DUPLICATE_TAGS);
+
+        assertParseFailure(parser, NAME_DESC_BOB + PHONE_DESC_BOB + TAG_DESC_FRIEND + " t/FRIEND",
+                ParserUtil.MESSAGE_DUPLICATE_TAGS);
+    }
+
+    @Test
     public void parse_repeatedNonTagValue_failure() {
         String validExpectedPersonString = NAME_DESC_BOB + PHONE_DESC_BOB + EMAIL_DESC_BOB
                 + ADDRESS_DESC_BOB + TAG_DESC_FRIEND;

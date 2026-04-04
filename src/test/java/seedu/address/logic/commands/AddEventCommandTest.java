@@ -242,6 +242,11 @@ public class AddEventCommandTest {
         public void showAllPersons() {
             throw new AssertionError("This method should not be called.");
         }
+
+        @Override
+        public void showAllPersonsPinnedFirst() {
+            throw new AssertionError("This method should not be called.");
+        }
         @Override
         public void showPersons(Predicate<Person> predicate) {
             throw new AssertionError("This method should not be called.");
@@ -250,6 +255,7 @@ public class AddEventCommandTest {
         public void showMatchingPersons(java.util.Set<Person> persons) {
             throw new AssertionError("This method should not be called.");
         }
+
         @Override
         public void showEventsForPerson(Person person) {
             throw new AssertionError("This method should not be called.");
@@ -293,6 +299,21 @@ public class AddEventCommandTest {
 
         @Override
         public boolean hasOverlappingEvent(Event event) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void pinPerson(Person person) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void unpinPerson(Person person) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public boolean isPersonPinned(Person person) {
             throw new AssertionError("This method should not be called.");
         }
     }

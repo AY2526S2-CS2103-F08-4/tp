@@ -1,24 +1,29 @@
 package seedu.address.ui;
 
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.Person;
 
 /**
- * An UI component that displays information of a {@code Person}.
+ * A UI component that displays information of a {@code Person}.
  */
 public class PersonCard extends UiPart<Region> {
 
@@ -28,6 +33,8 @@ public class PersonCard extends UiPart<Region> {
     private static final String TAG_BORDER_COLOR = "black";
     private static final String TAG_BORDER_WIDTH = "0.5";
     private static final String DEFAULT_IMAGE = "/images/pepe-default.png";
+
+    private static final Logger logger = LogsCenter.getLogger(PersonCard.class);
 
     /**
      * Note: Certain keywords such as "location" and "resources" are reserved keywords in JavaFX.
@@ -59,24 +66,27 @@ public class PersonCard extends UiPart<Region> {
     private Label altText;
     @FXML
     private Rectangle personCardSlidingAccent;
+    @FXML
+    private Label pinLabel;
 
     /**
      * Creates a {@code PersonCode} with the given {@code Person} and index to display.
      */
-    public PersonCard(Person person, int displayedIndex) {
+    public PersonCard(Person person, int displayedIndex, boolean isPinned) {
         super(FXML);
         this.person = person;
         id.setText(displayedIndex + ". ");
         name.setText(person.getName().fullName);
+        pinLabel.setVisible(isPinned);
         personCardSlidingAccent.visibleProperty().bind(
                 this.getRoot().focusedProperty().or(this.getRoot().hoverProperty())
         );
-        phone.setText(person.getPhone().value);
-        address.setText(person.getAddress().map(addr -> addr.value).orElse(""));
-        email.setText(person.getEmail().map(email -> email.value).orElse(""));
-        person.getTags().stream()
-                .sorted(Comparator.comparing(tag -> tag.tagName))
-                .forEach(tag -> tags.getChildren().add(createTagLabel(tag.tagName)));
+        phone.setText(person.getPhoneString());
+        address.setText(person.getAddressString().orElse(""));
+        email.setText(person.getEmailString().orElse(""));
+        person.getTagNames().stream()
+                .sorted()
+                .forEach(tagName -> tags.getChildren().add(createTagLabel(tagName)));
         handlePhoto(person);
     }
 
@@ -142,17 +152,17 @@ public class PersonCard extends UiPart<Region> {
         Image profilePicture = null;
 
         try {
-            if (person.getPhoto().isEmpty()) {
+            if (person.getPhotoPath().isEmpty()) {
                 java.io.InputStream stream = this.getClass().getResourceAsStream(DEFAULT_IMAGE);
                 if (stream != null) {
                     profilePicture = new Image(stream);
                 }
             } else {
-                String fileUri = Paths.get(person.getPhoto().get().getPath()).toUri().toString();
+                String fileUri = Paths.get(person.getPhotoPath().get()).toUri().toString();
                 profilePicture = new Image(fileUri);
             }
         } catch (Exception e) {
-            // Handle silently
+            logger.info("Unable to load photo for : " + person.getNameString());
         }
 
         if (profilePicture != null && !profilePicture.isError()) {
@@ -163,6 +173,7 @@ public class PersonCard extends UiPart<Region> {
             altText.setVisible(true);
         }
     }
+
     /**
      * Retrieves the accent bar associated with the person card UI component.
      *
@@ -170,5 +181,29 @@ public class PersonCard extends UiPart<Region> {
      */
     public Rectangle getAccentBar() {
         return personCardSlidingAccent;
+    }
+
+    /**
+     * Copies information contained within a Person Card to the clipboard.
+     */
+    @FXML
+    private void copyPersonCard() {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent personInformation = new ClipboardContent();
+        // Mandatory Fields
+        String name = "Name: " + person.getNameString();
+        String phoneNumber = "Phone: " + person.getPhoneString();
+
+        // Optional Fields
+        String tag = person.getTagsString();
+        String address = person.getAddressString().map(e -> "Address: " + e).orElse("");
+        String email = person.getEmailString().map(e -> "Email: " + e).orElse("");
+
+        // Copy Operation
+        String textToCopy = Stream.of(name, phoneNumber, tag, address, email)
+                .filter(field -> !field.isEmpty())
+                .collect(Collectors.joining("\n"));
+        personInformation.putString(textToCopy);
+        clipboard.setContent(personInformation);
     }
 }

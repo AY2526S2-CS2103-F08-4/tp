@@ -290,6 +290,26 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void showAllPersonsPinnedFirst_ordersPinnedPersonsBeforeUnpinnedPersons() {
+        Person first = new PersonBuilder().withName("Alpha One").withPhone("90000001").build();
+        Person second = new PersonBuilder().withName("Beta Two").withPhone("90000002").build();
+        Person third = new PersonBuilder().withName("Gamma Three").withPhone("90000003").build();
+
+        modelManager.addPerson(first);
+        modelManager.addPerson(second);
+        modelManager.addPerson(third);
+
+        modelManager.pinPerson(second);
+        modelManager.pinPerson(first);
+
+        modelManager.showAllPersonsPinnedFirst();
+
+        assertEquals(second, modelManager.getFilteredPersonList().get(0));
+        assertEquals(first, modelManager.getFilteredPersonList().get(1));
+        assertEquals(third, modelManager.getFilteredPersonList().get(2));
+    }
+
+    @Test
     public void showMatchingPersons_showsOnlyMatchingPersonsAndClearsEvents() {
         modelManager.addPerson(ALICE);
         modelManager.addPerson(BENSON);

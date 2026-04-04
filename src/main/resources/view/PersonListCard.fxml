@@ -13,7 +13,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane xmlns="http://javafx.com/javafx/17" onMouseClicked="#copyPersonCard" xmlns:fx="http://javafx.com/fxml/1">
   <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
     <VBox alignment="CENTER" minWidth="80">
       <padding>
@@ -40,6 +40,7 @@
             </minWidth>
           </Label>
           <Label fx:id="name" text="\$first" styleClass="cell_big_label" />
+          <Label fx:id="pinLabel" text="📌" style="-fx-font-size: 12px;" visible="false" />
         </HBox>
         <FlowPane fx:id="tags" />
         <Label fx:id="phone" styleClass="cell_small_label" text="\$phone" />

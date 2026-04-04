@@ -35,7 +35,7 @@ public class ClearCommandTest {
         userFolder = Files.createDirectory(sharedTempFolder.resolve("user_desktop"));
 
         originalDirectory = PhotoStorageUtil.getImageDirectory();
-        String tempDirPath = testFolder.toString().replace("\\", "/") + "/";
+        String tempDirPath = PhotoStorageUtil.formatPath(testFolder);
         PhotoStorageUtil.setImageDirectory(tempDirPath);
     }
 

@@ -27,6 +27,7 @@ import seedu.address.model.event.exceptions.ClashingEventException;
 import seedu.address.model.event.exceptions.DuplicateEventException;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.exceptions.DuplicatePersonException;
+import seedu.address.model.person.exceptions.PersonNotFoundException;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddressBookTest {
@@ -37,6 +38,7 @@ public class AddressBookTest {
     public void constructor() {
         assertEquals(Collections.emptyList(), addressBook.getPersonList());
         assertEquals(Collections.emptyList(), addressBook.getEventList());
+        assertEquals(Collections.emptyList(), addressBook.getPinnedPersonList());
     }
 
     @Test
@@ -196,10 +198,131 @@ public class AddressBookTest {
     }
 
     @Test
+    public void pinPerson_unpinnedPerson_success() {
+        addressBook.addPerson(ALICE);
+        assertFalse(addressBook.isPersonPinned(ALICE));
+
+        addressBook.pinPerson(ALICE);
+
+        assertTrue(addressBook.isPersonPinned(ALICE));
+        assertEquals(1, addressBook.getPinnedPersonList().size());
+    }
+
+    @Test
+    public void pinPerson_alreadyPinned_noChange() {
+        addressBook.addPerson(ALICE);
+        addressBook.pinPerson(ALICE);
+        addressBook.pinPerson(ALICE);
+
+        // Should still be pinned, not added twice
+        assertEquals(1, addressBook.getPinnedPersonList().size());
+        assertTrue(addressBook.isPersonPinned(ALICE));
+    }
+
+    @Test
+    public void pinPerson_notInAddressBook_noChange() {
+        addressBook.pinPerson(ALICE);
+
+        // Pin should not be added if person not in address book
+        assertEquals(0, addressBook.getPinnedPersonList().size());
+        assertFalse(addressBook.isPersonPinned(ALICE));
+    }
+
+    @Test
+    public void unpinPerson_pinnedPerson_success() {
+        addressBook.addPerson(ALICE);
+        addressBook.pinPerson(ALICE);
+        assertTrue(addressBook.isPersonPinned(ALICE));
+
+        addressBook.unpinPerson(ALICE);
+
+        assertFalse(addressBook.isPersonPinned(ALICE));
+        assertEquals(0, addressBook.getPinnedPersonList().size());
+    }
+
+    @Test
+    public void unpinPerson_unpinnedPerson_noChange() {
+        addressBook.addPerson(ALICE);
+        assertThrows(PersonNotFoundException.class, () -> addressBook.unpinPerson(ALICE));
+
+        assertFalse(addressBook.isPersonPinned(ALICE));
+        assertEquals(0, addressBook.getPinnedPersonList().size());
+    }
+
+    @Test
+    public void isPersonPinned_pinnedPerson_returnsTrue() {
+        addressBook.addPerson(ALICE);
+        addressBook.pinPerson(ALICE);
+
+        assertTrue(addressBook.isPersonPinned(ALICE));
+    }
+
+    @Test
+    public void isPersonPinned_unpinnedPerson_returnsFalse() {
+        addressBook.addPerson(ALICE);
+
+        assertFalse(addressBook.isPersonPinned(ALICE));
+    }
+
+    @Test
+    public void setPerson_pinnedPersonEdited_updatesBothLists() {
+        addressBook.addPerson(ALICE);
+        addressBook.pinPerson(ALICE);
+
+        Person editedAlice = new PersonBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).withTags(VALID_TAG_HUSBAND)
+                .build();
+        addressBook.setPerson(ALICE, editedAlice);
+
+        assertTrue(addressBook.hasPerson(editedAlice));
+        assertTrue(addressBook.isPersonPinned(editedAlice));
+        assertEquals(1, addressBook.getPinnedPersonList().size());
+    }
+
+    @Test
+    public void setPerson_unpinnedPersonEdited_onlyUpdatesMainList() {
+        addressBook.addPerson(ALICE);
+        Person editedAlice = new PersonBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).withTags(VALID_TAG_HUSBAND)
+                .build();
+        addressBook.setPerson(ALICE, editedAlice);
+
+        assertTrue(addressBook.hasPerson(editedAlice));
+        assertFalse(addressBook.isPersonPinned(editedAlice));
+    }
+
+    @Test
+    public void removePerson_pinnedPersonRemoved_removesFromBothLists() {
+        addressBook.addPerson(ALICE);
+        addressBook.pinPerson(ALICE);
+
+        addressBook.removePerson(ALICE);
+
+        assertFalse(addressBook.hasPerson(ALICE));
+        assertEquals(0, addressBook.getPinnedPersonList().size());
+    }
+
+    @Test
+    public void removePerson_unpinnedPersonRemoved_onlyRemovesFromMainList() {
+        addressBook.addPerson(ALICE);
+        addressBook.removePerson(ALICE);
+
+        assertFalse(addressBook.hasPerson(ALICE));
+        assertEquals(0, addressBook.getPinnedPersonList().size());
+    }
+
+    @Test
+    public void getPinnedPersonList_modifyList_throwsUnsupportedOperationException() {
+        addressBook.addPerson(ALICE);
+        addressBook.pinPerson(ALICE);
+
+        assertThrows(UnsupportedOperationException.class, () -> addressBook.getPinnedPersonList().remove(0));
+    }
+
+    @Test
     public void toStringMethod() {
         String expected = AddressBook.class.getCanonicalName()
                 + "{persons=" + addressBook.getPersonList()
-                + ", events=" + addressBook.getEventList() + "}";
+            + ", events=" + addressBook.getEventList()
+            + ", pinned=" + addressBook.getPinnedPersonList() + "}";
         assertEquals(expected, addressBook.toString());
     }
 
@@ -245,6 +368,7 @@ public class AddressBookTest {
     private static class AddressBookStub implements ReadOnlyAddressBook {
         private final ObservableList<Person> persons = FXCollections.observableArrayList();
         private final ObservableList<Event> events = FXCollections.observableArrayList();
+        private final ObservableList<Person> pinned = FXCollections.observableArrayList();
 
         AddressBookStub(Collection<Person> persons, Collection<Event> events) {
             this.persons.setAll(persons);
@@ -259,6 +383,11 @@ public class AddressBookTest {
         @Override
         public ObservableList<Event> getEventList() {
             return events;
+        }
+
+        @Override
+        public ObservableList<Person> getPinnedPersonList() {
+            return pinned;
         }
     }
 

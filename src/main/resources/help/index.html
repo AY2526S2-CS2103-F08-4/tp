@@ -60,12 +60,20 @@
             <li><a href="#editing-person">Editing a person</a></li>
             <li><a href="#finding-person">Finding persons by name</a></li>
             <li><a href="#filtering-person">Filtering persons by context</a></li>
+<<<<<<< HEAD
+            <li><a href="#pinning-person">Pinning a person</a></li>
+            <li><a href="#unpinning-person">Unpinning a person</a></li>
+=======
+            <li><a href="#tagging-person">Assigning tag(s) to person(s)</a></li>
+>>>>>>> master
             <li><a href="#deleting-person">Deleting a person</a></li>
             <li><a href="#adding-event">Adding an event</a></li>
             <li><a href="#viewing-event">Viewing an event</a></li>
             <li><a href="#deleting-event">Deleting an event</a></li>
             <li><a href="#clear">Clearing all entries</a></li>
             <li><a href="#exit">Exiting the Program</a></li>
+            <li><a href="#export">Export contacts</a></li>
+            <li><a href="#import">Import contacts</a></li>
 
         </ol>
         <div class="feature-block">
@@ -78,10 +86,20 @@
         <div class="feature-block">
             <h2 class="feature-header" id="adding-person">Adding a person: <code>add</code></h2>
             <p>Adds a person to the address book.</p>
-            <p>Format: <code>add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PROFILE_PICTURE]</code></p>
+            <p>Format: <code>add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]</code></p>
             <ul>
-                <li>Can associate 0 or more tags during the add process</li>
                 <li>Contact cannot be added if the added phone number is already registered in the address book</li>
+            </ul>
+            <p>Additional information for updating profile picture:</p>
+            <ul>
+                <li>For <code>pfp/PHOTO_PATH</code>, accepted file extensions are <code>.png</code>, <code>.jpg</code>,
+                    and <code>.jpeg</code>.
+                </li>
+                <li><code>PHOTO_PATH</code> can be absolute (e.g., <code>C:/Users/Alex/Pictures/me.jpg</code>) or
+                    relative to the app folder (e.g., <code>images/me.png</code>).
+                </li>
+                <li>The file must exist; NAB will copy it to <code>data/images/</code>.</li>
+
             </ul>
             <div class="command-box">
                 > add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01<br>
@@ -103,31 +121,56 @@
         <div class="feature-block">
             <h2 class="feature-header" id="editing-person">Editing a person: <code>edit</code></h2>
             <p>Edits an existing person in the address book.</p>
-            <p>Format: <code>edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PROFILE_PICTURE]</code></p>
+            <p>Format: <code>edit n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG] -- [n/NAME] [p/PHONE_NUMBER]
+                [e/EMAIL] [a/ADDRESS] [t/TAG] [pfp/PHOTO_PATH]</code></p>
+            <p><b>Tip: </b>If there are multiple contacts with the same <code>NAME</code>, utilize the other optional
+                parameters to narrow down the updating of the correct contact. This can be done by supplying any of the
+                following information just after <code>edit n/NAME</code>: Phone number, Email, Address or Tag.</p>
             <ul>
-                <li>Edits the person at the specified <code>INDEX</code>.
-                    The index refers to the index number shown in the displayed person list.
-                    The index <b>must be a positive integer 1, 2, 3, ...</b></li>
-                <li>At least one of the optional fields must be provided.</li>
+                <li>The segment <b>before</b> <code>--</code> identifies which contact to edit.</li>
+                <li>The segment <b>after</b> <code>--</code> specifies fields to be updated.</li>
+                <li>Updatable fields: <code>n/NAME</code>, <code>p/PHONE_NUMBER</code>, <code>e/EMAIL</code>,
+                    <code>a/ADDRESS</code>, <code>t/TAG</code>, <code>pfp/PHOTO_PATH</code></li>
+                <li><code>n/NAME</code> in the target segment is required.</li>
                 <li>Existing values will be updated to the input values.</li>
-                <li>When editing tags, the existing tags of the person will be removed i.e. adding of tags is not cumulative.</li>
-                <li>You can remove all the person's tags by typing <code>t/</code> without specifying any tags after it.</li>
+                <li>To add tags, you can specify new tags by typing <code>t/TAG</code> in the updated field.</li>
+                <li>To delete a specific tag, type an existing tag in the updated field.</li>
+                <li>You can remove all the person’s tags by typing <code>t/</code> without specifying any tags after it.</li>
+                <li>Tags are case-insensitive.</li>
+            </ul>
+            <p>Additional information for updating profile picture:</p>
+            <ul>
+                <li>For <code>pfp/PHOTO_PATH</code>, accepted file extensions are <code>.png</code>, <code>.jpg</code>,
+                    and <code>.jpeg</code>.
+                </li>
+                <li><code>PHOTO_PATH</code> can be absolute (e.g., <code>C:/Users/Alex/Pictures/me.jpg</code>) or
+                    relative to the app folder (e.g., <code>images/me.png</code>).
+                </li>
+                <li>The file must exist; NAB will copy it to <code>data/images/</code>.</li>
+
             </ul>
             <div class="command-box">
-                <span class="code-comment"># Edits the phone number and email address of the 1st person to be 91234567 and johndoe@example.com<br></span>
-                > edit 1 p/91234567 e/johndoe@example.com<br><br>
-                <span class="code-comment"># Edits the name of the 2nd person to be Betsy Crower and clears all existing tags.<br></span>
-                > edit 2 n/Betsy Crower t/
+                <span class="code-comment"># Edits n Doe's phone and email<br></span>
+                > edit n/John Doe -- p/91234567 e/johndoe@example.com<br><br>
+                <span class="code-comment"># Uniquely identifies John Doe by phone, then updates name and tags.<br></span>
+                > edit n/John Doe p/98765432 -- n/Johnathan Doe t/teammate<br><br>
+                <span class="code-comment"># Clears all tags for Betsy Crower<br></span>
+                > edit n/Betsy Crower -- t/<br><br>
+                <span class="code-comment"># Updates Alex Yeoh's profile picture.<br></span>
+                > edit n/Alex Yeoh -- pfp/C:/Users/Alex/Pictures/profile.jpg<br><br>
             </div>
         </div>
 
         <div class="feature-block">
             <h2 class="feature-header" id="finding-person">Finding persons by name: <code>find</code></h2>
-            <p>Finds persons who match the given contact information..</p>
-            <p>Format: <code>find n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p>Finds persons who match the given contact information.</p>
+            <p>Format: <code>find n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p><b>Tip: </b>If there are multiple contacts with the same <code>NAME</code>, utilize the other optional
+                parameters to identify the correct contact. This can be done by supplying any of the
+                following information just after <code>find n/NAME</code>: Phone number, Email, Address or Tag.</p>
             <ul>
                 <li> If there are multiple contacts with the same <code>NAME</code>,
-                    utilize the other optional parameters to narrow down the search to a specific contact.</b></li>
+                    utilize the other optional parameters to narrow down the search to a specific contact.</li>
                 <li>The search is case-insensitive. e.g. <code>hans</code> will match <code>Hans</code></li>
                 <li>Only full words will be matched e.g. <code>Han</code> will not match <code>Hans</code></li>
                 <li>Order of parameters does not matter.</li>
@@ -141,12 +184,14 @@
         </div>
 
         <div class="feature-block">
-            <h2 class="feature-header" id="filterting-person">Filtering persons by context: <code>filter</code></h2>
+            <h2 class="feature-header" id="filtering-person">Filtering persons by context: <code>filter</code></h2>
             <p>Finds persons with the given tag(s).</p>
             <p>Format: <code>filter t/TAG[, TAG]...</code></p>
             <ul>
                 <li> The search is case-insensitive. e.g. <code>friend</code> will match <code>Friend</code> tag.</li>
-                <li> The search is case-insensitive. e.g. <code>frie</code> will match <code>friend</code> tag.</li>
+                <li> The search does not match partial words. e.g. <code>frie</code> will not match <code>friend</code>
+                    tag.
+                </li>
             </ul>
             <div class="command-box">
                 <span class="code-comment"># Finds all contacts that are tagged friends.<br></span>
@@ -157,12 +202,71 @@
         </div>
 
         <div class="feature-block">
+            <h2 class="feature-header" id="pinning-person">Pinning a person: <code>pin</code></h2>
+            <p>Pins the person identified by their name.</p>
+            <p>Format: <code>pin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <ul>
+                <li>Pinned persons are shown first when the <code>list</code> command is used.</li>
+                <li>The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
+                <li>Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
+                <li>Order of parameters does not matter.</li>
+            </ul>
+            <div class="command-box">
+                <span class="code-comment"># Pins John Doe when the name uniquely identifies the contact.<br></span>
+                > pin n/John Doe<br><br>
+                <span class="code-comment"># Pins the matching John Doe contact by name and phone number.<br></span>
+                > pin n/John Doe p/91234567
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h2 class="feature-header" id="unpinning-person">Unpinning a person: <code>unpin</code></h2>
+            <p>Unpins the person identified by their name.</p>
+            <p>Format: <code>unpin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <ul>
+                <li>The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
+                <li>Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
+                <li>Order of parameters does not matter.</li>
+            </ul>
+            <div class="command-box">
+                <span class="code-comment"># Unpins John Doe when the name uniquely identifies the contact.<br></span>
+                > unpin n/John Doe<br><br>
+                <span class="code-comment"># Unpins the matching John Doe contact by name and phone number.<br></span>
+                > unpin n/John Doe p/91234567
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h2 class="feature-header" id="tagging-person">Assigning tag(s) to person(s): <code>tag</code></h2>
+            <p>Assigns one or more tags to one or more contacts in one command.</p>
+            <p>Format: <code>tag label/TAG_TO_ASSIGN [label/TAG_TO_ASSIGN]... n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]... [n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...]...</code></p>
+            <p><b>Tip: </b>Use optional fields immediately after each <code>n/NAME</code> to disambiguate contacts with the same name.</p>
+            <ul>
+                <li><code>label/...</code> are the tags that will be assigned to all specified contacts.</li>
+                <li>Contact segments start with <code>n/NAME</code>.</li>
+                <li>Optional fields after a given <code>n/NAME</code> apply only to that contact segment.</li>
+                <li>The tag-assignment segment (<code>label/...</code>) and person segments (<code>n/...</code>) cannot be mixed.
+                    All <code>label/...</code> entries must appear before the first <code>n/...</code>.</li>
+                <li>If a tag does not exist yet, NAB creates it automatically.</li>
+                <li>If a person segment matches multiple contacts, NAB shows those matches and asks for a more specific command.</li>
+            </ul>
+            <div class="command-box">
+                <span class="code-comment"># Assign CS2103 and CS2030S to Alice and Bob.<br></span>
+                > tag label/CS2103 label/CS2030S n/Alice n/Bob<br><br>
+                <span class="code-comment"># Suppose there are multiple Alice and Bob, an enriched search would be<br></span>
+                > tag label/CS2103 label/CS2030S n/Alice p/81234567 n/Bob a/Clementi<br>
+                <span class="code-comment"># where Alice has phone 81234567 and Bob has address Clementi.</span>
+            </div>
+        </div>
+
+        <div class="feature-block">
             <h2 class="feature-header" id="deleting-person">Deleting a person: <code>delete</code></h2>
             <p>Deletes the specified person from the address book.</p>
-            <p>Format: <code>delete n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p>Format: <code>delete n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p><b>Tip: </b>If there are multiple contacts with the same <code>NAME</code>, utilize the other optional
+                parameters to narrow down the deletion of the correct contact. This can be done by supplying any of the
+                following information just after <code>delete n/NAME</code>: Phone number, Email, Address or Tag.</p>
             <ul>
-                <li>If there are multiple contacts with the same <code>NAME</code>,
-                    utilize the other optional parameters to narrow down the deletion of the correct contact.</li>
                 <li> The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
                 <li> Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
                 <li> Order of parameters does not matter.</li>
@@ -170,7 +274,7 @@
             <div class="command-box">
                 <span class="code-comment"># Deletes the contact with a matching name.<br></span>
                 > delete n/Alex Yeoh<br><br>
-                <span class="code-comment"># Suppose there are multiple Alex Yeoh, an enriched search would bes<br></span>
+                <span class="code-comment"># Suppose there are multiple Alex Yeoh, an enriched search would be<br></span>
                 > delete n/Alex Yeoh t/cs2103 t/cs2105
             </div>
         </div>
@@ -178,7 +282,10 @@
         <div class="feature-block">
             <h2 class="feature-header" id="adding-event">Adding an event: <code>event add</code></h2>
             <p>Create a new event for a specified person.</p>
-            <p>Format: <code>event add d/DESCRIPTION start/START_DATE end/END_DATE to/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p>Format: <code>event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE to/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p><b>Tip: </b>If there are multiple contacts with the same <code>NAME</code>, utilize the other optional
+                parameters to add events to the correct contact. This can be done by supplying any of the
+                following information just after <code>event to/NAME</code>: Phone number, Email, Address or Tag.</p>
             <ul>
                 <li> The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
                 <li> Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
@@ -186,17 +293,22 @@
                 <li> The date time format for <code>start/</code> and <code>end/</code> is <code>YYYY-MM-DD HHmm</code> or <code>DD-MM-YYYY HHmm</code></li>
             </ul>
             <div class="command-box">
-                <span class="code-comment"># Adds an event to Bernice Yu.<br></span>
-                > event add d/Complete Quiz 4 start/12-03-2026 1100 end/12-04-2026 2359 to/Bernice Yu<br><br>
-                <span class="code-comment"># Suppose there are multiple Bernice Yu, an enriched search would be<br></span>
-                > event add d/Complete Quiz 4 start/12-03-2026 1100 end/12-04-2026 2359 to/Bernice Yu p/99272758
+                <span class="code-comment"># Adds an event to David Li.<br></span>
+                > event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900
+                end/2026-03-25 1000 to/David Li<br><br>
+                <span class="code-comment"># Suppose there are multiple David Li, an enriched search would be<br></span>
+                > event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900
+                end/2026-03-25 1000 to/David Li p/99272758
             </div>
         </div>
 
         <div class="feature-block">
             <h2 class="feature-header" id="viewing-event">Viewing an event: <code>event view</code></h2>
             <p>View all events for a specified person.</p>
-            <p>Format: <code>event view n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p>Format: <code>event view n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p><b>Tip: </b>If there are multiple contacts with the same <code>NAME</code>, utilize the other optional
+                parameters to narrow down viewing events of the correct contact. This can be done by supplying any of the
+                following information just after <code>event view n/NAME</code>: Phone number, Email, Address or Tag.</p>
             <ul>
                 <li> The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
                 <li> Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
@@ -213,7 +325,10 @@
         <div class="feature-block">
             <h2 class="feature-header" id="deleting-event">Delete an event: <code>event delete</code></h2>
             <p>Delete an event for a specified person.</p>
-            <p>Format: <code>event delete n/NAME start/START_TIME end/END_TIME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p>Format: <code>event delete title/TITLE start/START_DATE end/END_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
+            <p><b>Tip: </b>If there are multiple contacts with the same <code>NAME</code>, utilize the other optional
+                parameters to narrow down the deletion of an event from the correct contact. This can be done by supplying any of the
+                following information just after <code>event ... n/NAME</code>: Phone number, Email, Address or Tag.</p>
             <ul>
                 <li> The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
                 <li> Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
@@ -221,10 +336,11 @@
                 <li> The date time format for <code>start/</code> and <code>end/</code> is <code>YYYY-MM-DD HHmm</code> or <code>DD-MM-YYYY HHmm</code></li>
             </ul>
             <div class="command-box">
-                <span class="code-comment"># Deletes the event that starts at 12 March 2026 1100 and ends at 12 April 2026 2359 assigned to Bernice Yu.<br></span>
-                > event delete n/Bernice Yu start/12-03-2026 1100 end/12-04-2026 2359<br><br>
-                <span class="code-comment"># Suppose there are multiple Bernice Yu, an enriched search would be<br></span>
-                > event delete n/Bernice Yu start/12-03-2026 1100 end/12-04-2026 2359 a/Blk 30 Lorong 3 Serangoon Gardens, #07-18
+                <span class="code-comment"># Deletes the event that is titled "Meeting" which starts at
+                    12 March 2026 1100 and ends at 12 April 2026 2359 assigned to David Li<br></span>
+                > event delete title/Meeting start/2026-03-12 1100 end/2026-04-12 2359 n/David Li<br><br>
+                <span class="code-comment"># Suppose there are multiple David Li, an enriched search would be<br></span>
+                > event delete title/Meeting start/2026-03-12 1100 end/2026-04-12 2359 n/David Li p/99272758
             </div>
         </div>
 
@@ -246,8 +362,55 @@
                 > exit
             </div>
         </div>
-    </div>
 
+        <div class="feature-block">
+            <h2 class="feature-header" id="export">Exporting Contacts: <code>export</code></h2>
+            <p>Exports a list of contacts into a CSV formatted file</p>
+            <p>Format: <code>export t/EXPORT_TYPE f/FILENAME</code></p>
+            <ul>
+                <li><code>EXPORT_TYPE</code> dictates the scope of the export. Expected inputs are <code>all</code>
+                    (exports the entire address book) or <code>current</code> (exports the currently filtered list)
+                </li>
+                <li><code>FILENAME</code> dictates the name of the target CSV file. Do not include the <code>.csv</code>
+                    extension in the input
+                </li>
+                <li>The exported file is saved in the same directory that contains the current NAB data file.</li>
+                <li> Order of parameters does not matter.</li>
+            </ul>
+            <div class="command-box">
+                <span class="code-comment"># Exports all contacts stored in NAB into a CSV file<br></span>
+                > export t/all f/save_file<br><br>
+                <span class="code-comment"># Exports contacts from the currently filtered list, which is Alice Yeoh<br></span>
+                > find n/Alex Yeoh<br>
+                > export t/current f/save_file
+            </div>
+        </div>
+
+        <div class="feature-block">
+            <h2 class="feature-header" id="import">Importing Contacts: <code>import</code></h2>
+            <p>Imports a list of contacts from a CSV formatted file</p>
+            <p>Format: <code>import t/IMPORT_TYPE f/FILENAME</code></p>
+            <ul>
+                <li><code>IMPORT_TYPE</code> dictates how the data is imported. Expected inputs are <code>add</code>
+                    (appends the contacts from the list to existing address book) or
+                    <code>overwrite</code> (replaces all the current address book information with contacts from the list).
+                </li>
+                <li><code>FILENAME</code> dictates the name of the source CSV file. Do not include the <code>.csv</code>
+                    extension in the input.
+                </li>
+                <li>The file to be imported must be located in the same directory as your current AddressBook data file.</li>
+                <li>Any contacts in the CSV file that already exist in your current address book will be skipped to prevent duplicates.</li>
+                <li>Rows in the CSV that are malformed or have missing mandatory fields will be safely skipped.</li>
+                <li> Order of parameters does not matter.</li>
+            </ul>
+            <div class="command-box">
+                <span class="code-comment"># Import from the CSV file and overwrite existing data in NAB<br></span>
+                > import t/overwrite f/save_file<br><br>
+                <span class="code-comment"># Import from the CSV file and append to the existing data in NAB<br></span>
+                > import t/add f/save_file<br><br>
+            </div>
+        </div>
+    </div>
     <div id="edit-data-file">
         <h1>Editing the data file: </h1>
         <p>AddressBook data are saved automatically as a JSON file <code>[JAR file location]/data/addressbook.json</code>.
@@ -298,7 +461,7 @@
             <tr>
                 <td>Add</td>
                 <td>
-                    <code>add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PROFILE_PICTURE]</code><br>
+                    <code>add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]</code><br>
                     <span class="example-text">e.g., <code>add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague pfp//home/kali/Pictures/hello_world.jpg</code></span>
                 </td>
             </tr>
@@ -306,7 +469,7 @@
             <tr>
                 <td>Delete</td>
                 <td>
-                    <code>delete n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <code>delete n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
                     <span class="example-text">e.g., <code>delete n/Alex Yeoh t/cs2103 t/cs2105</code></span>
                 </td>
             </tr>
@@ -314,15 +477,15 @@
             <tr>
                 <td>Edit</td>
                 <td>
-                    <code>edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PROFILE_PICTURE]</code><br>
-                    <span class="example-text">e.g., <code>edit 2 n/James Lee e/jameslee@example.com</code></span>
+                    <code>edit n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... -- [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]</code><br>
+                    <span class="example-text">e.g., <code>edit n/James Lee e/jameslee@example.com -- t/CS2100 pfp/images/james.jpg</code></span>
                 </td>
             </tr>
 
             <tr>
                 <td>Find</td>
                 <td>
-                    <code>find n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <code>find n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
                     <span class="example-text">e.g., <code>find n/James Jake p/67676969</code></span>
                 </td>
             </tr>
@@ -336,26 +499,63 @@
             </tr>
 
             <tr>
+                <td>Pin</td>
+                <td>
+                    <code>pin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <span class="example-text">e.g., <code>pin n/John Doe p/91234567</code></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Unpin</td>
+                <td>
+                    <code>unpin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <span class="example-text">e.g., <code>unpin n/John Doe p/91234567</code></span>
+                <td>Tag</td>
+                <td>
+                    <code>tag label/TAG_TO_ASSIGN [label/TAG_TO_ASSIGN]... n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]... [n/NAME ...]...</code><br>
+                    <span class="example-text">e.g., <code>tag label/CS2103 label/CS2030S n/Alice n/Bob p/81234567</code></span>
+                </td>
+            </tr>
+
+            <tr>
                 <td>Event Add</td>
                 <td>
-                    <code>event add d/DESCRIPTION start/START_DATE end/END_DATE to/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
-                    <span class="example-text">e.g., <code>event add d/Complete Quiz 4 start/12-03-2026 1100 end/12-04-2026 2359 to/Bernice Yu</code></span>
+                    <code>event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE to/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <span class="example-text">e.g., <code>event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 to/David Li</code></span>
                 </td>
             </tr>
 
             <tr>
                 <td>Event Delete</td>
                 <td>
-                    <code>event delete n/NAME start/START_TIME end/END_TIME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
-                    <span class="example-text">e.g., <code>event delete n/Bernice Yu start/12-03-2026 1100 end/12-04-2026 2359</code></span>
+                    <code>event delete title/TITLE start/START_DATE end/END_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <span class="example-text">e.g., <code>event delete title/Meeting start/2026-03-12 1100 end/2026-04-12 2359 n/David Li</code></span>
                 </td>
             </tr>
 
             <tr>
                 <td>Event View</td>
                 <td>
-                    <code>event view n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
+                    <code>event view n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code><br>
                     <span class="example-text">e.g., <code>event view n/Bernice Yu</code></span>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>Export</td>
+                <td>
+                    <code>export t/EXPORT_TYPE f/FILENAME</code><br>
+                    <span class="example-text">e.g., <code>export t/all f/save_file</code></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Import</td>
+                <td>
+                    <code>import t/IMPORT_TYPE f/FILENAME</code><br>
+                    <span class="example-text">e.g., <code>import t/overwrite f/save_file</code></span>
                 </td>
             </tr>
 

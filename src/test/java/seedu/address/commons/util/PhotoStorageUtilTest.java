@@ -33,7 +33,7 @@ public class PhotoStorageUtilTest {
         userFolder = Files.createDirectory(sharedTempFolder.resolve("user_desktop"));
 
         originalDirectory = PhotoStorageUtil.getImageDirectory();
-        String tempDirPath = testFolder.toString().replace("\\", "/") + "/";
+        String tempDirPath = PhotoStorageUtil.formatPath(testFolder);
         PhotoStorageUtil.setImageDirectory(tempDirPath);
     }
 
@@ -47,14 +47,14 @@ public class PhotoStorageUtilTest {
         // Create the image file in the "user_desktop"
         Path sourceFile = userFolder.resolve("test.jpg");
         Files.createFile(sourceFile);
-        Photo imageFile = new Photo(sourceFile.toString().replace("\\", "/"));
+        Photo imageFile = new Photo(PhotoStorageUtil.formatPath(sourceFile));
 
         // Simulate copy to testFolder
         Photo result = PhotoStorageUtil.copyPhotoToDirectory(imageFile);
 
         // Assert
         assertNotEquals(imageFile.getPath(), result.getPath()); // raw path (from user) vs uuid encoded path (to test)
-        assertTrue(result.isSavedLocally());
+        assertTrue(PhotoStorageUtil.isSavedLocally(result));
         assertTrue(Files.exists(Paths.get(result.getPath())));
 
     }
@@ -62,7 +62,7 @@ public class PhotoStorageUtilTest {
     @Test
     public void copyPhotoToDirectory_nonExistentFile_throwIoException() throws IOException {
         Path sourceFile = userFolder.resolve("does_not_exist.jpg");
-        Photo imageFile = new Photo(sourceFile.toString().replace("\\", "/"));
+        Photo imageFile = new Photo(PhotoStorageUtil.formatPath(sourceFile));
         assertThrows(IOException.class, () -> PhotoStorageUtil.copyPhotoToDirectory(imageFile));
     }
 
@@ -70,10 +70,10 @@ public class PhotoStorageUtilTest {
     public void deletePhoto_validUserPhoto_success() throws IOException {
         Path sourceFile = testFolder.resolve("mock-uuid-1234.jpg");
         Files.createFile(sourceFile);
-        Photo imageFile = new Photo(sourceFile.toString().replace("\\", "/"));
+        Photo imageFile = new Photo(PhotoStorageUtil.formatPath(sourceFile));
 
         assertTrue(Files.exists(sourceFile));
-        assertTrue(imageFile.isSavedLocally());
+        assertTrue(PhotoStorageUtil.isSavedLocally(imageFile));
 
         PhotoStorageUtil.deletePhoto(imageFile);
         assertFalse(Files.exists(sourceFile));
@@ -87,9 +87,9 @@ public class PhotoStorageUtilTest {
 
         // Put a dummy file within this folder, OS will fail to delete this
         Files.createFile(dummyDir.resolve("dummy.jpg"));
-        Photo dummyPhoto = new Photo(dummyDir.toString().replace("\\", "/"));
+        Photo dummyPhoto = new Photo(PhotoStorageUtil.formatPath(dummyDir));
 
-        assertTrue(dummyPhoto.isSavedLocally());
+        assertTrue(PhotoStorageUtil.isSavedLocally(dummyPhoto));
         assertTrue(Files.exists(dummyDir));
 
         assertThrows(IOException.class, () -> PhotoStorageUtil.deletePhoto(dummyPhoto));
@@ -99,9 +99,9 @@ public class PhotoStorageUtilTest {
     public void deletePhoto_userPhotoNotSavedLocally_throwIoException() throws IOException {
         Path dummyFile = userFolder.resolve("do_not_delete_me.jpg");
         Files.createDirectory(dummyFile);
-        Photo dummyPhoto = new Photo(dummyFile.toString().replace("\\", "/"));
+        Photo dummyPhoto = new Photo(PhotoStorageUtil.formatPath(dummyFile));
 
-        assertFalse(dummyPhoto.isSavedLocally());
+        assertFalse(PhotoStorageUtil.isSavedLocally(dummyPhoto));
         assertTrue(Files.exists(dummyFile));
 
         PhotoStorageUtil.deletePhoto(dummyPhoto);
@@ -110,10 +110,26 @@ public class PhotoStorageUtilTest {
 
     @Test
     public void copyPhotoToDirectory_photoInsideManagedDirectory_throwsIoException() {
-        Photo localPhoto = new Photo(testFolder.resolve("existing-uuid.jpg")
-                .toString().replace("\\", "/"));
+        Photo localPhoto = new Photo(PhotoStorageUtil.formatPath(testFolder.resolve("existing-uuid.jpg")));
 
         assertThrows(IOException.class, () -> PhotoStorageUtil.copyPhotoToDirectory(localPhoto));
+    }
+
+    @Test
+    public void copyPhotoToDirectory_missingImageDirectory_createsDirectory() throws IOException {
+        // Set the image directory to a non-existent directory first
+        Path missingDir = sharedTempFolder.resolve("this_folder_does_not_exist");
+        String missingDirPath = PhotoStorageUtil.formatPath(missingDir);
+        PhotoStorageUtil.setImageDirectory(missingDirPath);
+
+        assertFalse(Files.exists(missingDir));
+
+        Path dummyFile = userFolder.resolve("do_not_delete_me.jpg");
+        Files.createFile(dummyFile);
+        Photo dummyPhoto = new Photo(PhotoStorageUtil.formatPath(dummyFile));
+
+        PhotoStorageUtil.copyPhotoToDirectory(dummyPhoto);
+        assertTrue(Files.exists(missingDir));
     }
 
     @Test

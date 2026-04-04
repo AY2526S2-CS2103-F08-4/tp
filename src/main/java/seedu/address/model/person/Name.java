@@ -12,7 +12,7 @@ public class Name {
     public static final String MESSAGE_CONSTRAINTS =
             "Names should only contain alphabetic characters and spaces, and it should not be blank";
 
-    /*
+    /**
      * The first character of the name must be a letter (not whitespace or digit),
      * otherwise " " (a blank string) or purely numeric inputs become valid.
      */

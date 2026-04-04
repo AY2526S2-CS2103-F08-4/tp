@@ -3,6 +3,7 @@ package seedu.address.model.event;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -116,14 +117,15 @@ public class UniqueEventList implements Iterable<Event> {
     @Override
     public boolean equals(Object other) {
         if (other instanceof UniqueEventList otherUniqueEventList) {
-            return internalList.equals(otherUniqueEventList.internalList);
+            // Same regardless of order
+            return new HashSet<>(internalList).equals(new HashSet<>(otherUniqueEventList.internalList));
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return internalList.hashCode();
+        return new HashSet<>(internalList).hashCode();
     }
 
     @Override

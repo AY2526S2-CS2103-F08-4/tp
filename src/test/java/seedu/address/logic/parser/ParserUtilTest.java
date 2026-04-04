@@ -1,14 +1,20 @@
 package seedu.address.logic.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
+import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_PERSONS_FORMAT;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +23,7 @@ import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
+import seedu.address.model.person.PersonInformation;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.Photo;
 import seedu.address.model.tag.Tag;
@@ -38,6 +45,11 @@ public class ParserUtilTest {
     private static final String VALID_PHOTO = "valid.jpg";
 
     private static final String WHITESPACE = " \t\r\n";
+
+    @Test
+    public void constructor_defaultConstructor_coverage() {
+        assertTrue(new ParserUtil() != null);
+    }
 
     @Test
     public void parseIndex_invalidInput_throwsParseException() {
@@ -198,6 +210,11 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void parseTags_collectionWithDuplicateTags_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseTags(Arrays.asList(VALID_TAG_1, VALID_TAG_1)));
+    }
+
+    @Test
     public void parsePhoto_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> ParserUtil.parsePhoto((String) null));
     }
@@ -218,6 +235,67 @@ public class ParserUtilTest {
         String photoWithWhitespace = WHITESPACE + VALID_PHOTO + WHITESPACE;
         Photo expectedPhoto = new Photo(VALID_PHOTO);
         assertEquals(expectedPhoto, ParserUtil.parsePhoto(photoWithWhitespace));
+    }
+
+    @Test
+    public void parsePersons_validMultiplePersons_success() throws Exception {
+        String personsSection = " n/Alice n/Joe t/Family n/Bob p/81234567 e/bob@example.com a/NUS";
+        List<PersonInformation> actual = ParserUtil.parsePersons(personsSection);
+
+        List<PersonInformation> expected = List.of(
+                new PersonInformation(new Name("Alice"), null, null, null, null),
+                new PersonInformation(new Name("Joe"), null, null, null, Set.of(new Tag("Family"))),
+                new PersonInformation(new Name("Bob"), new Phone("81234567"),
+                        new Email("bob@example.com"), new Address("NUS"), null)
+        );
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void parsePersons_noNamePrefix_failure() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_PERSONS_FORMAT, () ->
+                ParserUtil.parsePersons(" n"));
+    }
+
+    @Test
+    public void parsePersons_preambleBeforeFirstName_failure() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_PERSONS_FORMAT, () ->
+                ParserUtil.parsePersons(" preamble n/Alice"));
+    }
+
+    @Test
+    public void parsePersons_invalidPersonSegment_failure() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_PERSONS_FORMAT, () ->
+                ParserUtil.parsePersons(" n/Alice p/not-a-phone"));
+    }
+
+    @Test
+    public void parsePersons_duplicateSingleValuedField_failure() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_PERSONS_FORMAT, () ->
+                ParserUtil.parsePersons(" n/Alice p/81234567 p/91234567"));
+    }
+
+    @Test
+    public void parseEachPerson_emptyPositions_failure() throws Exception {
+        Method parseEachPerson = ParserUtil.class.getDeclaredMethod("parseEachPerson", String.class, List.class);
+        parseEachPerson.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(InvocationTargetException.class, () ->
+                parseEachPerson.invoke(null, " n/Alice", new ArrayList<Integer>()));
+        assertTrue(ex.getCause() instanceof ParseException);
+        assertEquals(MESSAGE_INVALID_PERSONS_FORMAT, ex.getCause().getMessage());
+    }
+
+    @Test
+    public void parseEachPerson_segmentWithoutNamePrefix_failure() throws Exception {
+        Method parseEachPerson = ParserUtil.class.getDeclaredMethod("parseEachPerson", String.class, List.class);
+        parseEachPerson.setAccessible(true);
+
+        List<Integer> invalidNamePositions = List.of(0);
+        InvocationTargetException ex = assertThrows(InvocationTargetException.class, () ->
+                parseEachPerson.invoke(null, " abc", invalidNamePositions));
+        assertTrue(ex.getCause() instanceof ParseException);
+        assertEquals(MESSAGE_INVALID_PERSONS_FORMAT, ex.getCause().getMessage());
     }
 
 }

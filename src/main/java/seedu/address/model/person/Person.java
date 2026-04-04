@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.event.Event;
@@ -83,12 +84,55 @@ public class Person {
         return photo;
     }
 
+    public String getNameString() {
+        return name.fullName;
+    }
+
+    public String getPhoneString() {
+        return phone.value;
+    }
+
+    public Optional<String> getEmailString() {
+        return this.email.map(e -> e.value);
+    }
+
+    public Optional<String> getAddressString() {
+        return this.address.map(a -> a.value);
+    }
+
+    public Optional<String> getPhotoPath() {
+        return photo.map(Photo::getPath);
+    }
+
     /**
      * Returns an immutable tag set, which throws {@code UnsupportedOperationException}
      * if modification is attempted.
      */
     public Set<Tag> getTags() {
         return Collections.unmodifiableSet(tags);
+    }
+
+    /**
+     * Returns a list of tag names associated with the person.
+     */
+    public List<String> getTagNames() {
+        return tags.stream()
+                .map(tag -> tag.tagName)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a String representation of tags tied to the Person
+     */
+    public String getTagsString() {
+        if (tags.isEmpty()) {
+            return "";
+        }
+
+        return "Tags: " + tags.stream()
+                .map(tag -> tag.tagName)
+                .sorted()
+                .collect(Collectors.joining(", "));
     }
 
     /**

@@ -21,6 +21,7 @@ public class AddressBook implements ReadOnlyAddressBook {
 
     private final UniquePersonList persons;
     private final UniqueEventList events;
+    private final UniquePersonList pinnedPersons;
 
     /*
      * The 'unusual' code block below is a non-static initialization block, sometimes used to avoid duplication
@@ -32,6 +33,7 @@ public class AddressBook implements ReadOnlyAddressBook {
     {
         persons = new UniquePersonList();
         events = new UniqueEventList();
+        pinnedPersons = new UniquePersonList();
     }
 
     /**
@@ -54,6 +56,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         requireNonNull(newData);
         setPersons(newData.getPersonList());
         setEvents(newData.getEventList());
+        setPinnedPersons(newData.getPinnedPersonList());
     }
 
 
@@ -65,6 +68,14 @@ public class AddressBook implements ReadOnlyAddressBook {
      */
     public void setPersons(List<Person> persons) {
         this.persons.setPersons(persons);
+    }
+
+    /**
+     * Replaces the contents of the pinned persons list with {@code pinnedPersons}.
+     * {@code pinnedPersons} must not contain duplicates and every pinned person must exist in the person list.
+     */
+    public void setPinnedPersons(List<Person> pinnedPersons) {
+        this.pinnedPersons.setPersons(pinnedPersons);
     }
 
     /**
@@ -92,6 +103,10 @@ public class AddressBook implements ReadOnlyAddressBook {
         requireNonNull(editedPerson);
 
         persons.setPerson(target, editedPerson);
+
+        if (pinnedPersons.contains(target)) {
+            pinnedPersons.setPerson(target, editedPerson);
+        }
     }
 
     /**
@@ -100,6 +115,37 @@ public class AddressBook implements ReadOnlyAddressBook {
      */
     public void removePerson(Person key) {
         persons.remove(key);
+
+        if (pinnedPersons.contains(key)) {
+            pinnedPersons.remove(key);
+        }
+    }
+
+    /**
+     * Pins the given person if present and not already pinned.
+     */
+    public void pinPerson(Person person) {
+        requireNonNull(person);
+        if (!persons.contains(person) || pinnedPersons.contains(person)) {
+            return;
+        }
+        pinnedPersons.add(person);
+    }
+
+    /**
+     * Unpins the given person if currently pinned.
+     */
+    public void unpinPerson(Person person) {
+        requireNonNull(person);
+        pinnedPersons.remove(person);
+    }
+
+    /**
+     * Returns true if the person is pinned.
+     */
+    public boolean isPersonPinned(Person person) {
+        requireNonNull(person);
+        return pinnedPersons.contains(person);
     }
 
     //// event-level operations
@@ -205,6 +251,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         return new ToStringBuilder(this)
                 .add("persons", persons)
                 .add("events", events)
+                .add("pinned", pinnedPersons)
                 .toString();
     }
 
@@ -224,17 +271,26 @@ public class AddressBook implements ReadOnlyAddressBook {
         return events.asUnmodifiableObservableList();
     }
 
+    /**
+     * Returns an unmodifiable view of the pinned person list.
+     */
+    @Override
+    public ObservableList<Person> getPinnedPersonList() {
+        return pinnedPersons.asUnmodifiableObservableList();
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other instanceof AddressBook otherAddressBook) {
             return persons.equals(otherAddressBook.persons)
-                    && events.equals(otherAddressBook.events);
+                    && events.equals(otherAddressBook.events)
+                    && pinnedPersons.equals(otherAddressBook.pinnedPersons);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(persons, events);
+        return Objects.hash(persons, events, pinnedPersons);
     }
 }

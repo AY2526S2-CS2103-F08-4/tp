@@ -14,7 +14,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.Messages;
-import seedu.address.logic.commands.FindCommand;
+import seedu.address.logic.commands.PinCommand;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -22,32 +22,26 @@ import seedu.address.model.person.PersonInformation;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
 
-public class FindCommandParserTest {
+public class PinCommandParserTest {
 
-    private FindCommandParser parser = new FindCommandParser();
+    private final PinCommandParser parser = new PinCommandParser();
 
     @Test
     public void parse_missingNamePrefix_throwsParseException() {
         assertParseFailure(parser, "     ",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE));
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, PinCommand.MESSAGE_USAGE));
     }
 
     @Test
     public void parse_nonEmptyPreamble_throwsParseException() {
         assertParseFailure(parser, "Alex " + PREFIX_NAME + "Alex Tan",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE));
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, PinCommand.MESSAGE_USAGE));
     }
 
     @Test
     public void parse_invalidOptionalField_throwsParseException() {
         assertParseFailure(parser, " " + PREFIX_NAME + "Alex Tan " + PREFIX_PHONE + "not-a-phone",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE));
-    }
-
-    @Test
-    public void parse_duplicateTags_failure() {
-        assertParseFailure(parser, " " + PREFIX_NAME + "Alex Tan " + PREFIX_TAG + "cs2030s " + PREFIX_TAG + "cs2030s",
-                ParserUtil.MESSAGE_DUPLICATE_TAGS);
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, PinCommand.MESSAGE_USAGE));
     }
 
     @Test
@@ -58,11 +52,9 @@ public class FindCommandParserTest {
                 + " " + PREFIX_ADDRESS + "Block 123, NUS Street 1"
                 + " " + PREFIX_TAG + "CS2103";
 
-        // multiple names
         assertParseFailure(parser, " " + PREFIX_NAME + "Alice" + validExpectedPersonString,
                 Messages.getErrorMessageForDuplicatePrefixes(PREFIX_NAME));
 
-        // multiple fields repeated
         assertParseFailure(parser,
                 validExpectedPersonString
                         + " " + PREFIX_PHONE + "91234567"
@@ -74,9 +66,9 @@ public class FindCommandParserTest {
 
     @Test
     public void parse_nameOnly_success() {
-        FindCommand expectedFindCommand =
-                new FindCommand(new PersonInformation(new Name("Alex Tan"), null, null, null, null));
-        assertParseSuccess(parser, " " + PREFIX_NAME + "Alex Tan", expectedFindCommand);
+        PinCommand expectedPinCommand =
+                new PinCommand(new PersonInformation(new Name("Alex Tan"), null, null, null, null));
+        assertParseSuccess(parser, " " + PREFIX_NAME + "Alex Tan", expectedPinCommand);
     }
 
     @Test
@@ -88,8 +80,7 @@ public class FindCommandParserTest {
                 new Address("Block 123, NUS Street 1"),
                 Set.of(new Tag("CS2103"), new Tag("Lab"))
         );
-        FindCommand expectedFindCommand =
-                new FindCommand(info);
+        PinCommand expectedPinCommand = new PinCommand(info);
 
         assertParseSuccess(parser,
                 " " + PREFIX_NAME + "Alex Tan"
@@ -98,6 +89,6 @@ public class FindCommandParserTest {
                         + " " + PREFIX_ADDRESS + "Block 123, NUS Street 1"
                         + " " + PREFIX_TAG + "CS2103"
                         + " " + PREFIX_TAG + "Lab",
-                expectedFindCommand);
+                expectedPinCommand);
     }
 }

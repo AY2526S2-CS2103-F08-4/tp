@@ -4,12 +4,15 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.event.Event;
@@ -25,6 +28,7 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
+    private final SortedList<Person> sortedPersons;
     private final FilteredList<Event> filteredEvents;
 
     /**
@@ -38,6 +42,8 @@ public class ModelManager implements Model {
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        sortedPersons = new SortedList<>(filteredPersons);
+        sortedPersons.setComparator(createPinnedComparator());
         filteredEvents = new FilteredList<>(this.addressBook.getEventList());
     }
 
@@ -162,7 +168,7 @@ public class ModelManager implements Model {
      */
     @Override
     public ObservableList<Person> getFilteredPersonList() {
-        return filteredPersons;
+        return sortedPersons;
     }
 
     @Override
@@ -174,19 +180,46 @@ public class ModelManager implements Model {
     @Override
     public void showAllPersons() {
         updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+        sortedPersons.setComparator(null);
+    }
+
+    @Override
+    public void showAllPersonsPinnedFirst() {
+        updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+        sortedPersons.setComparator(createPinnedComparator());
     }
 
     @Override
     public void showPersons(Predicate<Person> predicate) {
         requireNonNull(predicate);
         updateFilteredPersonList(predicate);
+        sortedPersons.setComparator(null);
     }
 
     @Override
-    public void showMatchingPersons(java.util.Set<Person> persons) {
+    public void showMatchingPersons(Set<Person> persons) {
         requireNonNull(persons);
         updateFilteredPersonList(persons::contains);
+        sortedPersons.setComparator(null);
         updateFilteredEventList(event -> false);
+    }
+
+    @Override
+    public void pinPerson(Person person) {
+        requireNonNull(person);
+        addressBook.pinPerson(person);
+    }
+
+    @Override
+    public boolean isPersonPinned(Person person) {
+        requireNonNull(person);
+        return addressBook.isPersonPinned(person);
+    }
+
+    @Override
+    public void unpinPerson(Person person) {
+        requireNonNull(person);
+        addressBook.unpinPerson(person);
     }
 
     @Override
@@ -220,6 +253,7 @@ public class ModelManager implements Model {
     public void showEventsForPerson(Person person) {
         requireNonNull(person);
         updateFilteredPersonList(p -> p.equals(person));
+        sortedPersons.setComparator(null);
         updateFilteredEventList(person::hasEvent);
     }
 
@@ -259,6 +293,53 @@ public class ModelManager implements Model {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Creates a comparator that orders pinned persons first.
+     * Pinned persons are ordered by pin sequence (list index), while unpinned persons
+     * retain their relative order from the address book list.
+     */
+    private Comparator<Person> createPinnedComparator() {
+        return (p1, p2) -> {
+            boolean p1Pinned = findPinnedPersonByIdentity(p1) != null;
+            boolean p2Pinned = findPinnedPersonByIdentity(p2) != null;
+
+            if (p1Pinned && !p2Pinned) {
+                return -1;
+            }
+            if (!p1Pinned && p2Pinned) {
+                return 1;
+            }
+            if (p1Pinned) {
+                return Integer.compare(getPinIndexByIdentity(p1), getPinIndexByIdentity(p2));
+            }
+
+            List<Person> personList = addressBook.getPersonList();
+            return Integer.compare(personList.indexOf(p1), personList.indexOf(p2));
+        };
+    }
+
+    /**
+     * Returns the pinned person with the same identity as {@code person}, if present.
+     */
+    private Person findPinnedPersonByIdentity(Person person) {
+        return addressBook.getPinnedPersonList().stream()
+                .filter(pinnedPerson -> pinnedPerson.isSamePerson(person))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Returns the pin index for the person with the same identity as {@code person}.
+     * Returns {@code Integer.MAX_VALUE} when the person is not pinned.
+     */
+    private int getPinIndexByIdentity(Person person) {
+        Person pinnedPerson = findPinnedPersonByIdentity(person);
+        if (pinnedPerson == null) {
+            return Integer.MAX_VALUE;
+        }
+        return addressBook.getPinnedPersonList().indexOf(pinnedPerson);
     }
 
 }

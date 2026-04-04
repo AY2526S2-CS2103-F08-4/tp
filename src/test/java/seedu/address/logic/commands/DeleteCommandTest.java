@@ -134,6 +134,7 @@ public class DeleteCommandTest {
         CommandException thrown = assertThrows(CommandException.class, () -> deleteCommand2.execute(model));
         assertEquals(Messages.MESSAGE_MULTIPLE_MATCH, thrown.getMessage());
         model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
+        model.updateFilteredEventList(e -> true);
 
         // 1 result test:
         PersonInformation info3 = new PersonInformation(new Name("David Ng"), new Phone("90002222"),
@@ -200,13 +201,13 @@ public class DeleteCommandTest {
     public void execute_deletesPersonAndPhoto_success(@TempDir Path tempDir) throws Exception {
         // Set up the temp directories for simulation
         String originalDir = PhotoStorageUtil.getImageDirectory();
-        String tempDirPath = tempDir.toString().replace("\\", "/") + "/";
+        String tempDirPath = PhotoStorageUtil.formatPath(tempDir);
         PhotoStorageUtil.setImageDirectory(tempDirPath);
 
         try {
             Path photoFile = tempDir.resolve("delete_me.jpg");
             Files.createFile(photoFile);
-            String photoPath = photoFile.toString().replace("\\", "/");
+            String photoPath = PhotoStorageUtil.formatPath(photoFile);
 
             Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
             model.addPerson(personToDelete);
@@ -226,7 +227,7 @@ public class DeleteCommandTest {
     public void execute_deletesPersonAndPhoto_throwsCommandException(@TempDir Path tempDir) throws Exception {
         // Set up the temp directories for simulation
         String originalDir = PhotoStorageUtil.getImageDirectory();
-        String tempDirPath = tempDir.toString().replace("\\", "/") + "/";
+        String tempDirPath = PhotoStorageUtil.formatPath(tempDir);
         PhotoStorageUtil.setImageDirectory(tempDirPath);
 
         try {
@@ -236,7 +237,7 @@ public class DeleteCommandTest {
             Files.createDirectory(dummyDir);
 
             Files.createFile(dummyDir.resolve("dummy.txt"));
-            String photoPath = dummyDir.toString().replace("\\", "/");
+            String photoPath = PhotoStorageUtil.formatPath(dummyDir);
 
             Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
             model.addPerson(personToDelete);
