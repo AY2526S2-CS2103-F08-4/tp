@@ -118,6 +118,7 @@
         "editing-a-person-edit": "Editing a person : edit",
         "locating-persons-by-name-find": "Locating persons by name: find",
         "filtering-persons-by-context-filter": "Filtering persons by context : filter",
+        "assigning-tag-s-to-person-s-tag": "Assigning tag(s) to person(s) : tag",
         "deleting-a-person-delete": "Deleting a person : delete",
         "clearing-all-entries-clear": "Clearing all entries : clear",
         "adding-an-event-event-add": "Adding an event : event add",
