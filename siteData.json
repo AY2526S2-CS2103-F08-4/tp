@@ -124,6 +124,8 @@
         "view-an-event-event-view": "View an event : event view",
         "delete-an-event-event-delete": "Delete an event : event delete",
         "exiting-the-program-exit": "Exiting the program : exit",
+        "exporting-contacts-export": "Exporting Contacts : export",
+        "importing-contacts-import": "Importing Contacts : import",
         "saving-the-data": "Saving the data",
         "editing-the-data-file": "Editing the data file",
         "archiving-data-files-coming-in-v2-0": "Archiving data files [coming in v2.0]",
