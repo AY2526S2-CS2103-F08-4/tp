@@ -210,25 +210,27 @@ public class ExportCommand extends Command {
     }
 
     /**
-     * Formats a single {@code Event} into a pipe-separated string (Description|Start|End).
+     * Formats a single {@code Event} into a pipe-separated string.
      * Special characters like pipe and semicolon are removed from the description
      * to maintain CSV integrity.
      *
      * @param e The {@code Event} object to format.
      * @return A pipe-separated string of event details.
      */
-    // Event column becomes: Title|Description|Start|End
+    // Event column becomes: Title|Description|Start|End|NumberOfPersonLinked|EventId
     private String formatSingleEvent(Event e) {
         String title = e.getTitle().fullTitle; // adjust if getter differs
         String desc = e.getDescription().map(d -> d.fullDescription).orElse("");
         String sanitizedTitle = title.replace("|", " ").replace(";", " ");
         String sanitizedDesc = desc.replace("|", " ").replace(";", " ");
 
-        return String.format("%s|%s|%s|%s",
+        return String.format("%s|%s|%s|%s|%d|%d",
                 sanitizedTitle,
                 sanitizedDesc,
                 e.getStartTimeFormatted(), // or timeRange.getStartTimeFormatted()
-                e.getEndTimeFormatted());
+                e.getEndTimeFormatted(),
+                e.getNumberOfPersonLinked(),
+                e.getEventId());
     }
 
     /**

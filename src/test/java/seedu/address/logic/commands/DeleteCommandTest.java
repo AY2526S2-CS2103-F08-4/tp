@@ -134,6 +134,7 @@ public class DeleteCommandTest {
         CommandException thrown = assertThrows(CommandException.class, () -> deleteCommand2.execute(model));
         assertEquals(Messages.MESSAGE_MULTIPLE_MATCH, thrown.getMessage());
         model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
+        model.updateFilteredEventList(e -> true);
 
         // 1 result test:
         PersonInformation info3 = new PersonInformation(new Name("David Ng"), new Phone("90002222"),

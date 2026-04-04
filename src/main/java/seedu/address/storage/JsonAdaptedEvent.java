@@ -23,6 +23,7 @@ class JsonAdaptedEvent {
     private final String startTime;
     private final String endTime;
     private final int numberOfPersonLinked;
+    private final int eventId; // Unused during loading (purely for cosmetic when saving)
 
     /**
      * Constructs a {@code JsonAdaptedEvent} with the given event details.
@@ -32,12 +33,14 @@ class JsonAdaptedEvent {
                             @JsonProperty("description") String description,
                             @JsonProperty("startTime") String startTime,
                             @JsonProperty("endTime") String endTime,
-                            @JsonProperty("numberOfPersonLinked") int numberOfPersonLinked) {
+                            @JsonProperty("numberOfPersonLinked") int numberOfPersonLinked,
+                            @JsonProperty("eventId") int eventId) {
         this.title = title;
         this.description = description;
         this.startTime = startTime;
         this.endTime = endTime;
         this.numberOfPersonLinked = numberOfPersonLinked;
+        this.eventId = eventId; // Used only for mapping
     }
 
     /**
@@ -49,6 +52,7 @@ class JsonAdaptedEvent {
         startTime = source.getStartTimeFormatted();
         endTime = source.getEndTimeFormatted();
         numberOfPersonLinked = source.getNumberOfPersonLinked();
+        eventId = source.getEventId(); // Used only for mapping
     }
 
     /**

@@ -61,16 +61,13 @@ class JsonSerializableAddressBook {
     public AddressBook toModelType() throws IllegalValueException {
         AddressBook addressBook = new AddressBook();
 
-        Map<String, Event> eventMap = new HashMap<>();
+        Map<Integer, Event> eventMap = new HashMap<>();
         for (JsonAdaptedEvent jsonAdaptedEvent : events) {
             Event event = jsonAdaptedEvent.toModelType();
-            String key = event.getTitle().fullTitle
-                    + "|" + event.getStartTimeFormatted()
-                    + "|" + event.getEndTimeFormatted();
-            if (eventMap.containsKey(key)) {
+            if (eventMap.containsKey(event.getEventId())) {
                 throw new IllegalValueException(MESSAGE_DUPLICATE_EVENT);
             }
-            eventMap.put(key, event);
+            eventMap.put(event.getEventId(), event);
         }
         addressBook.setEvents(new ArrayList<>(eventMap.values()));
 
