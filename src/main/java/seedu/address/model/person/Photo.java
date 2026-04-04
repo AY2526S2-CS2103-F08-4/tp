@@ -3,8 +3,6 @@ package seedu.address.model.person;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
-import seedu.address.commons.util.PhotoStorageUtil;
-
 /**
  * Represents a Person's photo in the address book.
  * Guarantees: immutable; is valid as declared in {@link #isValidPhoto(String)}
@@ -39,12 +37,7 @@ public class Photo {
         return test.matches(VALIDATION_REGEX);
     }
 
-    /**
-     * Returns true if the photo is already in the directory.
-     */
-    public boolean isSavedLocally() {
-        return this.getPath().startsWith(PhotoStorageUtil.getImageDirectory());
-    }
+
 
     /**
      * Returns the path pointing to image variable.
