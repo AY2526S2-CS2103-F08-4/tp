@@ -28,6 +28,7 @@ import seedu.address.model.event.Title;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonInformation;
+import seedu.address.model.person.Photo;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddEventCommandTest {
@@ -314,6 +315,11 @@ public class AddEventCommandTest {
 
         @Override
         public boolean isPersonPinned(Person person) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public boolean isPhotoShared(Photo photo, Person personToExclude) {
             throw new AssertionError("This method should not be called.");
         }
     }

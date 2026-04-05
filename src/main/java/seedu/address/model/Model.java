@@ -10,6 +10,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonInformation;
+import seedu.address.model.person.Photo;
 
 /**
  * The API of the Model component.
@@ -178,5 +179,10 @@ public interface Model {
      */
     void showEventsForPerson(Person person);
 
+    /**
+     * Returns true if the given photo is used by any person in the address book,
+     * excluding the specified person.
+     */
+    boolean isPhotoShared(Photo photo, Person personToExclude);
 }
 

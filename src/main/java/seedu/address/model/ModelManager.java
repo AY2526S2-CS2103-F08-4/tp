@@ -6,6 +6,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonInformation;
+import seedu.address.model.person.Photo;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -340,6 +342,16 @@ public class ModelManager implements Model {
             return Integer.MAX_VALUE;
         }
         return addressBook.getPinnedPersonList().indexOf(pinnedPerson);
+    }
+
+    @Override
+    public boolean isPhotoShared(Photo photo, Person personToExclude) {
+        requireNonNull(photo);
+        requireNonNull(personToExclude);
+
+        return addressBook.getPersonList().stream()
+                .filter(p -> !p.isSamePerson(personToExclude))
+                .anyMatch(p -> p.getPhoto().equals(Optional.of(photo)));
     }
 
 }
