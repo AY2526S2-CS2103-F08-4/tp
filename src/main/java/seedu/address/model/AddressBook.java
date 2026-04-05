@@ -113,11 +113,17 @@ public class AddressBook implements ReadOnlyAddressBook {
      * Removes {@code key} from this {@code AddressBook}.
      * {@code key} must exist in the address book.
      */
-    public void removePerson(Person key) {
-        persons.remove(key);
+    public void removePerson(Person personToRemove) {
+        requireNonNull(personToRemove);
+        // Unlink events from person
+        List.copyOf(personToRemove.getEvents()).stream()
+            .filter(this::hasEvent) // defensive
+            .forEach(this::unlinkPersonFromEvent);
 
-        if (pinnedPersons.contains(key)) {
-            pinnedPersons.remove(key);
+        persons.remove(personToRemove);
+
+        if (pinnedPersons.contains(personToRemove)) {
+            pinnedPersons.remove(personToRemove);
         }
     }
 
