@@ -78,7 +78,7 @@ public class AddEventCommand extends Command {
         logger.info("AddEvent: person updated " + personToEdit.getName()
                 + ", total events=" + editedPerson.getEvents().size());
 
-        model.showEventsForPerson(personToEdit);
+        model.showEventsForPerson(editedPerson);
         return new CommandResult(String.format(MESSAGE_SUCCESS, personToEdit.getName(), toAdd));
     }
 

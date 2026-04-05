@@ -252,7 +252,7 @@ public class ModelManager implements Model {
     @Override
     public void showEventsForPerson(Person person) {
         requireNonNull(person);
-        updateFilteredPersonList(p -> p.equals(person));
+        updateFilteredPersonList(p -> p.isSamePerson(person));
         sortedPersons.setComparator(null);
         updateFilteredEventList(person::hasEvent);
     }

@@ -341,6 +341,32 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void showEventsForPerson_sameIdentityDifferentInstance_filtersStoredPersonAndEvents() {
+        Person storedPerson = new PersonBuilder().withName("Eve Tan").withPhone("91110000").build();
+        modelManager.addPerson(storedPerson);
+        modelManager.addPerson(BENSON);
+
+        Event existingEvent = newEvent("Consult", null, "2026-03-27 0900", "2026-03-27 1000");
+        modelManager.addEvent(existingEvent);
+        storedPerson.addEvent(existingEvent);
+
+        Event newEvent = newEvent("Review", null, "2026-03-28 0900", "2026-03-28 1000");
+        Person editedCopy = new PersonBuilder().withName("Eve Tan").withPhone("91110000").build();
+        editedCopy.addEvent(existingEvent);
+        editedCopy.addEvent(newEvent);
+
+        assertTrue(storedPerson.isSamePerson(editedCopy));
+        assertFalse(storedPerson.equals(editedCopy));
+
+        modelManager.showEventsForPerson(editedCopy);
+
+        assertEquals(1, modelManager.getFilteredPersonList().size());
+        assertEquals(storedPerson, modelManager.getFilteredPersonList().get(0));
+        assertEquals(1, modelManager.getFilteredEventList().size());
+        assertTrue(modelManager.getFilteredEventList().contains(existingEvent));
+    }
+
+    @Test
     public void findPersons_matchesByNameOnly_returnsMatchingPersons() {
         modelManager.addPerson(ALICE);
         modelManager.addPerson(BENSON);

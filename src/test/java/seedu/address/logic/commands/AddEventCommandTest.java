@@ -81,6 +81,7 @@ public class AddEventCommandTest {
         assertEquals(2, modelStub.editedPerson.getEvents().size());
         assertEquals(eventToAdd, modelStub.addedEvent);
         assertFalse(modelStub.linkCalled);
+        assertEquals(modelStub.editedPerson, modelStub.shownPerson);
     }
 
     @Test
@@ -322,6 +323,7 @@ public class AddEventCommandTest {
         private final Person person;
         private Person targetPerson;
         private Person editedPerson;
+        private Person shownPerson;
         private Event addedEvent;
         private boolean addCalled;
         private boolean linkCalled;
@@ -352,7 +354,9 @@ public class AddEventCommandTest {
         public void updateFilteredEventList(Predicate<Event> predicate) {}
 
         @Override
-        public void showEventsForPerson(Person person) {}
+        public void showEventsForPerson(Person person) {
+            shownPerson = person;
+        }
 
         @Override
         public ReadOnlyAddressBook getAddressBook() {
@@ -386,6 +390,7 @@ public class AddEventCommandTest {
         private final Person person;
         private final Event existingEvent;
         private Person editedPerson;
+        private Person shownPerson;
         private boolean addCalled;
         private boolean linkCalled;
 
@@ -414,7 +419,9 @@ public class AddEventCommandTest {
         public void updateFilteredEventList(Predicate<Event> predicate) {}
 
         @Override
-        public void showEventsForPerson(Person person) {}
+        public void showEventsForPerson(Person person) {
+            shownPerson = person;
+        }
 
         @Override
         public ReadOnlyAddressBook getAddressBook() {

@@ -81,6 +81,7 @@ public class DeleteEventCommandTest {
         assertTrue(modelStub.editedPerson.getEvents().contains(otherEvent));
         assertEquals(1, modelStub.editedPerson.getEvents().size());
         assertTrue(modelStub.unlinkCalled);
+        assertEquals(modelStub.editedPerson, modelStub.shownPerson);
     }
 
     @Test
@@ -273,6 +274,7 @@ public class DeleteEventCommandTest {
         private final Person person;
         private final Event eventToUnlink;
         private Person editedPerson;
+        private Person shownPerson;
         private boolean unlinkCalled;
 
         ModelStubWithPerson(Person person, Event eventToUnlink) {
@@ -301,7 +303,9 @@ public class DeleteEventCommandTest {
         public void updateFilteredEventList(Predicate<Event> predicate) {}
 
         @Override
-        public void showEventsForPerson(Person person) {}
+        public void showEventsForPerson(Person person) {
+            shownPerson = person;
+        }
 
         @Override
         public ReadOnlyAddressBook getAddressBook() {
