@@ -23,7 +23,7 @@ public class FindEventCommand extends Command {
     public static final String MESSAGE_USAGE = "event " + COMMAND_WORD
             + ": Finds all events from persons whose names contain any of "
             + "the specified keywords (case-insensitive) and displays them as a list.\n"
-            + "Parameters: event view n/NAME [p/PHONE] [e/EMAIL] [a/ADDRESS]...\n"
+            + "Parameters: event view n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...\n"
             + "Example: event " + COMMAND_WORD + " n/yikleong";
 
     private static final Logger logger = LogsCenter.getLogger(FindEventCommand.class);

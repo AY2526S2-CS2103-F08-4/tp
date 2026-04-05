@@ -28,11 +28,11 @@ public class UnpinCommand extends Command {
             + ": Unpins the person identified by their name.\n"
             + "Parameters: "
             + PREFIX_NAME + "NAME "
-            + "[" + PREFIX_PHONE + "PHONE] "
+            + "[" + PREFIX_PHONE + "PHONE_NUMBER] "
             + "[" + PREFIX_EMAIL + "EMAIL] "
             + "[" + PREFIX_ADDRESS + "ADDRESS] "
             + "[" + PREFIX_TAG + "TAG]...\n"
-            + "Example : " + COMMAND_WORD + " " + PREFIX_NAME + "John Doe\n"
+            + "Example : " + COMMAND_WORD + " " + PREFIX_NAME + "John Doe "
             + PREFIX_PHONE + "91234567";
 
     public static final String MESSAGE_UNPIN_PERSON_SUCCESS = "Unpinned Person: %1$s";

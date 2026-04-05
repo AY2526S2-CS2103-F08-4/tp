@@ -38,7 +38,7 @@ public class AddTagCommand extends Command {
             + PREFIX_TAG_ASSIGN + "TAG_TO_ASSIGN ["
             + PREFIX_TAG_ASSIGN + "TAG_TO_ASSIGN]... "
             + PREFIX_NAME + "NAME "
-            + "[" + PREFIX_PHONE + "PHONE] "
+            + "[" + PREFIX_PHONE + "PHONE_NUMBER] "
             + "[" + PREFIX_EMAIL + "EMAIL] "
             + "[" + PREFIX_ADDRESS + "ADDRESS] "
             + "[" + PREFIX_TAG + "TAG]... "

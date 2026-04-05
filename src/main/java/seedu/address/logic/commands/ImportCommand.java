@@ -49,7 +49,7 @@ public class ImportCommand extends Command {
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Imports a list of contacts from a CSV formatted file.\n"
             + "Parameters: "
-            + PREFIX_TYPE + "IMPORT TYPE "
+            + PREFIX_TYPE + "IMPORT_TYPE "
             + PREFIX_FILENAME + "FILENAME\n"
             + "Example: " + COMMAND_WORD + " "
             + PREFIX_TYPE + "add "

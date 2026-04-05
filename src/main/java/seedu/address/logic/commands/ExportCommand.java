@@ -31,7 +31,7 @@ public class ExportCommand extends Command {
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Exports a list of contacts into a CSV formatted file for future use.\n"
             + "Parameters: "
-            + PREFIX_TYPE + "EXPORT TYPE "
+            + PREFIX_TYPE + "EXPORT_TYPE "
             + PREFIX_FILENAME + "FILENAME\n"
             + "Example: " + COMMAND_WORD + " "
             + PREFIX_TYPE + "all "
