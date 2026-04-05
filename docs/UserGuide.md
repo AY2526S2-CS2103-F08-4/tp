@@ -6,14 +6,65 @@
 
 # NAB User Guide
 
-NAB is a **desktop app for NUS students to manage contacts across multiple modules, project groups, and CCAs, optimized for use via a Command Line Interface** (CLI) while still having the benefits of a Graphical User Interface (GUI). If you can type fast, NAB can help you organize and retrieve context-specific contacts and track commitments faster than traditional GUI apps.
+___All your NUS connections, right at your fingertips___
+
+NUS Address Book (NAB) is a desktop application built for **NUS students** to manage contacts across multiple modules, project groups, and CCAs with eases.
+It is **optimized for use** via a Command Line Interface (CLI) while still having the benefits of a **Graphical User Interface (GUI)**. 
+If you can type fast, NAB can help you organize and retrieve context-specific contacts and track events faster than traditional GUI apps.
+
+Here is how NAB can **make student networking easier**: 
+- Store and edit contact cards for your friends
+- Helps track events tied to contacts
+- Make bulk organisation easier with tags
 
 <!-- * Table of Contents -->
 <page-nav-print />
 
+
+
+## Navigating this User Guide
+
+This section provides a quick overview of how this guide is structured, so you can easily find the information you need and understand the notation used throughout.
+
+### Who is this guide for?
+This guide is for NUS students who want to use NAB to manage contacts and related events efficiently.
+
+Whether you are new to NAB or just looking for a specific command, this guide is organised to help you find what you need quickly.
+
+|                 Looking to...                  |                Head to...                |
+|:----------------------------------------------:|:----------------------------------------:|
+|         Set up NAB for the first time          |     **[Quick Start](#quick-start)**      |
+|      Check command syntax and usage rules      |        **[Features](#features)**         |
+|     Find a command quickly while using NAB     | **[Command summary](#command-summary)**  |
+| Understand the comprehensive technical details | **[Developer Guide](DeveloperGuide.md)** |
+### Conventions used
+This guide uses **callout boxes** to help you quickly identify different types of information:
+<div>
+<box type="info" icon=":fa-solid-code:">
+
+This **blue box** with the **code mark icon** provides you with **example commands** that demonstrate how a feature works.
+
+</box>
+
+<box type="important" icon=":fa-solid-exclamation-triangle:">
+
+This **red box** with the **exclaimation triangle icon** draws your attention to **warnings, important notes or limitations**
+
+</box>
+
+<box theme="success" icon=":fa-solid-lightbulb:">
+
+This **green box** with a **lightbulb icon** highlights **helpful tips** for using NAB more effectively.
+
+</box>
+
+</div>
+
+
+
 --------------------------------------------------------------------------------------------------------------------
 
-## Quick Start
+# Quick Start
 
 1. Ensure you have Java `17` or above installed on your computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
@@ -44,7 +95,7 @@ NAB is a **desktop app for NUS students to manage contacts across multiple modul
 
 --------------------------------------------------------------------------------------------------------------------
 
-## Features
+# Features
 
 <box type="info" seamless>
 
@@ -69,78 +120,172 @@ NAB is a **desktop app for NUS students to manage contacts across multiple modul
 e.g `find n/John Doe t/Friends t/friends`
 
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
+
 </box>
 
-### Parameter Constraints & Formats
-Throughout this guide, various commands require specific parameters. <br><br>
-Unless stated otherwise, please ensure your inputs adhere to the following rules:
+## Quick utilities
 
-* **`NAME`**
-    * Must contain only alphabetic characters and spaces.
-    * Cannot be blank or start with a space (the first character must be a letter).
+### Navigating command history
 
-* **`PHONE_NUMBER`**
-    * Must contain strictly numbers.
-    * Must be between 7 and 15 digits long.
+NAB keeps track of the commands you have entered, making it easier to reuse previous commands without typing them again.
 
-* **`EMAIL`**
-    * Must be of the standard format: `local-part@domain`.
-    * **Local-part:** Can only contain alphanumeric characters and the special characters `+`, `_`, `.`, and `-`. It cannot start or end with a special character.
-    * **Domain:** Made up of domain labels separated by periods (`.`).
-        * Must end with a domain label at least 2 characters long.
-        * Each label must start and end with alphanumeric characters.
-        * Labels can contain hyphens (`-`), but no other special characters.
+This feature allows you to use **arrow keys** while in the command box to navigate through previously entered commands for the current session.
 
-* **`ADDRESS`**
-    * Can contain alphanumeric characters, spaces, and the following special characters: `#`, `_`, `,` (comma), and `-` (hyphen).
-    * Cannot be blank or consist only of spaces (must start with an alphanumeric or allowed special character).
+* Press ↑ to go back to older commands.
+* Press ↓ to go forward to more recent commands.
+* Pressing ↓ past the most recent history entry restores the text you were typing before you started navigating.
+* Command history is session-only and is not saved after you exit NAB.
 
-* **`TAG`**
-    * Can contain letters, digits, spaces, hyphens (`-`), and underscores (`_`).
-    * Must start with an alphanumeric character (a letter or digit).
-    * Must be between 1 and 20 characters long.
+### Copying a Contact's Information
 
-* **`PHOTO_PATH`**
-    * The file path must end with a valid image extension: `.png`, `.jpg`, or `.jpeg`.
-    * The extension is case-insensitive (e.g., `.PNG` is also accepted).
+NAB allows you to copy a contact’s information, making it easier to reuse their details without typing them out manually.
 
-### Managing Profile Pictures
-When using the `pfp/PHOTO_PATH` parameter in commands like `add` and `edit`, please note:
-* Accepted file extensions are `.png`, `.jpg`, and `.jpeg`.
-* `PHOTO_PATH` can be absolute (e.g., `C:/Users/Alex/Pictures/me.jpg`) or relative to the app folder (e.g., `images/me.png`).
-* The specified file must exist on your computer; NAB will copy it into the `data/images/` directory.
+This feature allows you to copy the displayed information of a contact for use outside NAB.
+
+The copied text includes the following fields (optional fields that are not present are omitted):
+- Name
+- Phone number
+- Tags
+- Address
+- Email
+
+Each field is placed on a separate line.
 
 ### Viewing help: `help`
 
-Shows a message explaining how to access the help page.
+NAB provides quick access to both the online and offline versions of the User Guide, allowing you to refer to it whenever you need guidance on NAB’s features and commands.
+
+This feature displays a message explaining how to access the online and offline help pages.
 
 ![help message](images/helpMessage.png)
 
 Format: `help`
 
-* The help window provides quick access to:
-  * the online User Guide
-  * the local offline help page
-* Use this command when you need a quick reference for NAB’s features and commands.
+### Exiting the program: `exit`
 
-### Adding a person: `add`
+When it is time to say goodbye, NAB will not make it awkward.
 
-Adds a person to the address book.
+This feature closes the program and ends the current session.
+
+Format: `exit`
+
+## Contact Managements
+
+### Parameters constraints & format
+
+Before examining the individual commands for managing contacts, please refer to the formatting requirements and constraints for each parameter. Unless stated otherwise, ensure all inputs adhere to the rules stated in this section
+
+<panel header=":fa-solid-book: **Parameters Requirements and Constraints**" type="secondary" expanded no-close>
+
+| Parameter | Format | Example |
+|-----------|--------|---------|
+| `n/NAME` | • Must contain only alphabetic characters and spaces.<br>• Cannot be blank or start with a space (the first character must be a letter). | `n/John Doe` |
+| `p/PHONE_NUMBER` | • Must contain strictly numbers.<br>• Must be between 7 and 15 digits long. | `p/98765432` |
+| `e/EMAIL` | • Must be of the standard format: `local-part@domain`.<br>• **Local-part:** Can only contain alphanumeric characters and the special characters `+`, `_`, `.`, and `-`. It cannot start or end with a special character.<br>• **Domain:** Made up of domain labels separated by periods (`.`).<br>&nbsp;&nbsp;◦ Must end with a domain label at least 2 characters long.<br>&nbsp;&nbsp;◦ Each label must start and end with alphanumeric characters.<br>&nbsp;&nbsp;◦ Labels can contain hyphens (`-`), but no other special characters. | `e/johnd@example.com` |
+| `a/ADDRESS` | • Can contain alphanumeric characters, spaces, and the following special characters: `#`, `_`, `,` (comma), and `-` (hyphen).<br>• Cannot be blank or consist only of spaces (must start with an alphanumeric or allowed special character). | `a/John street, block 123, #01-01` |
+| `t/TAG` | • Can contain letters, digits, spaces, hyphens (`-`), and underscores (`_`).<br>• Must start with an alphanumeric character (a letter or digit).<br>• Must be between 1 and 20 characters long. | `t/friend` |
+| `pfp/PHOTO_PATH` | • File path must end with a valid image extension: `.png`, `.jpg`, or `.jpeg` (case-insensitive).<br>• Can be absolute (e.g., `C:/Users/Alex/Pictures/me.jpg`) or relative to the app folder (e.g., `images/me.png`).<br>• The specified file must exist on your computer. | `pfp/images/me.png` |
+
+</panel>
+
+<box type="info" seamless>
+
+**Managing Profile Pictures**
+
+When using the `pfp/PHOTO_PATH` parameter in commands like `add` and `edit`, please note:
+* Accepted file extensions are `.png`, `.jpg`, and `.jpeg`.
+* `PHOTO_PATH` can be absolute (e.g., `C:/Users/Alex/Pictures/me.jpg`) or relative to the app folder (e.g., `images/me.png`).
+* The specified file must exist on your computer; NAB will copy it into the `data/images/` directory.
+</box>
+
+### User Disambiguation
+
+Commands in NAB identify a contact by name. If two or more contacts share the same name,
+NAB cannot determine which one you meant, and will display the following error:
+<box type="important" icon=":fa-solid-exclamation-triangle:">
+
+**ERROR MESSAGE**  
+`Multiple matches identified! Please provide more information to narrow down the contact.`  
+This error means your command matched more than one contact. No changes have been made —
+retry the command with additional details to uniquely identify the contact you want.
+
+</box>
+
+<panel header=":fa-solid-book: **Disambiguate with Optional Parameters**" type="secondary" expanded no-close>
+
+Add one or more optional parameters **immediately after `n/NAME`** (or after `to/NAME` for `event add`)
+to narrow the match down to a single contact.
+
+| Parameter | Prefix | Example               |
+|-----------|--------|-----------------------|
+| Phone number | `p/` | `p/91234567`          |
+| Email address | `e/` | `e/Irene@example.com` |
+| Home address | `a/` | `a/Clementi Ave 6`    |
+| Tag | `t/` | `t/CS2103`            |
+
+Supply as many parameters as needed — NAB will only proceed once exactly one contact matches all the criteria you provide.
+
+<box theme="success" icon=":fa-solid-lightbulb:">
+
+**TIP**
+
+Use `find n/NAME` first to see all contacts that share a name. Their details will help you
+decide which parameter to add for disambiguation.
+
+</box>
+
+Here is what NAB looks like when you **disambiguate duplicates:**  
+
+
+![disambiguation.png](images/disambiguation.png)
+</panel>
+
+
+<br> 
+
+### Adding a person: `add`  
+Build your NUS network instantly with NAB by contacts of the people you meet across modules, project groups, and CCAs.    
+
+This `add` feature allows you to add a person to the address book.
 
 Format: `add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]`
 
-<box type="tip" seamless>
 
-**Tip:** Can associate 0 or more tags during the add process
+<div>
+<box type="info" icon=":fa-solid-code:">
+
+**EXAMPLES**
+
+- `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`<br>
+  Adds a new contact named John Doe with a phone number, email, and address.
+
+- `add n/Betsy Crower t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`<br>
+  Adds a new contact named Betsy Crower with a phone number, email, address, and two tags: _friend_ and _criminal_.
+
+- `add n/Kim Chaewon p/67676969 pfp/C:\Users\User\Desktop\Photos\Le_sserafim.jpg`<br>
+  Adds a new contact named Kim Chaewon with phone and a profile photo.
+
 </box>
 
-* Contact cannot be added if the added phone number is already registered in the address book.
+<box type="important" icon=":fa-solid-exclamation-triangle:">
 
-Examples:
-* `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
-* `add n/Betsy Crower t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
-* `add n/Kim Chaewon p/67676969 pfp/C:\Users\User\Desktop\Photos\Le_sserafim.jpg`
-* `add n/Hibiscus p/12345678 t/enemy pfp//home/Desktop/Pictures/hibiscus_flower.png`
+**IMPORTANT**
+
+- `add` command with `pfp/` succeeds only if the image file exists, is readable, and is a supported image format.
+- Contact cannot be added if the added phone number is already registered in the address book.
+- Refer to the [user disambiguation](#user-disambiguation) section if you encounter the error: `Multiple matches identified!`
+
+</box>
+
+<box theme="success" icon=":fa-solid-lightbulb:">
+
+**TIP**  
+- Can associate 0 or more tags during the add process
+
+</box>
+
+</div>
+
 
 ### Listing all persons: `list`
 
@@ -237,6 +382,7 @@ Format: `unpin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 Examples:
 * `unpin n/John Doe` unpins John Doe when the name uniquely identifies the contact.
 * `unpin n/John Doe p/91234567` unpins the matching John Doe contact by name and phone number.
+
 ### Assigning tag(s) to person(s): `tag`
 
 Assigns one or more tags to one or more contacts in one command.
@@ -288,6 +434,8 @@ Examples:
 Clears all entries from the address book.
 
 Format: `clear`
+
+## Event Managements
 
 ### Adding an event: `event add`
 
@@ -355,11 +503,7 @@ Examples:
 * `event delete title/Meeting start/2026-03-12 1100 end/2026-04-12 2359 n/David Li` deletes the event that titled Meeting which starts at 12 March 2026 1100 and ends at 12 April 2026 2359 assigned to David Li.
 * Suppose there are multiple `David Li`, an enriched search would be `event delete title/Meeting start/2026-03-12 1100 end/2026-04-12 2359 n/David Li p/99272758`
 
-### Exiting the program: `exit`
-
-Exits the program.
-
-Format: `exit`
+## Data and Storage
 
 ### Exporting contacts: `export`
 
