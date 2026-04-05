@@ -15,7 +15,6 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
-import seedu.address.model.person.Photo;
 
 /**
  * Exports a list of contacts into a CSV formatted file for future use.
@@ -169,7 +168,7 @@ public class ExportCommand extends Command {
                 sanitizeAndWrapValue(getAddressValue(p)),
                 sanitizeAndWrapValue(formatTags(p)),
                 sanitizeAndWrapValue(formatEvents(p)),
-                sanitizeAndWrapValue(getPhotoValue(p))
+                sanitizeAndWrapValue(getPhotoValue())
         );
     }
 
@@ -247,14 +246,12 @@ public class ExportCommand extends Command {
     }
 
     /**
-     * Retrieves the photo string from a {@code Person}. Returns an empty string
-     * if the photo is not present.
+     * Returns an empty string when exported. Photo paths should not carry over.
      *
-     * @param p The {@code Person} object.
-     * @return The string representation of the photo path, or an empty string.
+     * @return Returns an empty string
      */
-    private String getPhotoValue(Person p) {
-        return p.getPhoto().map(Photo::getPath).orElse("");
+    private String getPhotoValue() {
+        return "";
     }
 
     /**
