@@ -346,6 +346,9 @@ public class AddCommandTest {
         public void showAllPersons() {}
 
         @Override
+        public void showAllPersonsPinnedFirst() {}
+
+        @Override
         public ReadOnlyAddressBook getAddressBook() {
             return new AddressBook();
         }
