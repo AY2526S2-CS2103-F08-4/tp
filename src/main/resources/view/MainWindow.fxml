@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 
 <fx:root type="javafx.stage.Stage" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-         title="NAB" minWidth="450" minHeight="600" onCloseRequest="#handleExit">
+         title="NAB" minWidth="800" minHeight="600" onCloseRequest="#handleExit">
   <icons>
     <Image url="@/images/nab_app_logo.png" />
   </icons>
@@ -41,7 +41,7 @@
         </StackPane>
 
         <StackPane VBox.vgrow="NEVER" fx:id="resultDisplayPlaceholder" styleClass="pane-with-border"
-                   minHeight="100" prefHeight="100" maxHeight="100">
+                   minHeight="150" prefHeight="200" maxHeight="150">
           <padding>
             <Insets top="5" right="10" bottom="5" left="10" />
           </padding>
