@@ -8,7 +8,7 @@
 
 ___All your NUS connections, right at your fingertips___
 
-NUS Address Book (NAB) is a desktop application built for **NUS students** to manage contacts across multiple modules, project groups and CCAs with eases.
+NUS Address Book (NAB) is a desktop application built for **NUS students** to manage contacts across multiple modules, project groups, and CCAs with ease.
 It is **optimized for use** via a Command Line Interface (CLI) while still having the benefits of a **Graphical User Interface (GUI)**. 
 If you can type fast, NAB can help you organize and retrieve context-specific contacts and track events faster than traditional GUI apps.
 
