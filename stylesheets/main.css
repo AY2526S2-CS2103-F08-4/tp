@@ -55,9 +55,9 @@ mark {
   flex: 1;
   margin: 0 auto;
   min-width: 0;
-  max-width: 1000px;
+  max-width: 900px;
   overflow-x: auto;
-  padding: 0.8rem 20px 0 20px;
+  padding: 0.8rem 40px 0 40px;
   transition: 0.4s;
   -webkit-transition: 0.4s;
 }
@@ -160,12 +160,81 @@ mark {
       zoom: 0.8;  /* might not work on some browsers */
   }
 }
-h1 { color: #000000; }
-h2 { color: #8b4513; }
-h3 { color: #ff8c00; }
+/* Soften panel colors to match box callout pastels */
+
+/* Info panels */
+.card.expandable-card.border-info {
+  border-color: #9eeaf9 !important;
+}
+.card-header.bg-info,
+.header-wrapper.bg-info {
+  background-color: #cff4fc !important;
+  border-color: #9eeaf9 !important;
+  color: #055160 !important;
+}
+.card-header.bg-info .btn {
+  color: #055160 !important;
+  border-color: #055160 !important;
+}
+.card-header.bg-info .btn:hover {
+  background-color: #9eeaf9 !important;
+}
+
+/* Success panels */
+.card.expandable-card.border-success {
+  border-color: #a3cfbb !important;
+}
+.card-header.bg-success,
+.header-wrapper.bg-success {
+  background-color: #d1e7dd !important;
+  border-color: #a3cfbb !important;
+  color: #0f5132 !important;
+}
+.card-header.bg-success .btn {
+  color: #0f5132 !important;
+  border-color: #0f5132 !important;
+}
+.card-header.bg-success .btn:hover {
+  background-color: #a3cfbb !important;
+}
+
+/* Danger panels */
+.card.expandable-card.border-danger {
+  border-color: #f1aeb5 !important;
+}
+.card-header.bg-danger,
+.header-wrapper.bg-danger {
+  background-color: #f8d7da !important;
+  border-color: #f1aeb5 !important;
+  color: #842029 !important;
+}
+.card-header.bg-danger .btn {
+  color: #842029 !important;
+  border-color: #842029 !important;
+}
+.card-header.bg-danger .btn:hover {
+  background-color: #f1aeb5 !important;
+}
+
+/* Option B — Slate blue
+h1 { color: #1e2a3a; }
+h2 { color: #2e5f8a; }
+h3 { color: #4a90b8; margin-top: 1rem; }
 
 h4,
 h5,
 h6 {
-  color: #e46c0a;
+  color: #4a90b8;
+}
+*/
+
+/* Option D — Teal/green (swap in by uncommenting and commenting out Option B above) */
+h1 { color: #1a1a2e; } /*#1a1a2e*/
+h2 { color: #2a6b5a; }
+h3 { color: #3a9b7a; margin-top: 1rem; }
+
+h4,
+h5,
+h6 {
+  color: #3a9b7a;
 }
