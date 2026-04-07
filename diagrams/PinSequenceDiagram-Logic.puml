@@ -1,0 +1,59 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Logic LOGIC_COLOR_T1
+participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
+participant ":PinCommandParser" as PinCommandParser LOGIC_COLOR
+participant "p:PinCommand" as PinCommand LOGIC_COLOR
+participant ":CommandUtil" as CommandUtil LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant ":Model" as Model MODEL_COLOR
+end box
+
+[-> AddressBookParser : parseCommand("pin n/David Ng p/90002222")
+activate AddressBookParser
+
+AddressBookParser -> PinCommandParser : parse(arguments)
+activate PinCommandParser
+
+create PinCommand
+PinCommandParser -> PinCommand
+activate PinCommand
+PinCommand --> PinCommandParser : p
+deactivate PinCommand
+
+PinCommandParser --> AddressBookParser : p
+deactivate PinCommandParser
+deactivate AddressBookParser
+
+[-> PinCommand : execute(model)
+activate PinCommand
+
+PinCommand -> Model : findPersons(targetInfo)
+activate Model
+Model --> PinCommand : matches
+deactivate Model
+
+PinCommand -> CommandUtil : targetPersonFromMatches(model, matches)
+activate CommandUtil
+CommandUtil --> PinCommand : personToPin
+deactivate CommandUtil
+
+PinCommand -> Model : pinPerson(personToPin)
+activate Model
+Model --> PinCommand
+deactivate Model
+
+PinCommand -> Model : showAllPersonsPinnedFirst()
+activate Model
+Model --> PinCommand
+deactivate Model
+
+[<-- PinCommand : result
+deactivate PinCommand
+PinCommand -[hidden]-> PinCommand
+destroy PinCommand
+@enduml

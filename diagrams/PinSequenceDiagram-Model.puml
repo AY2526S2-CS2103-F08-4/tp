@@ -1,0 +1,20 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Model MODEL_COLOR_T1
+participant ":ModelManager" as ModelManager MODEL_COLOR
+participant ":AddressBook" as AddressBook MODEL_COLOR
+end box
+
+[-> ModelManager : pinPerson(personToPin)
+activate ModelManager
+
+ModelManager -> AddressBook : pinPerson(personToPin)
+activate AddressBook
+AddressBook --> ModelManager
+deactivate AddressBook
+
+[<-- ModelManager
+deactivate ModelManager
+@enduml

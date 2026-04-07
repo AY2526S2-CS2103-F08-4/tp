@@ -1,0 +1,23 @@
+@startuml
+skin rose
+skinparam ActivityFontSize 15
+skinparam ArrowFontSize 12
+
+start
+:Parse pin command into PinCommand;
+:Find matching persons using targetInfo;
+:Remove already pinned matches;
+
+if () then ([no matches])
+  :Show no match error;
+else ([matches found])
+  if () then ([multiple matches])
+    :Show ambiguous matches\nin list, show error;
+  else ([single match])
+    :Pin the contact;
+    :Reorder list with pinned contacts first;
+  endif
+endif
+
+stop
+@enduml

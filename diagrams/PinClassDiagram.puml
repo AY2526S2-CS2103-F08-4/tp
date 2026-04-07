@@ -1,0 +1,46 @@
+@startuml
+!include style.puml
+skinparam arrowThickness 1.1
+
+package Logic as LogicPackage {
+  class AddressBookParser LOGIC_COLOR
+  class PinCommandParser LOGIC_COLOR
+  class UnpinCommandParser LOGIC_COLOR
+  class PinCommand LOGIC_COLOR
+  class UnpinCommand LOGIC_COLOR
+  class CommandUtil LOGIC_COLOR
+  class PersonInformation LOGIC_COLOR
+}
+
+package Model as ModelPackage {
+  class "<<interface>>\nModel" as Model MODEL_COLOR
+  class ModelManager MODEL_COLOR
+  class AddressBook MODEL_COLOR
+  class "UniquePersonList\n(persons)" as PersonsList MODEL_COLOR
+  class "UniquePersonList\n(pinnedPersons)" as PinnedList MODEL_COLOR
+}
+
+package Storage as StoragePackage {
+  class JsonSerializableAddressBook STORAGE_COLOR
+}
+
+AddressBookParser --> PinCommandParser
+AddressBookParser --> UnpinCommandParser
+PinCommandParser ..> PinCommand : <<create>>
+UnpinCommandParser ..> UnpinCommand : <<create>>
+PinCommand --> PersonInformation
+UnpinCommand --> PersonInformation
+PinCommand --> CommandUtil
+UnpinCommand --> CommandUtil
+PinCommand --> Model
+UnpinCommand --> Model
+
+ModelManager .up.|> Model
+ModelManager --> AddressBook
+AddressBook --> PersonsList
+AddressBook --> PinnedList
+
+JsonSerializableAddressBook --> AddressBook
+
+Model ..> PersonInformation
+@enduml
