@@ -426,7 +426,7 @@ The following sequence diagram illustrates the functional path taken when a user
 
 **Note:** Due to a PlantUML rendering limitation, the `:XYZCommand` lifeline is shown to prematurely end at the 1st alt path. The unified destroy marker (X) at the bottom represents the termination of the command's lifecycle for all three alternative paths.
 
-</box>                
+</box>
 
 The following activity diagram summarizes the command's match-resolution flow:
 
@@ -444,8 +444,8 @@ The following activity diagram summarizes the command's match-resolution flow:
 * **Alternative 2:** Pass individual fields directly as arguments to the utility and model methods.
     * Pros: Does not require creating and maintaining a new class.
     * Cons: Creates method signatures with "Long Parameter List" code smell.
-    * Cons: Tight coupling. Any changes to the search criteria (e.g., adding new search criteria,removing search criteria) will require modification to all the method signatures. 
-
+    * Cons: Tight coupling. Any changes to the search criteria (e.g., adding new search criteria,removing search criteria) will require modification to all the method signatures.
+  
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Documentation, logging, testing, configuration, dev-ops**
