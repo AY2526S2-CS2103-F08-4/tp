@@ -498,6 +498,58 @@ public class ImportCommandTest {
     }
 
     @Test
+    public void parseEvents_invalidColumnCount_skipsMalformedEntryKeepsValidEntry() {
+        ImportCommand importCommand = new ImportCommand("add", "testFile");
+        HashMap<Integer, Event> eventMap = new HashMap<>();
+
+        String eventString = "Invalid|Only|Four|Columns;"
+                + "Meeting|Kickoff|2026-05-06 1000|2026-05-06 1100|1|100";
+
+        List<Event> result = importCommand.parseEvents(eventString, eventMap);
+
+        assertEquals(1, result.size());
+        assertEquals("Meeting", result.get(0).getTitle().fullTitle);
+        assertEquals(1, eventMap.size());
+        assertTrue(eventMap.containsKey(100));
+    }
+
+    @Test
+    public void parseEvents_missingRequiredFields_skipsEntriesWithBlankTitleStartEndOrEventId() {
+        ImportCommand importCommand = new ImportCommand("add", "testFile");
+        HashMap<Integer, Event> eventMap = new HashMap<>();
+
+        String eventString = "|Desc|2026-05-06 1000|2026-05-06 1100|1|100;"
+                + "Meeting|Desc||2026-05-06 1100|1|101;"
+                + "Meeting|Desc|2026-05-06 1000||1|102;"
+                + "Meeting|Desc|2026-05-06 1000|2026-05-06 1100|1|;"
+                + "Valid|Desc|2026-05-06 1200|2026-05-06 1300|1|106";
+
+        List<Event> result = importCommand.parseEvents(eventString, eventMap);
+
+        assertEquals(1, result.size());
+        assertEquals("Valid", result.get(0).getTitle().fullTitle);
+        assertEquals(1, eventMap.size());
+        assertTrue(eventMap.containsKey(106));
+    }
+
+    @Test
+    public void parseEvents_nonPositiveLinkedCount_skipsZeroAndNegativeCountsKeepsPositiveCount() {
+        ImportCommand importCommand = new ImportCommand("add", "testFile");
+        HashMap<Integer, Event> eventMap = new HashMap<>();
+
+        String eventString = "Meeting|Desc|2026-05-06 1000|2026-05-06 1100|0|103;"
+                + "Meeting|Desc|2026-05-06 1000|2026-05-06 1100|-1|104;"
+                + "Valid|Desc|2026-05-06 1200|2026-05-06 1300|1|105";
+
+        List<Event> result = importCommand.parseEvents(eventString, eventMap);
+
+        assertEquals(1, result.size());
+        assertEquals("Valid", result.get(0).getTitle().fullTitle);
+        assertEquals(1, eventMap.size());
+        assertTrue(eventMap.containsKey(105));
+    }
+
+    @Test
     public void parseTags_validTagString_returnsTagSet() {
         ImportCommand importCommand = new ImportCommand("add", "testFile");
         var tags = importCommand.parseTags("friends;colleagues");

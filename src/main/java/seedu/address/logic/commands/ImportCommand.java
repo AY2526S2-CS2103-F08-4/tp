@@ -340,6 +340,9 @@ public class ImportCommand extends Command {
         for (String entry : eventEntries) {
             String[] details = entry.trim().split("\\|", -1);
             if (details.length != 6) {
+                logger.info(String.format(
+                        "ImportCommand: Skipping event entry with invalid column count: %s", entry)
+                );
                 continue;
             }
 
@@ -352,12 +355,19 @@ public class ImportCommand extends Command {
                 String eventIdStr = details[5].trim();
 
                 if (titleStr.isEmpty() || startStr.isEmpty() || endStr.isEmpty() || eventIdStr.isEmpty()) {
+                    logger.info(String.format(
+                            "ImportCommand: Skipping event entry with missing required fields: %s", entry)
+                    );
                     continue;
                 }
 
                 int linkedCount = Integer.parseInt(linkedCountStr);
                 int eventId = Integer.parseInt(eventIdStr);
                 if (linkedCount <= 0) {
+                    logger.info(String.format(
+                            "ImportCommand: Skipping event entry with non-positive linked count for eventId %d",
+                            eventId)
+                    );
                     continue;
                 }
 
