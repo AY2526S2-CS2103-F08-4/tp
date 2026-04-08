@@ -232,6 +232,39 @@ public class JsonSerializableAddressBookTest {
         Event linkedEvent = addressBook.getPersonList().get(0).getEvents().get(0);
 
         assertSame(topLevelEvent, linkedEvent);
-        assertEquals(4, linkedEvent.getNumberOfPersonLinked());
+        assertEquals(1, linkedEvent.getNumberOfPersonLinked());
+    }
+
+    @Test
+    public void toModelType_orphanedEvent_isDropped() throws Exception {
+        String json = """
+                {
+                  "persons": [
+                    {
+                      "name": "Alice Pauline",
+                      "phone": "94351253",
+                      "email": "alice@example.com",
+                      "address": "123, Jurong West Ave 6, #08-111",
+                      "tags": ["friends"],
+                      "eventIds": []
+                    }
+                  ],
+                  "events": [
+                    {
+                      "title": "Ghost Event",
+                      "description": "Nobody references this",
+                      "startTime": "2026-03-25 0900",
+                      "endTime": "2026-03-25 1000",
+                      "numberOfPersonLinked": 1
+                    }
+                  ]
+                }
+                """;
+
+        JsonSerializableAddressBook dataFromJson = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
+        AddressBook addressBook = dataFromJson.toModelType();
+
+        assertEquals(0, addressBook.getEventList().size());
+        assertEquals(1, addressBook.getPersonList().size());
     }
 }

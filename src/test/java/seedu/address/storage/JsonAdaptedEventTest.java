@@ -33,7 +33,7 @@ public class JsonAdaptedEventTest {
         assertEquals(Optional.of(new Description(VALID_DESC)), event.getDescription());
         assertEquals(VALID_START, event.getStartTimeFormatted());
         assertEquals(VALID_END, event.getEndTimeFormatted());
-        assertEquals(VALID_NUMBER_OF_PERSON_LINKED, event.getNumberOfPersonLinked());
+        assertEquals(0, event.getNumberOfPersonLinked());
     }
 
     @Test
@@ -47,7 +47,7 @@ public class JsonAdaptedEventTest {
         assertEquals(source.getDescription(), modelEvent.getDescription());
         assertEquals(source.getStartTimeFormatted(), modelEvent.getStartTimeFormatted());
         assertEquals(source.getEndTimeFormatted(), modelEvent.getEndTimeFormatted());
-        assertEquals(source.getNumberOfPersonLinked(), modelEvent.getNumberOfPersonLinked());
+        assertEquals(0, modelEvent.getNumberOfPersonLinked());
     }
 
     @Test
