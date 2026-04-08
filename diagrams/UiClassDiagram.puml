@@ -15,6 +15,7 @@ Class PersonListPanel
 Class PersonCard
 Class StatusBarFooter
 Class CommandBox
+Class CommandHistory
 }
 
 package Model <<Rectangle>> {
@@ -47,14 +48,16 @@ PersonCard --|> UiPart
 StatusBarFooter --|> UiPart
 HelpWindow --|> UiPart
 
+CommandBox *-down-> "1" CommandHistory
+
 PersonCard ..> Model
 UiManager -right-> Logic
 MainWindow -left-> Logic
 
 PersonListPanel -[hidden]left- HelpWindow
-HelpWindow -[hidden]left- CommandBox
-CommandBox -[hidden]left- ResultDisplay
+HelpWindow -[hidden]left- ResultDisplay
 ResultDisplay -[hidden]left- StatusBarFooter
+StatusBarFooter -[hidden]left- CommandBox
 
 MainWindow -[hidden]-|> UiPart
 @enduml

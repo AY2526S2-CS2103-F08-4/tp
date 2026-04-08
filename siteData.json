@@ -55,6 +55,7 @@
         "implementation": "Implementation",
         "proposed-undo-redo-feature": "[Proposed] Undo/redo feature",
         "proposed-data-archiving": "[Proposed] Data archiving",
+        "proposed-retrieval-of-past-entered-commands": "[Proposed] Retrieval of past entered commands",
         "pin-unpin-contact-feature": "Pin/Unpin contact feature",
         "contact-disambiguating-feature": "Contact Disambiguating feature",
         "documentation-logging-testing-configuration-dev-ops": "Documentation, logging, testing, configuration, dev-ops",

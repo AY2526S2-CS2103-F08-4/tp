@@ -1,0 +1,28 @@
+@startuml
+
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Ui UI_COLOR_T1
+participant ":CommandBox" as CommandBox UI_COLOR
+participant ":CommandHistory" as CommandHistory UI_COLOR
+end box
+
+-> CommandBox : press Enter
+activate CommandBox
+
+CommandBox -> CommandBox : handleCommandEntered()
+activate CommandBox #LightBlue
+
+CommandBox -> CommandHistory : recordCommand(commandText)
+activate CommandHistory
+
+deactivate CommandHistory
+
+CommandBox -> CommandBox
+deactivate CommandBox
+
+<-[Hidden]- CommandBox
+deactivate CommandBox
+
+@enduml

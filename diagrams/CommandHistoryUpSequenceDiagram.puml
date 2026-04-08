@@ -1,0 +1,34 @@
+@startuml
+
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Ui UI_COLOR_T1
+participant ":CommandBox" as CommandBox UI_COLOR
+participant ":CommandHistory" as CommandHistory UI_COLOR
+end box
+
+-> CommandBox : press Up
+activate CommandBox
+
+CommandBox -> CommandBox : handleCommandHistoryNavigation()
+activate CommandBox #LightBlue
+
+CommandBox -> CommandHistory : navigateUp()
+activate CommandHistory
+
+CommandHistory --> CommandBox
+deactivate CommandHistory
+
+CommandBox -> CommandBox
+deactivate CommandBox
+
+CommandBox -> CommandBox : setCommandText()
+activate CommandBox #LightBlue
+CommandBox -> CommandBox
+deactivate CommandBox
+
+<-- CommandBox
+deactivate CommandBox
+
+@enduml
