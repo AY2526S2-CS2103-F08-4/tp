@@ -93,6 +93,19 @@ This **green box** with a **lightbulb icon** highlights **helpful tips** for usi
 
 6. Refer to the [Features](#features) below for details of each command.
 
+<panel header=":fa-solid-book: **Understanding the GUI**" type="secondary" expanded>
+
+The labelled interface below highlights the main parts of NAB's GUI.
+
+![Labelled UI](images/Ui-guide.png)
+
+* **Command input box**: where you type commands.
+* **Command output box**: shows feedback after each command is executed.
+* **Person list panel**: displays the contacts currently shown.
+* **Event list panel**: displays events related to the current context, such as a selected or uniquely matched person.
+
+</panel>
+
 --------------------------------------------------------------------------------------------------------------------
 
 # Features
@@ -555,59 +568,100 @@ Add optional parameters immediately after `n/NAME` to narrow down the match — 
 ## Data and Storage
 
 ### Exporting contacts: `export`
+Back up your NAB contacts in seconds so you can share, archive, or migrate your data anytime.
 
-Exports contacts from NAB into a CSV file.
+This `export` feature allows you to write contacts from NAB into a CSV file.
 
 Format: `export t/EXPORT_TYPE f/FILENAME`
 
-* `EXPORT_TYPE` specifies which contacts to export:
-  * `all` exports every contact in NAB
-  * `current` exports only the contacts currently shown in the contact list
-* `FILENAME` specifies the name of the exported file.
-  Enter the file name without `.csv`, as NAB automatically appends the `.csv` extension for you.
-  For example, `f/backup` creates a file named `backup.csv`.
-* The exported file is saved in the same directory as the current NAB data file.
-* Order of parameters does not matter.
+<panel header=":fa-solid-code: **Examples**" type="info">
 
-Examples:
-* `export t/all f/save_file` exports all contacts in NAB to `save_file.csv`
-* `export t/current f/save_file` exports only the currently displayed contacts to `save_file.csv`
+- `export t/all f/save_file`<br>
+  Exports all contacts in NAB to `save_file.csv`.
+
+- `export t/current f/save_file`<br>
+  Exports only the currently displayed contacts to `save_file.csv`.
+
+</panel>
+
+
+<panel header=":fa-solid-exclamation-triangle: **Important**" type="danger">
+
+- `EXPORT_TYPE` must be either:
+    - `all` (export every contact in NAB), or
+    - `current` (export only the contacts currently shown in the contact list).
+- Enter `FILENAME` without `.csv`, as NAB automatically appends the `.csv` extension for you.
+- The exported file is saved in the same directory as the current NAB data file.
+  - If a file with the same name already exists, it will be overwritten.
+- Order of parameters does not matter.
+
+</panel>
+
+<panel header=":fa-solid-lightbulb: **Tip**" type="success">
+
+Use `export t/current ...` after `find` or `filter` to quickly export a specific subset of contacts.
+
+</panel>
+
 
 ### Importing contacts: `import`
+Bring your contact data into NAB quickly when switching devices or restoring from a backup.
 
-Imports contacts from a CSV file into NAB.
+This `import` feature allows you to load contacts from a CSV file into NAB.
 
 Format: `import t/IMPORT_TYPE f/FILENAME`
 
-* `IMPORT_TYPE` specifies how the CSV data should be applied:
-  * `add` adds the imported contacts to the current address book
-  * `overwrite` replaces the current address book with the imported contacts
-* `FILENAME` specifies the name of the CSV file to import.
-  Enter the file name without `.csv`, as NAB automatically looks for the file with the `.csv` extension.
-  For example, `f/save_file` tells NAB to import from `save_file.csv`.
-* The CSV file must be placed in the same directory as the current NAB data file.
-* Contacts in the CSV file that already exist in NAB are skipped to avoid duplicates.
-* Rows with invalid or missing required fields are skipped.
-* Order of parameters does not matter.
 
-Examples:
-* `import t/overwrite f/save_file` imports contacts from `save_file.csv` and replaces the current address book
-* `import t/add f/save_file` imports contacts from `save_file.csv` and adds them to the current address book
+<panel header=":fa-solid-code: **Examples**" type="info">
+
+- `import t/overwrite f/save_file`<br>
+  Imports contacts from `save_file.csv` and replaces the current address book.
+
+- `import t/add f/save_file`<br>
+  Imports contacts from `save_file.csv` and adds them to the current address book.
+
+</panel>
+
+<panel header=":fa-solid-exclamation-triangle: **Important**" type="danger">
+
+- `IMPORT_TYPE` must be either:
+    - `add` (adds imported contacts to the current address book), or
+    - `overwrite` (replaces the current address book with imported contacts).
+- Enter `FILENAME` without `.csv`, as NAB automatically looks for the file with the `.csv` extension.
+- The CSV file must be placed in the same directory as the current NAB data file.
+- Contacts in the CSV file that already exist in NAB are skipped to avoid duplicates.
+- Rows with invalid or missing required fields are skipped.
+- Order of parameters does not matter.
+
+</panel>
+
+<panel header=":fa-solid-lightbulb: **Tip**" type="success">
+
+If you are unsure, run `import t/add ...` first to avoid accidental data loss. Use `import t/overwrite ...` only when you want a full replacement.
+
+</panel>
+
 
 ### Saving the data
+Focus on managing your contacts! NAB does the heavy lifting by saving your data automatically in the background.
 
-AddressBook data are saved in the hard disk automatically after any command that changes the data. There is no need to save manually.
+<panel header=":fa-solid-lightbulb: **Tip**" type="success">
+
+- There is no manual save command in NAB.
+- If a command succeeds, your latest data is already persistent in the data file.
+
+</panel>
 
 ### Editing the data file
 
-AddressBook data are saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
+AddressBook data is saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
 
-<box type="warning" seamless>
+<panel header=":fa-solid-exclamation-triangle: **Important**" type="danger">
 
-**Caution:**
-If your changes to the data file makes its format invalid, AddressBook will discard all data and start with an empty data file at the next run.  Hence, it is recommended to take a backup of the file before editing it.<br>
-Furthermore, certain edits can cause the AddressBook to behave in unexpected ways (e.g., if a value entered is outside the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
-</box>
+- If your changes to the data file make its format invalid, AddressBook will discard all data and start with an empty data file at the next run.  Hence, it is recommended to take a backup of the file before editing it.
+- Furthermore, certain edits can cause the AddressBook to behave in unexpected ways (e.g. if a value entered is outside the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
+
+</panel>
 
 --------------------------------------------------------------------------------------------------------------------
 

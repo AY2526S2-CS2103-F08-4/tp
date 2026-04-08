@@ -25,6 +25,7 @@ import seedu.address.commons.util.CsvUtil;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
+import seedu.address.model.ModelManager;
 import seedu.address.model.event.Description;
 import seedu.address.model.event.Event;
 import seedu.address.model.event.TimeRange;
@@ -62,6 +63,8 @@ public class ImportCommand extends Command {
     public static final String MESSAGE_EMPTY_FILE = "The file %1$s is empty.";
     public static final String MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED = "Successfully imported list from %1$s with "
             + "%2$d row(s) added, %3$d row(s) skipped.";
+    public static final String MESSAGE_MALFORM_CSV = "Import aborted: %1$s has either 0 lines "
+            + "or is completely malformed";
 
     private static final Logger logger = LogsCenter.getLogger(ImportCommand.class);
 
@@ -100,14 +103,21 @@ public class ImportCommand extends Command {
             return new CommandResult(String.format(MESSAGE_EMPTY_FILE, filename + FILENAME_SUFFIX));
         }
 
+        AddressBook tempAddressBook;
+        Model tempModel = new ModelManager();
         if (importType.equalsIgnoreCase("overwrite")) {
-            model.setAddressBook(new AddressBook());
+            tempAddressBook = new AddressBook();
+        } else {
+            tempAddressBook = new AddressBook(model.getAddressBook());
         }
+        tempModel.setAddressBook(tempAddressBook);
 
-        int addedRows = processImportedLinesFromCsv(model, allLines);
+        int addedRows = processImportedLinesFromCsv(tempModel, allLines);
         int totalRows = allLines.size() - 1;
         int skippedRows = totalRows - addedRows;
 
+        // Reaches here if successful, copies over what was performed to the current model
+        model.setAddressBook(tempModel.getAddressBook());
         return new CommandResult(String.format(MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED,
                 filename + FILENAME_SUFFIX,
                 addedRows,
@@ -153,15 +163,24 @@ public class ImportCommand extends Command {
      */
     private int processImportedLinesFromCsv(Model model, List<String> lines) throws CommandException {
         int added = 0;
+        int successfullyParsed = 0;
         Map<Integer, Event> eventMap = new HashMap<>();
 
         for (int i = 1; i < lines.size(); i++) {
             Optional<Person> person = parseLineToPerson(lines.get(i), eventMap);
 
-            if (person.isPresent() && !model.hasPerson(person.get())) {
-                model.addPerson(person.get());
-                added++;
+            if (person.isPresent()) {
+                successfullyParsed++;
+                if (!model.hasPerson(person.get())) {
+                    model.addPerson(person.get());
+                    added++;
+                }
             }
+        }
+
+        // If CSV is empty or completely malformed
+        if (!hasHeaderOnly(lines) && successfullyParsed == 0) {
+            throw new CommandException(String.format(MESSAGE_MALFORM_CSV, filename + FILENAME_SUFFIX));
         }
 
         return added;

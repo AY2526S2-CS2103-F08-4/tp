@@ -145,14 +145,17 @@ The `Model` component,
 
 ### Storage component
 
-**API** : [`Storage.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/storage/Storage.java)
+**API** : [`Storage.java`](https://github.com/AY2526S2-CS2103-F08-4/tp/tree/master/src/main/java/seedu/address/storage/Storage.java)
 
-<puml src="diagrams/StorageClassDiagram.puml" width="550" />
+<puml src="diagrams/StorageClassDiagram.puml" width="700" />
 
 The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
-* inherits from both `AddressBookStorage` and `UserPrefStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
-* depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
+* inherits from both `AddressBookStorage` and `UserPrefsStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
+* depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`).
+* persists `Event` objects as a top-level list in the address book JSON, identified by a unique integer ID. Each `JsonAdaptedPerson` stores a list of event IDs as foreign keys, which are resolved back into `Event` objects during loading.
+* persists the pinned persons list separately within the address book JSON. During loading, pinned entries are resolved against the main persons list to ensure a single source of truth.
+* **Note:** CSV import/export (`import`/`export` commands) is handled at the `Logic` layer via `CsvUtil` in `Commons`, and is not part of the `Storage` component.
 
 ### Common classes
 

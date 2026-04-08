@@ -240,6 +240,25 @@ public class ImportCommandTest {
     }
 
     @Test
+    public void execute_totalMalformedCsv_abortAndReports() throws Exception {
+        String testString = "\nValid,91234567,valid@u.nus.edu,Blk 123,,,aaa"
+                + "\nInvalid,abcd,invalid@u.nus.edu,Blk 123,,,";
+
+        createCsvFile("malformed", header + testString);
+
+        ImportCommand addCommand = createTestCommand("add", "malformed");
+        CommandException addException = assertThrows(CommandException.class, () -> addCommand.execute(model));
+        assertEquals(String.format(ImportCommand.MESSAGE_MALFORM_CSV, "malformed" + FILENAME_SUFFIX),
+                addException.getMessage());
+
+        ImportCommand overwriteCommand = createTestCommand("overwrite", "malformed");
+        CommandException overwriteException = assertThrows(
+                CommandException.class, () -> overwriteCommand.execute(model));
+        assertEquals(String.format(ImportCommand.MESSAGE_MALFORM_CSV, "malformed" + FILENAME_SUFFIX),
+                overwriteException.getMessage());
+    }
+
+    @Test
     public void execute_fileDoesNotExist_throwsCommandException() {
         ImportCommand importCommand = new ImportCommand("add", "nonExistentFile");
         assertCommandFailure(importCommand, model,
@@ -286,7 +305,8 @@ public class ImportCommandTest {
         Path filePath = testFolder.resolve("malformed.csv");
         List<String> lines = List.of(
                 "Name,Phone,Email,Address,Tags,Events,Photo",
-                "John Doe,91234567"
+                "John Doe,91234567",
+                "Yohan,67676868,,,,,"
         );
         Files.write(filePath, lines);
 
@@ -300,7 +320,7 @@ public class ImportCommandTest {
         CommandResult result = importCommand.execute(model);
 
         String expectedFeedback = String.format(ImportCommand.MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED,
-                "malformed.csv", 0, 1);
+                "malformed.csv", 1, 1);
         assertEquals(expectedFeedback, result.getFeedbackToUser());
     }
 

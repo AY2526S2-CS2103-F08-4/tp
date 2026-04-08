@@ -20,6 +20,7 @@ Class JsonAddressBookStorage
 Class JsonSerializableAddressBook
 Class JsonAdaptedPerson
 Class JsonAdaptedTag
+Class JsonAdaptedEvent
 }
 
 }
@@ -37,7 +38,10 @@ Storage -right-|> AddressBookStorage
 JsonUserPrefsStorage .up.|> UserPrefsStorage
 JsonAddressBookStorage .up.|> AddressBookStorage
 JsonAddressBookStorage ..> JsonSerializableAddressBook
-JsonSerializableAddressBook --> "*" JsonAdaptedPerson
+JsonSerializableAddressBook --> "*" JsonAdaptedPerson : persons
+JsonSerializableAddressBook --> "*" JsonAdaptedPerson : pinned
+JsonSerializableAddressBook --> "*" JsonAdaptedEvent
 JsonAdaptedPerson --> "*" JsonAdaptedTag
+JsonAdaptedPerson ..> JsonAdaptedEvent : resolves via ID
 
 @enduml
