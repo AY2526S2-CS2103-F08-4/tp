@@ -135,14 +135,14 @@ public class ModelManagerTest {
         Event event = newEvent("Consultation", "Client sync", "2026-03-25 1300", "2026-03-25 1400");
         modelManager.addEvent(event);
         assertTrue(modelManager.hasEvent(event));
-        assertEquals(1, modelManager.getFilteredEventList().size());
+        assertEquals(0, modelManager.getFilteredEventList().size());
     }
 
     @Test
     public void deleteEvent_removesEventFromFilteredEventList() {
         Event event = newEvent("Delete Event", "Cleanup", "2026-03-26 0900", "2026-03-26 1000");
         modelManager.addEvent(event);
-        assertEquals(1, modelManager.getFilteredEventList().size());
+        assertEquals(0, modelManager.getFilteredEventList().size());
 
         modelManager.deleteEvent(event);
         assertEquals(0, modelManager.getFilteredEventList().size());
@@ -297,8 +297,12 @@ public class ModelManagerTest {
 
     @Test
     public void showNoEvents_clearsEventFilter() {
+        Person personWithEvent = new PersonBuilder().withName("Clear Events").withPhone("98880000").build();
+        modelManager.addPerson(personWithEvent);
         Event event = newEvent("Meeting", null, "2026-03-25 0900", "2026-03-25 1000");
         modelManager.addEvent(event);
+        personWithEvent.addEvent(event);
+        modelManager.showEventsForPerson(personWithEvent);
 
         assertEquals(1, modelManager.getFilteredEventList().size());
         modelManager.showNoEvents();

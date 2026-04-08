@@ -47,6 +47,8 @@ public class ModelManager implements Model {
         sortedPersons = new SortedList<>(filteredPersons);
         sortedPersons.setComparator(createPinnedComparator());
         filteredEvents = new FilteredList<>(this.addressBook.getEventList());
+
+        showNoEvents();
     }
 
     public ModelManager() {
