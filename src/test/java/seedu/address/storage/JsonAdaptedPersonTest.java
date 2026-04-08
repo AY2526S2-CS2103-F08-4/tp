@@ -2,7 +2,6 @@ package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static seedu.address.storage.JsonAdaptedPerson.MISSING_EVENT_MESSAGE_FORMAT;
 import static seedu.address.storage.JsonAdaptedPerson.MISSING_FIELD_MESSAGE_FORMAT;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.BENSON;
@@ -24,8 +23,10 @@ import seedu.address.model.event.Title;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
+import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.Photo;
+import seedu.address.testutil.PersonBuilder;
 
 public class JsonAdaptedPersonTest {
     private static final String INVALID_NAME = "R@chel";
@@ -173,12 +174,37 @@ public class JsonAdaptedPersonTest {
     }
 
     @Test
-    public void toModelType_unknownEventId_throwsIllegalValueException() {
-        int unknownId = 99999;
+    public void toModelType_missingEventId_skipsMissingEvent() throws IllegalValueException {
+        Event mappedEvent = new Event(new Title("Team Sync"), Optional.of(new Description("Weekly sync")),
+                new TimeRange("2026-03-26 1000", "2026-03-26 1030"), 3);
+        int missingEventId = mappedEvent.getEventId() + 100;
+
+        Map<Integer, Event> eventMap = new HashMap<>();
+        eventMap.put(mappedEvent.getEventId(), mappedEvent);
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
-                VALID_PHOTO, VALID_TAGS, List.of(unknownId));
-        String expectedMessage = String.format(MISSING_EVENT_MESSAGE_FORMAT, unknownId, VALID_NAME);
-        assertThrows(IllegalValueException.class, expectedMessage, () -> person.toModelType(new HashMap<>()));
+                VALID_PHOTO, VALID_TAGS, List.of(mappedEvent.getEventId(), missingEventId));
+
+        Person modelPerson = person.toModelType(eventMap);
+        assertEquals(1, modelPerson.getEvents().size());
+        assertSame(mappedEvent, modelPerson.getEvents().get(0));
+    }
+
+    @Test
+    public void jsonCreator_nullTagsAndEventIds_defaultsToEmptyCollections() throws IllegalValueException {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
+                VALID_PHOTO, null, null);
+
+        Person modelPerson = person.toModelType(new HashMap<>());
+        assertEquals(0, modelPerson.getTags().size());
+        assertEquals(0, modelPerson.getEvents().size());
+    }
+
+    @Test
+    public void fromSource_withPhoto_serializesAndDeserializesPhotoPath() throws IllegalValueException {
+        Person personWithPhoto = new PersonBuilder(BENSON).withPhoto(VALID_PHOTO).build();
+
+        JsonAdaptedPerson adapted = new JsonAdaptedPerson(personWithPhoto);
+        assertEquals(Optional.of(new Photo(VALID_PHOTO)), adapted.toModelType(bensonEventMap()).getPhoto());
     }
 
     @Test

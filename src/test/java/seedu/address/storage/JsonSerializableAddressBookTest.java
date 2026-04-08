@@ -234,25 +234,4 @@ public class JsonSerializableAddressBookTest {
         assertSame(topLevelEvent, linkedEvent);
         assertEquals(4, linkedEvent.getNumberOfPersonLinked());
     }
-
-    @Test
-    public void toModelType_personWithUnknownEventId_throwsIllegalValueException() throws Exception {
-        String json = """
-                {
-                  "persons": [
-                    {
-                      "name": "Alice Pauline",
-                      "phone": "94351253",
-                      "email": null,
-                      "address": null,
-                      "tags": [],
-                      "eventIds": [99999]
-                    }
-                  ],
-                  "events": []
-                }
-                """;
-        JsonSerializableAddressBook dataFromJson = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
-        assertThrows(IllegalValueException.class, dataFromJson::toModelType);
-    }
 }
