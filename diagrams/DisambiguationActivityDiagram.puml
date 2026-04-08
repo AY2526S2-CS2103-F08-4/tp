@@ -1,0 +1,26 @@
+@startuml
+skin rose
+skinparam ActivityFontSize 15
+skinparam ArrowFontSize 12
+
+start
+:User executes command (e.g., DeleteCommand);
+:Extract target information\n(Name and any optional fields);
+:Filter AddressBook for matching contacts;
+
+if () then ([No matches found])
+:Throw CommandException\n(Warn user that no contact matches the criteria);
+
+else ([Matches found])
+    if () then ([Exactly 1 match])
+    :Return the exact Target Person;
+    :Command executes successfully\n(e.g., Person is deleted);
+
+    else ([> 1 matches])
+    :Update UI to display all the matched persons;
+    :Throw CommandException\n(Prompt user to provide more specific details);
+    endif
+endif
+
+stop
+@enduml
