@@ -528,6 +528,16 @@ Format: `event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE 
 
 </panel>
 
+<panel header=":fa-solid-exclamation-triangle: **Important: Event uniqueness and time clashes**" type="danger">
+
+- NAB treats the event list as **your schedule** (user point of view).
+- Time clashes are checked **globally** across the event list, not per contact.
+  - Reason: from your point of view, one user cannot be in two places at the same time, so overlapping events are blocked.
+- Overlap means the 2 ranges share actual time in common. Back-to-back events are allowed (for example, one ends at `1000` and another starts at `1000`).
+- If a clash is found, NAB shows: `This event clashes with an existing event in the calendar.`
+
+</panel>
+
 <panel header=":fa-solid-exclamation-triangle: **Important: Disambiguating contacts with the same name**" type="danger">
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -572,10 +582,10 @@ Format: `event delete start/START_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDR
 
 <panel header=":fa-solid-code: **Examples**" type="info">
 
-- `event delete start/2026-03-12 1100 n/David Li`<br>
+- `event delete start/2026-03-12 1100 to/David Li`<br>
   Deletes the event only if David Li has an assigned event that starts at `2026-03-12 1100`.
 
-- `event delete start/2026-03-12 1100 n/David Li p/99272758`<br>
+- `event delete start/2026-03-12 1100 to/David Li p/99272758`<br>
   Deletes the event only if the David Li with phone number `99272758` has an assigned event that starts at `2026-03-12 1100`, disambiguating between multiple contacts with the same name.
 
 </panel>
