@@ -531,8 +531,6 @@ Format: `event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE 
 <panel header=":fa-solid-exclamation-triangle: **Important: Event uniqueness and time clashes**" type="danger">
 
 - NAB treats the event list as **your schedule** (user point of view).
-- A duplicate event (for the same contact) has the same `title/`, `start/`, and `end/` as an event already linked to that contact.
-- `desc/` is not part of duplicate checking. Changing only the description still counts as the same event.
 - Time clashes are checked **globally** across the event list, not per contact.
   - Reason: from your point of view, one user cannot be in two places at the same time, so overlapping events are blocked.
 - Overlap means the 2 ranges share actual time in common. Back-to-back events are allowed (for example, one ends at `1000` and another starts at `1000`).
