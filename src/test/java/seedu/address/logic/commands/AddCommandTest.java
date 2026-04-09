@@ -44,24 +44,16 @@ public class AddCommandTest {
         Files.createDirectory(appFolder);
         Files.createDirectory(userFolder);
 
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         String tempDirPath = PhotoStorageUtil.formatPath(appFolder);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
+        Path sourceFile = userFolder.resolve("test.jpg");
+        Files.createFile(sourceFile);
 
-        try {
-            Path sourceFile = userFolder.resolve("test.jpg");
-            Files.createFile(sourceFile);
-            String pathToSourceFile = PhotoStorageUtil.formatPath(sourceFile);
+        Person validPersonWithPhoto = new PersonBuilder().withPhoto(sourceFile.toString()).build();
+        CommandResult commandResult = new AddCommand(validPersonWithPhoto).execute(modelStub);
+        Person addedPerson = modelStub.personsAdded.get(0);
 
-            Person validPersonWithPhoto = new PersonBuilder().withPhoto(pathToSourceFile).build();
-            CommandResult commandResult = new AddCommand(validPersonWithPhoto).execute(modelStub);
-            Person addedPerson = modelStub.personsAdded.get(0);
-
-            assertEquals(String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(addedPerson)),
-                    commandResult.getFeedbackToUser());
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        assertEquals(String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(addedPerson)),
+                commandResult.getFeedbackToUser());
     }
 
     @Test
@@ -74,20 +66,14 @@ public class AddCommandTest {
         Files.createDirectory(appFolder);
         Files.createDirectory(userFolder);
 
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         String tempDirPath = PhotoStorageUtil.formatPath(appFolder);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
 
-        try {
-            String dummyFile = PhotoStorageUtil.formatPath(userFolder.resolve("does_not_exist.jpg"));
-            Person personWithInvalidPhoto = new PersonBuilder().withPhoto(dummyFile).build();
-            AddCommand addCommand = new AddCommand(personWithInvalidPhoto);
+        String dummyFile = PhotoStorageUtil.formatPath(userFolder.resolve("does_not_exist.jpg"));
+        Person personWithInvalidPhoto = new PersonBuilder().withPhoto(dummyFile).build();
+        AddCommand addCommand = new AddCommand(personWithInvalidPhoto, tempDirPath);
 
-            // Photo does not exist
-            assertThrows(CommandException.class, () -> addCommand.execute(modelStub));
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        // Photo does not exist
+        assertThrows(CommandException.class, () -> addCommand.execute(modelStub));
     }
 
     @Test

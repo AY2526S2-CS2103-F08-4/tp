@@ -419,132 +419,106 @@ public class EditCommandTest {
         Files.createDirectory(appFolder);
         Files.createDirectory(userFolder);
 
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         String tempDirPath = PhotoStorageUtil.formatPath(appFolder);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
 
-        try {
-            Path sourceFile = userFolder.resolve("test.jpg");
-            Files.createFile(sourceFile);
-            String pathToSourceFile = PhotoStorageUtil.formatPath(sourceFile);
+        Path sourceFile = userFolder.resolve("test.jpg");
+        Files.createFile(sourceFile);
+        String pathToSourceFile = PhotoStorageUtil.formatPath(sourceFile);
 
-            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
-            Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+        Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+        Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
 
-            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
-                    .withName(VALID_NAME_BOB).withPhoto(pathToSourceFile).withPhone(VALID_PHONE_BOB)
-                    .withTags(VALID_TAG_HUSBAND).build();
+        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                .withName(VALID_NAME_BOB).withPhoto(pathToSourceFile).withPhone(VALID_PHONE_BOB)
+                .withTags(VALID_TAG_HUSBAND).build();
 
-            EditCommand editCommand = new EditCommand(targetInfoFromPerson(lastPerson), descriptor);
-            CommandResult result = editCommand.execute(model);
+        EditCommand editCommand = new EditCommand(targetInfoFromPerson(lastPerson), descriptor, tempDirPath);
+        CommandResult result = editCommand.execute(model);
 
-            assertTrue(result.getFeedbackToUser().startsWith("Edited Person:"));
-            Person storedPerson = model.getFilteredPersonList().get(0);
-            assertTrue(storedPerson.getPhoto().isPresent());
-            assertNotEquals(pathToSourceFile, storedPerson.getPhoto().get().getPath());
-            assertTrue(PhotoStorageUtil.isSavedLocally(storedPerson.getPhoto().get()));
-            assertTrue(Files.exists(Path.of(storedPerson.getPhoto().get().getPath())));
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        assertTrue(result.getFeedbackToUser().startsWith("Edited Person:"));
+        Person storedPerson = model.getFilteredPersonList().get(0);
+        assertTrue(storedPerson.getPhoto().isPresent());
+        assertNotEquals(pathToSourceFile, storedPerson.getPhoto().get().getPath());
+        assertTrue(PhotoStorageUtil.isSavedLocally(storedPerson.getPhoto().get(), tempDirPath));
+        assertTrue(Files.exists(Path.of(storedPerson.getPhoto().get().getPath())));
     }
 
     @Test
     public void execute_editPersonWithInvalidPhoto_throwsCommandException(@TempDir Path tempDir)
             throws Exception {
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         Path appFolder = tempDir.resolve("app_storage");
         Path userFolder = tempDir.resolve("user_desktop");
         Files.createDirectory(appFolder);
         Files.createDirectory(userFolder);
 
         String tempDirPath = PhotoStorageUtil.formatPath(appFolder);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
 
-        try {
-            String missingFilePath = PhotoStorageUtil.formatPath(userFolder.resolve("does_not_exist.jpg"));
-            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+        String missingFilePath = PhotoStorageUtil.formatPath(userFolder.resolve("does_not_exist.jpg"));
+        Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
 
-            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
-                    .withName(VALID_NAME_BOB).withPhoto(missingFilePath).withPhone(VALID_PHONE_BOB)
-                    .withTags(VALID_TAG_HUSBAND).build();
+        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                .withName(VALID_NAME_BOB).withPhoto(missingFilePath).withPhone(VALID_PHONE_BOB)
+                .withTags(VALID_TAG_HUSBAND).build();
 
-            Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
-            EditCommand editCommand = new EditCommand(targetInfoFromPerson(lastPerson), descriptor);
-            assertThrows(CommandException.class, () -> editCommand.execute(model));
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+        EditCommand editCommand = new EditCommand(targetInfoFromPerson(lastPerson), descriptor, tempDirPath);
+        assertThrows(CommandException.class, () -> editCommand.execute(model));
     }
 
     @Test
     public void execute_editPersonWithManagedDirectoryPhoto_throwsCommandException(
             @TempDir Path tempDir) throws Exception {
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         Path appFolder = tempDir.resolve("app_storage");
         Files.createDirectory(appFolder);
-
         String tempDirPath = PhotoStorageUtil.formatPath(appFolder);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
 
-        try {
-            Path existingPhoto = appFolder.resolve("i_exists.jpg");
-            Files.createFile(existingPhoto);
-            String existingPhotoPath = PhotoStorageUtil.formatPath(existingPhoto);
+        Path existingPhoto = appFolder.resolve("i_exists.jpg");
+        Files.createFile(existingPhoto);
+        String existingPhotoPath = PhotoStorageUtil.formatPath(existingPhoto);
 
-            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
-            Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
-            Person personWithPhoto = new PersonBuilder(lastPerson).withPhoto(existingPhotoPath)
-                    .build();
-            model.setPerson(lastPerson, personWithPhoto);
-            model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+        Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+        Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+        Person personWithPhoto = new PersonBuilder(lastPerson).withPhoto(existingPhotoPath)
+                .build();
+        model.setPerson(lastPerson, personWithPhoto);
+        model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
 
-            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
-                    .withPhoto(existingPhotoPath).build();
+        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                .withPhoto(existingPhotoPath).build();
 
-            EditCommand editCommand = new EditCommand(targetInfoFromPerson(personWithPhoto),
-                    descriptor);
-            assertThrows(CommandException.class, () -> editCommand.execute(model));
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        EditCommand editCommand = new EditCommand(targetInfoFromPerson(personWithPhoto),
+                descriptor, tempDirPath);
+        assertThrows(CommandException.class, () -> editCommand.execute(model));
     }
 
     @Test
-    public void execute_editPersonPhotoDeletion_throwsCommandException(@TempDir Path tempDir)
-            throws Exception {
-        String originalDir = PhotoStorageUtil.getImageDirectory();
+    public void execute_editPersonPhotoDeletion_throwsCommandException(@TempDir Path tempDir) throws Exception {
         Path appFolder = tempDir.resolve("app_storage");
         Files.createDirectory(appFolder);
-        PhotoStorageUtil.setImageDirectory(PhotoStorageUtil.formatPath(appFolder));
+        String tempDirPath = PhotoStorageUtil.formatPath(appFolder);
 
-        try {
-            // cannot_delete.jpg/locked.txt to prevent cannot_delete.jpg from being deleted
-            // trick
-            Path undeletableOldPhoto = appFolder.resolve("cannot_delete.jpg");
-            Files.createDirectory(undeletableOldPhoto);
-            Files.createFile(undeletableOldPhoto.resolve("locked.txt"));
-            String oldPhotoPath = PhotoStorageUtil.formatPath(undeletableOldPhoto);
+        // cannot_delete.jpg/locked.txt to prevent cannot_delete.jpg from being deleted
+        Path undeletableOldPhoto = appFolder.resolve("cannot_delete.jpg");
+        Files.createDirectory(undeletableOldPhoto);
+        Files.createFile(undeletableOldPhoto.resolve("locked.txt"));
+        String oldPhotoPath = PhotoStorageUtil.formatPath(undeletableOldPhoto);
 
-            // Give the person "cannot_delete.jpg"
-            Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
-            Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
-            Person personWithOldPhoto = new PersonBuilder(lastPerson).withPhoto(oldPhotoPath)
-                    .build();
-            model.setPerson(lastPerson, personWithOldPhoto);
+        // Give the person "cannot_delete.jpg"
+        Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+        Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+        Person personWithOldPhoto = new PersonBuilder(lastPerson).withPhoto(oldPhotoPath).build();
+        model.setPerson(lastPerson, personWithOldPhoto);
 
-            // Create file to replace "cannot_delete.jpg" with
-            Path newPhotoFile = tempDir.resolve("new_photo.jpg");
-            Files.createFile(newPhotoFile);
-            String newPhotoPath = PhotoStorageUtil.formatPath(newPhotoFile);
+        // Create file to replace "cannot_delete.jpg" with
+        Path newPhotoFile = tempDir.resolve("new_photo.jpg");
+        Files.createFile(newPhotoFile);
+        String newPhotoPath = PhotoStorageUtil.formatPath(newPhotoFile);
 
-            EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
-                    .withPhoto(newPhotoPath).build();
-            EditCommand editCommand = new EditCommand(targetInfoFromPerson(personWithOldPhoto),
-                    descriptor);
-            assertThrows(CommandException.class, () -> editCommand.execute(model));
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
+                .withPhoto(newPhotoPath).build();
+
+        // THE FIX: Inject the temp directory
+        EditCommand editCommand = new EditCommand(targetInfoFromPerson(personWithOldPhoto), descriptor, tempDirPath);
+        assertThrows(CommandException.class, () -> editCommand.execute(model));
     }
 }

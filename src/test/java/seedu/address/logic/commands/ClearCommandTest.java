@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -21,50 +19,41 @@ import seedu.address.model.UserPrefs;
 
 public class ClearCommandTest {
 
-    @TempDir
-    public Path sharedTempFolder; // Simulate data/
-
-    private Path testFolder; // Simulate data_images
-    private Path userFolder; // Simulate user_desktop
-
-    private String originalDirectory;
-
-    @BeforeEach
-    public void setUp() throws IOException {
-        testFolder = Files.createDirectory(sharedTempFolder.resolve("data_images"));
-        userFolder = Files.createDirectory(sharedTempFolder.resolve("user_desktop"));
-
-        originalDirectory = PhotoStorageUtil.getImageDirectory();
-        String tempDirPath = PhotoStorageUtil.formatPath(testFolder);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        PhotoStorageUtil.setImageDirectory(originalDirectory);
-    }
-
     @Test
-    public void execute_emptyAddressBook_success() {
+    public void execute_emptyAddressBook_success(@TempDir Path tempDir) throws IOException {
         Model model = new ModelManager();
         Model expectedModel = new ModelManager();
 
-        assertCommandSuccess(new ClearCommand(), model, ClearCommand.MESSAGE_SUCCESS, expectedModel);
+        Path testFolder = tempDir.resolve("data_images");
+        Files.createDirectory(testFolder);
+        String tempDirPath = PhotoStorageUtil.formatPath(testFolder);
+
+        assertCommandSuccess(new ClearCommand(tempDirPath), model, ClearCommand.MESSAGE_SUCCESS, expectedModel);
     }
 
     @Test
-    public void execute_nonEmptyAddressBook_success() {
+    public void execute_nonEmptyAddressBook_success(@TempDir Path tempDir) throws IOException {
         Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
         Model expectedModel = new ModelManager(getTypicalAddressBook(), new UserPrefs());
         expectedModel.setAddressBook(new AddressBook());
 
-        assertCommandSuccess(new ClearCommand(), model, ClearCommand.MESSAGE_SUCCESS, expectedModel);
+
+        Path testFolder = tempDir.resolve("data_images");
+        Files.createDirectory(testFolder);
+        String tempDirPath = PhotoStorageUtil.formatPath(testFolder);
+
+        assertCommandSuccess(new ClearCommand(tempDirPath), model, ClearCommand.MESSAGE_SUCCESS, expectedModel);
     }
 
     @Test
-    public void execute_clearDirectoryFails_throwsIoException() throws IOException {
+    public void execute_clearDirectoryFails_throwsIoException(@TempDir Path tempDir) throws IOException {
         Model model = new ModelManager();
         Model expectedModel = new ModelManager();
+
+        // Create an isolated test folder inside the temp directory
+        Path testFolder = tempDir.resolve("data_images");
+        Files.createDirectory(testFolder);
+        String tempDirPath = PhotoStorageUtil.formatPath(testFolder);
 
         Path dummyFile = testFolder.resolve("cannot_delete_me.jpg");
         Files.createFile(dummyFile);
@@ -77,7 +66,7 @@ public class ClearCommandTest {
             testFolder.toFile().setExecutable(false);
 
             try {
-                assertCommandSuccess(new ClearCommand(), model, ClearCommand.MESSAGE_SUCCESS, expectedModel);
+                assertCommandSuccess(new ClearCommand(tempDirPath), model, ClearCommand.MESSAGE_SUCCESS, expectedModel);
             } finally {
                 testFolder.toFile().setReadable(true);
                 testFolder.toFile().setWritable(true);

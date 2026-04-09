@@ -14,7 +14,7 @@ public class Photo {
      * Path to photo must end with the extension any of the extensions .png, .jpg or .jpeg
      */
     public static final String VALIDATION_REGEX = "(?i)^.*\\.(png|jpg|jpeg)$";
-    public final String value;
+    private final String value;
 
 
     /**
@@ -26,17 +26,17 @@ public class Photo {
         requireNonNull(path);
 
         // Check Extension is .png, .jpg or .jpeg
-        checkArgument(isValidPhoto(path), MESSAGE_CONSTRAINTS);
-        this.value = path;
+        String trimmedPath = path.trim().replace("\\", "/");
+        checkArgument(isValidPhoto(trimmedPath), MESSAGE_CONSTRAINTS);
+        this.value = trimmedPath;
     }
 
     /**
      * Returns true if a given string is a valid file path and the image is of the format .png, .jpg, .jpeg.
      */
     public static boolean isValidPhoto(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return test.trim().matches(VALIDATION_REGEX);
     }
-
 
 
     /**

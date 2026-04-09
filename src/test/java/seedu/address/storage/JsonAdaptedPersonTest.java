@@ -141,7 +141,7 @@ public class JsonAdaptedPersonTest {
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS,
                 INVALID_PHOTO, VALID_TAGS, List.of());
         assertEquals("data/images/corrupted_data.jpg",
-                person.toModelType(new HashMap<>()).getPhoto().get().value);
+                person.toModelType(new HashMap<>()).getPhoto().get().getPath());
     }
 
     @Test

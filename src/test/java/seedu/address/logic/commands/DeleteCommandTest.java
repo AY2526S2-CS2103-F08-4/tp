@@ -217,82 +217,64 @@ public class DeleteCommandTest {
     @Test
     public void execute_deletesPersonAndPhoto_success(@TempDir Path tempDir) throws Exception {
         // Set up the temp directories for simulation
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         String tempDirPath = PhotoStorageUtil.formatPath(tempDir);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
 
-        try {
-            Path photoFile = tempDir.resolve("delete_me.jpg");
-            Files.createFile(photoFile);
-            String photoPath = PhotoStorageUtil.formatPath(photoFile);
+        Path photoFile = tempDir.resolve("delete_me.jpg");
+        Files.createFile(photoFile);
+        String photoPath = PhotoStorageUtil.formatPath(photoFile);
 
-            Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
-            model.addPerson(personToDelete);
+        Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
+        model.addPerson(personToDelete);
 
-            DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(personToDelete.getName()));
-            deleteCommand.execute(model);
+        DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(personToDelete.getName()), tempDirPath);
+        deleteCommand.execute(model);
 
-            assertFalse(model.hasPerson(personToDelete));
-            assertFalse(Files.exists(photoFile));
+        assertFalse(model.hasPerson(personToDelete));
+        assertFalse(Files.exists(photoFile));
 
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
     }
 
     @Test
     public void execute_deletesPersonAndPhoto_throwsCommandException(@TempDir Path tempDir) throws Exception {
         // Set up the temp directories for simulation
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         String tempDirPath = PhotoStorageUtil.formatPath(tempDir);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
 
-        try {
-            // Create a structure where /to_be_deleted.jpg/dummy.txt
-            // Prevent to_be_deleted.jpg from getting deleted
-            Path dummyDir = tempDir.resolve("to_be_deleted.jpg");
-            Files.createDirectory(dummyDir);
+        // Create a structure where /to_be_deleted.jpg/dummy.txt
+        // Prevent to_be_deleted.jpg from getting deleted
+        Path dummyDir = tempDir.resolve("to_be_deleted.jpg");
+        Files.createDirectory(dummyDir);
 
-            Files.createFile(dummyDir.resolve("dummy.txt"));
-            String photoPath = PhotoStorageUtil.formatPath(dummyDir);
+        Files.createFile(dummyDir.resolve("dummy.txt"));
+        String photoPath = PhotoStorageUtil.formatPath(dummyDir);
 
-            Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
-            model.addPerson(personToDelete);
+        Person personToDelete = new PersonBuilder().withName("John Doe").withPhoto(photoPath).build();
+        model.addPerson(personToDelete);
 
-            DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(personToDelete.getName()));
-            assertThrows(CommandException.class, () -> deleteCommand.execute(model));
-
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(personToDelete.getName()), tempDirPath);
+        assertThrows(CommandException.class, () -> deleteCommand.execute(model));
     }
 
     @Test
     public void execute_sharedPhoto_deletesPersonButKeepsPhotoFile(@TempDir Path tempDir) throws Exception {
-        String originalDir = PhotoStorageUtil.getImageDirectory();
         String tempDirPath = PhotoStorageUtil.formatPath(tempDir);
-        PhotoStorageUtil.setImageDirectory(tempDirPath);
 
-        try {
-            Path sharedPhotoFile = tempDir.resolve("shared.jpg");
-            Files.createFile(sharedPhotoFile);
-            String sharedPhotoPath = PhotoStorageUtil.formatPath(sharedPhotoFile);
 
-            Person firstPerson = new PersonBuilder().withName("Shared One").withPhone("81112222")
-                    .withPhoto(sharedPhotoPath).build();
-            Person secondPerson = new PersonBuilder().withName("Shared Two").withPhone("83334444")
-                    .withPhoto(sharedPhotoPath).build();
-            model.addPerson(firstPerson);
-            model.addPerson(secondPerson);
+        Path sharedPhotoFile = tempDir.resolve("shared.jpg");
+        Files.createFile(sharedPhotoFile);
+        String sharedPhotoPath = PhotoStorageUtil.formatPath(sharedPhotoFile);
 
-            DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(firstPerson.getName()));
-            deleteCommand.execute(model);
+        Person firstPerson = new PersonBuilder().withName("Shared One").withPhone("81112222")
+                .withPhoto(sharedPhotoPath).build();
+        Person secondPerson = new PersonBuilder().withName("Shared Two").withPhone("83334444")
+                .withPhoto(sharedPhotoPath).build();
+        model.addPerson(firstPerson);
+        model.addPerson(secondPerson);
 
-            assertFalse(model.hasPerson(firstPerson));
-            assertTrue(model.hasPerson(secondPerson));
-            assertTrue(Files.exists(sharedPhotoFile));
-        } finally {
-            PhotoStorageUtil.setImageDirectory(originalDir);
-        }
+        DeleteCommand deleteCommand = new DeleteCommand(createNameOnlyInfo(firstPerson.getName()), tempDirPath);
+        deleteCommand.execute(model);
+
+        assertFalse(model.hasPerson(firstPerson));
+        assertTrue(model.hasPerson(secondPerson));
+        assertTrue(Files.exists(sharedPhotoFile));
     }
 }

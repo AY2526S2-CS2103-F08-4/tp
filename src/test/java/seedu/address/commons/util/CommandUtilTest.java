@@ -85,12 +85,14 @@ public class CommandUtilTest {
 
     @Test
     public void safelyDeletePhoto_photoIsNotShared_deletesImageFile(@TempDir Path tempDir) throws Exception {
-        // Setup directory and dummyPhoto
-        String originalDirectory = PhotoStorageUtil.getImageDirectory();
-        PhotoStorageUtil.setImageDirectory(PhotoStorageUtil.formatPath(tempDir));
+        // Setup tempDir
         Path dummyImagePath = tempDir.resolve("test_image.png");
+        String tempDirString = PhotoStorageUtil.formatPath(tempDir);
+
+        // Setup dummyFolder
         Files.createFile(dummyImagePath);
-        Photo dummyPhoto = new Photo(PhotoStorageUtil.formatPath(dummyImagePath));
+        Photo dummyPhoto = new Photo(dummyImagePath.toString());
+
 
         // Setup model
         Model model = new ModelManager();
@@ -98,21 +100,19 @@ public class CommandUtilTest {
         model.addPerson(personA);
 
         // Test
-        CommandUtil.safelyDeletePhoto(model, personA, dummyPhoto);
+        CommandUtil.safelyDeletePhoto(model, personA, dummyPhoto, tempDirString);
         assertTrue(Files.notExists(dummyImagePath));
-
-        // Return to original
-        PhotoStorageUtil.setImageDirectory(originalDirectory);
     }
 
     @Test
     public void safelyDeletePhoto_photoIsShared_doesNotDeleteImageFile(@TempDir Path tempDir) throws Exception {
-        // Setup directory and dummyPhoto
-        String originalDirectory = PhotoStorageUtil.getImageDirectory();
-        PhotoStorageUtil.setImageDirectory(PhotoStorageUtil.formatPath(tempDir));
+        // Setup tempDir
         Path dummyImagePath = tempDir.resolve("test_image.png");
+        String tempDirString = PhotoStorageUtil.formatPath(tempDir);
+
+        // Setup dummyFolder
         Files.createFile(dummyImagePath);
-        Photo dummyPhoto = new Photo(PhotoStorageUtil.formatPath(dummyImagePath));
+        Photo dummyPhoto = new Photo(dummyImagePath.toString());
 
         // Setup model
         Model model = new ModelManager();
@@ -122,11 +122,9 @@ public class CommandUtilTest {
         model.addPerson(personB);
 
         // Test
-        CommandUtil.safelyDeletePhoto(model, personA, dummyPhoto);
+        CommandUtil.safelyDeletePhoto(model, personA, dummyPhoto, tempDirString);
         assertTrue(Files.exists(dummyImagePath));
 
-        // Return to original
-        PhotoStorageUtil.setImageDirectory(originalDirectory);
     }
 
 }

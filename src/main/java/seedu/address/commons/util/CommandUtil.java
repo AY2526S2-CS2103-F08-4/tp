@@ -62,11 +62,12 @@ public final class CommandUtil {
      * @param photoToDelete the photo to evaluate and potentially delete
      * @throws CommandException if the file deletion fails
      */
-    public static void safelyDeletePhoto(Model model, Person personToExclude, Photo photoToDelete)
+    public static void safelyDeletePhoto(Model model, Person personToExclude, Photo photoToDelete,
+                                         String targetDirectory)
             throws CommandException {
         if (!model.isPhotoShared(photoToDelete, personToExclude)) {
             try {
-                PhotoStorageUtil.deletePhoto(photoToDelete);
+                PhotoStorageUtil.deletePhoto(photoToDelete, targetDirectory);
             } catch (IOException e) {
                 throw new CommandException(Messages.MESSAGE_DELETE_PHOTO_FAIL + e.getMessage());
             }

@@ -66,6 +66,7 @@ public class EditCommand extends Command {
 
     private final PersonInformation targetInfo;
     private final EditPersonDescriptor editPersonDescriptor;
+    private final String targetDirectory;
 
     /**
      * Creates an EditCommand that encapsulates the details required to edit a person's information.
@@ -81,6 +82,20 @@ public class EditCommand extends Command {
 
         this.targetInfo = targetInfo;
         this.editPersonDescriptor = new EditPersonDescriptor(editPersonDescriptor);
+        this.targetDirectory = PhotoStorageUtil.DEFAULT_IMAGE_DIR;
+    }
+
+    /**
+     * Creates an EditCommand specifying a target directory (Used for testing).
+     */
+    public EditCommand(PersonInformation targetInfo, EditPersonDescriptor editPersonDescriptor,
+                       String targetDirectory) {
+        requireNonNull(targetInfo);
+        requireNonNull(editPersonDescriptor);
+
+        this.targetInfo = targetInfo;
+        this.editPersonDescriptor = new EditPersonDescriptor(editPersonDescriptor);
+        this.targetDirectory = targetDirectory;
     }
 
     @Override
@@ -97,7 +112,9 @@ public class EditCommand extends Command {
         if (editPersonDescriptor.getPhoto().isPresent()) {
             Photo newPhoto;
             try {
-                newPhoto = PhotoStorageUtil.copyPhotoToDirectory(editPersonDescriptor.getPhoto().get());
+                newPhoto = PhotoStorageUtil.copyPhotoToDirectory(
+                        editPersonDescriptor.getPhoto().get(),
+                        this.targetDirectory);
                 editPersonDescriptor.setPhoto(newPhoto);
             } catch (IOException e) {
                 throw new CommandException(Messages.MESSAGE_SAVE_PHOTO_FAIL + e.getMessage());
@@ -106,7 +123,7 @@ public class EditCommand extends Command {
             if (personToEdit.getPhoto().isPresent()) {
                 Photo oldPhoto = personToEdit.getPhoto().get();
                 if (!oldPhoto.equals(newPhoto)) {
-                    CommandUtil.safelyDeletePhoto(model, personToEdit, oldPhoto);
+                    CommandUtil.safelyDeletePhoto(model, personToEdit, oldPhoto, this.targetDirectory);
                 }
             }
         }

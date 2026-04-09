@@ -8,6 +8,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 
 import seedu.address.commons.util.CommandUtil;
+import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
@@ -39,6 +40,7 @@ public class DeleteCommand extends Command {
 
 
     private final PersonInformation targetInfo;
+    private final String targetDirectory;
 
     /**
      * Creates a {@code DeleteCommand} that targets contacts matching the provided information.
@@ -48,6 +50,16 @@ public class DeleteCommand extends Command {
     public DeleteCommand(PersonInformation targetInfo) {
         requireNonNull(targetInfo);
         this.targetInfo = targetInfo;
+        this.targetDirectory = PhotoStorageUtil.DEFAULT_IMAGE_DIR;
+    }
+
+    /**
+     * Creates a DeleteCommand specifying a target directory (Used for testing).
+     */
+    public DeleteCommand(PersonInformation targetInfo, String targetDirectory) {
+        requireNonNull(targetInfo);
+        this.targetInfo = targetInfo;
+        this.targetDirectory = targetDirectory;
     }
 
     @Override
@@ -55,7 +67,8 @@ public class DeleteCommand extends Command {
         requireNonNull(model);
         Person personToDelete = CommandUtil.targetPerson(model, this.targetInfo);
         if (personToDelete.getPhoto().isPresent()) {
-            CommandUtil.safelyDeletePhoto(model, personToDelete, personToDelete.getPhoto().get());
+            CommandUtil.safelyDeletePhoto(model, personToDelete, personToDelete.getPhoto().get(),
+                    this.targetDirectory);
         }
 
         model.deletePerson(personToDelete);

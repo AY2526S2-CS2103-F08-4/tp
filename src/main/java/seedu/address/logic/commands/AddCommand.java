@@ -47,13 +47,24 @@ public class AddCommand extends Command {
     public static final String MESSAGE_DUPLICATE_PERSON = "A contact with this phone number already exists.";
 
     private final Person toAdd;
+    private final String targetDirectory;
 
     /**
      * Creates an AddCommand to add the specified {@code Person}
      */
     public AddCommand(Person person) {
         requireNonNull(person);
-        toAdd = person;
+        this.toAdd = person;
+        this.targetDirectory = PhotoStorageUtil.DEFAULT_IMAGE_DIR;
+    }
+
+    /**
+     * Creates an AddCommand specifying a target directory (Used for testing).
+     */
+    public AddCommand(Person person, String targetDirectory) {
+        requireNonNull(person);
+        this.toAdd = person;
+        this.targetDirectory = targetDirectory;
     }
 
     @Override
@@ -68,7 +79,9 @@ public class AddCommand extends Command {
         Person finalPersonToAdd = toAdd;
         if (toAdd.getPhoto().isPresent()) {
             try {
-                Photo photoObjectToRecord = PhotoStorageUtil.copyPhotoToDirectory(toAdd.getPhoto().get());
+                Photo photoObjectToRecord = PhotoStorageUtil.copyPhotoToDirectory(
+                        toAdd.getPhoto().get(),
+                        this.targetDirectory);
                 finalPersonToAdd = new Person(
                         toAdd.getName(),
                         toAdd.getPhone(),
