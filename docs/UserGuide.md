@@ -428,7 +428,7 @@ Format: `pin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
   <img src="images/pin_command.png" style="width: 80%;">
 </div>
 
-* Pinned persons are shown first when the `list` command is used.
+* Pinned persons are shown first in the full list and in filtered tag views.
 
 <box type="info">
 

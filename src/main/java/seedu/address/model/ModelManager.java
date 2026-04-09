@@ -197,7 +197,7 @@ public class ModelManager implements Model {
     public void showPersons(Predicate<Person> predicate) {
         requireNonNull(predicate);
         updateFilteredPersonList(predicate);
-        sortedPersons.setComparator(null);
+        sortedPersons.setComparator(createPinnedComparator());
     }
 
     @Override

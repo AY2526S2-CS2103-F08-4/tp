@@ -142,7 +142,7 @@ The `Model` component,
 * stores the address book data i.e., all `Person` objects (contained in a `UniquePersonList`) and all pinned `Person` objects (contained in a separate `UniquePersonList`), as well as all `Event` objects (contained in a `UniqueEventList`).
 * exposes the currently 'selected' `Person` objects (e.g., results of a search query or a `pin` operation) as a _filtered_ and _sorted_ live view over the address book's person list, exposed to outsiders as an unmodifiable `ObservableList<Person>` 
 that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list changes. The _sorted_ list's comparator is dynamically toggled — it floats pinned contacts to the top only when 
-showing all persons (`showAllPersonsPinnedFirst()`), and is disabled during search, filter, or event-view operations.
+showing all persons (`showAllPersonsPinnedFirst()`) and tag-filtered views (`showPersons(...)`), and is disabled during search-result, single-person, or event-view operations.
 * exposes the currently 'selected' `Event` objects (e.g., results of an `event view` query) as a _filtered_ live view over the address book's event list, similarly exposed as an unmodifiable `ObservableList<Event>`.
 * stores a `UserPrefs` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components).
@@ -810,7 +810,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ###### Usability:
 5.  GUI should work well (i.e. should not cause any resolution-related inconveniences to the user), for standard screen resolutions 1980x1080 and higher, and for screens scaled by 100% to 125%.
-6.  GUI should remain usable (i.e. all functions can be used even if the user experieince is not optimal) for resolutions 1280x720 and higher, and for screens scaled by 150%.
+6.  GUI should remain usable (i.e. all functions can be used even if the user experience is not optimal) for resolutions 1280x720 and higher, and for screens scaled by 150%.
 
 ###### Performance:
 7. NAB should be able to hold up to 1000 persons without a noticeable sluggishness in performance for typical usage.
@@ -819,16 +819,16 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 8.  The data file should be stored locally in a human-editable text file, allowing advanced users to manipulate data directly by editing the file.
 
 ###### Data Synchronization:
-9.  All modifications to data should be propogated and reflected in local data storage within 3 seconds.
+9.  All modifications to data should be propagated and reflected in local data storage within 3 seconds.
 
 ###### Stability:
-10.  All exceptions and errors should be handled gracefully by the application, i.e. there should not be any application crashes.
+10.  All exceptions and errors should be handled gracefully by the application (i.e. there should not be any application crashes).
 
 ###### Fault Tolerance:
-11.  Should be able to recover at least uncorrupted portions of local storage file or from a backup file should data file be corrupted.
+11.  Should be able to recover at least uncorrupted portions of the local storage file or from a backup file should the data file be corrupted.
 
 ###### Efficiency:
-12.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
+12.  A user with above-average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
 
 ###### Response time:
 13.  Should not take more than 1 second to process commands and load data for up to 1000 persons and 30 tags cumulative in storage.
@@ -852,6 +852,79 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * **Mainstream OS**: Windows, Linux, Unix, macOS
 * **JavaScript Object Notation (JSON)**: A file format used to store and send data in a human-readable format.
 * **Java Archive (JAR)**: A file format used to compress multiple Java-related files into a single file for ease of distribution, deployment and execution.
+* **Prefix**: A keyword that is used to identify parameters in a command (e.g. n/, p/, e/, a/).
+
+--------------------------------------------------------------------------------------------------------------------
+
+## **Appendix: Effort**
+
+##### Why NAB required more effort than AB3
+
+AB3 mainly manages one entity type and many operations can rely on direct list selection. NAB extends that baseline into a product with **two closely related entity types**, `Person` and `Event`, while still remaining a CLI-first brownfield evolution of AB3. This increased the effort significantly because many features now involve not just storing data, but preserving relationships and consistency between contacts, events, UI views, and storage.
+
+##### Main difficulty: modelling events realistically
+
+The hardest design problem was the **event model**. In NAB, an event is not just a note attached to one contact, and it is not a free-standing calendar entry either. It represents a commitment that implicitly involves the NAB user together with one or more saved contacts. Because the user is not modelled as an explicit in-app entity, the event could not be implemented as a straightforward association class.
+
+We therefore designed events as **global shared entities** stored in a `UniqueEventList`, while each `Person` keeps references to those events. This decision increased the implementation effort because it required custom handling for:
+
+* linking multiple contacts to the same canonical event
+* distinguishing duplicate event linkage from true event clashes
+* enforcing a global no-overlap rule
+* tracking participant counts and cleaning up orphaned events
+* reconstructing shared event references correctly during storage loading
+
+##### Realistic command targeting made the logic harder
+
+Another major difficulty came from replacing AB3's index-based targeting with **name-based resolution and disambiguation**. For a realistic address book, users remember names, not list indices. NAB also allows duplicate names, which meant the team had to build a reusable disambiguation mechanism rather than depending on unique-name assumptions or index selection.
+
+This affected a large number of commands, including `edit`, `delete`, `pin`, `unpin`, `tag`, `event add`, `event view`, and `event delete`. Each of these commands had to support:
+
+* matching by name first
+* narrowing by optional fields such as phone, email, address, and tags
+* surfacing ambiguous results safely instead of acting on the wrong contact
+
+This added substantial parser, model, and testing complexity compared to AB3.
+
+##### Data handling and storage complexity
+
+NAB also went beyond AB3 in its storage and file-handling requirements. Besides JSON persistence, the product supports **CSV import/export** with both `add` and `overwrite` modes. This created many extra cases to design and test, such as:
+
+* reconstructing persons and events from two related CSV files
+* merging imported persons with already existing canonical events
+* preserving pinned state through import/export
+* skipping malformed or duplicate rows safely
+* ensuring that cross-entity links remain valid after import
+
+Profile photo support introduced another layer of effort in file management: path validation, copying external images into managed storage, avoiding invalid reuse, and deleting photos safely only when no other contact still depends on them.
+
+##### Additional implementation effort beyond the core model
+
+On top of the major modelling work, NAB also introduced several non-trivial user-facing features that added meaningful implementation and testing effort:
+
+* pinned contacts with persistent ordering and separate pinned-state storage
+* command history implemented at the UI layer for CLI-heavy usage
+* copy-to-clipboard support from contact cards
+* event-aware list views that keep the person and event panels synchronized
+
+Each feature is individually smaller than the event/disambiguation work, but together they significantly increased the integration surface of the product.
+
+##### Reuse and its impact on effort
+
+NAB reused a meaningful portion of AB3's infrastructure, including the high-level architecture, JavaFX scaffold, command/parser structure, base contact management flow, and JSON framework. This definitely saved effort, well above 5%, because the team did not need to build the application skeleton from scratch.
+
+However, the reuse mainly provided a platform rather than a shortcut for the most difficult work. The most effort-intensive parts of NAB were custom additions built on top of that reused base. This includes the global event model, name-based disambiguation, pinned-state handling, CSV import/export logic, and photo/file lifecycle management.
+
+##### Key achievement
+
+The main achievement of the project was turning AB3 into a more realistic student-facing contact manager while still keeping it usable as a CLI-first product. In particular, the project successfully combined:
+
+* contact management with duplicate-name support
+* a shared event model with cross-entity consistency
+* realistic import/export and file-handling features
+* several usability improvements beyond the original AB3 baseline
+
+Overall, the project required substantially more effort than AB3 because it introduced both deeper domain modelling and more difficult consistency problems, while still operating within the constraints of a portable, single-user, human-editable desktop application.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -861,57 +934,133 @@ Given below are instructions to test the app manually.
 
 <box type="info" seamless>
 
-**Note:** These instructions only provide a starting point for testers to work on;
-testers are expected to do more *exploratory* testing.
+**Note:** These steps assume the tester starts NAB from a fresh home folder so that the default sample data is loaded. 
+If the app state has already been modified, restart with a new empty folder before following the sequence below.
 
 </box>
 
-### Launch and shutdown
+### Suggested route for testing
 
-1. Initial launch
-   1. Download the jar file and copy into an empty folder.
-   2. Run `java --jar NAB.jar`.<br>
-      Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
+1. Start with the built-in sample contacts and verify basic launch, shutdown, and persistence behaviour.
+2. Use the sample data first for non-destructive features such as `find`, `filter`, `pin`, `unpin`, `event view`, command history, and copy-to-clipboard.
+3. Create the additional contacts in the [Reusable test inputs](#reusable-test-inputs) section. These are intended to help test duplicate-name disambiguation, editing, tagging, deletion, profile photos, and event management.
+4. After creating those contacts, test commands that require a unique target by intentionally trying both ambiguous and disambiguated variants.
+5. Export the current data, then test `clear` and `import` using the exported files.
 
-2. Saving window preferences
-   1. Resize the window to an optimum size. Move the window to a different location. Close the window.
-   2. Re-launch the app by double-clicking the jar file.<br>
-      Expected: The most recent window size and location is retained.
+### Sample data reference
 
-3. Closing the app with the exit command
+The default sample data includes these useful contacts:
 
-   1. Prerequisites: App is running normally.
-   2. Test case: `exit`<br>
-      Expected: Application closes gracefully.
+* `Alex Yeoh` tagged with `friends`
+* `Bernice Yu` tagged with `colleagues`, `friends`
+* `Charlotte Oliveiro` tagged with `neighbours`
+* `David Li` tagged with `family`
+* `Irfan Ibrahim` tagged with `classmates`
+* `Roy Balakrishnan` tagged with `colleagues`
 
-### Deleting a person
+The sample data also contains existing events, so `event view n/Alex Yeoh` and `event view n/David Li` are good starting points for event-related testing.
 
-1. Deleting a person while all persons are being shown
+### Launch, shutdown, and persistence
 
-   1. Prerequisites: List all persons using the `list` command. Multiple persons are in the list.
-   2. Test case: `delete n/John Doe`<br>
-      Prerequisites: A person named `John Doe` is in the contact list.<br>
-      Expected: Contact matching `John Doe` is deleted from the list.
-   3. Test case: `delete n/David Li p/91234567`<br>
-      Prerequisites: A person named `David Li` with phone number `91234567` is in the contact list.<br>
-      Expected: Contact matching `David Li` with phone number `91234567` is deleted from the list.
-   4. Other incorrect delete commands to try: `delete`, `delete n/`, `delete p/91234567`<br>
-      Expected: Error message.
+| Scenario | Command | Manual action | Expected |
+| --- | --- | --- | --- |
+| Initial launch | `java -jar NAB.jar` | Copy `NAB.jar` into an empty folder and run the command there | The GUI opens with sample contacts and sample events. |
+| Saving window preferences | - | Resize and move the window, close the app, then relaunch the jar | The window size and position are retained. |
+| Help | `help` | - | NAB shows the help message. |
+| Exit | `exit` | - | The application closes cleanly. |
 
-### Add an event
+### Quick checks on sample data
 
-1. Adding an event to a person using unique name match
+| Feature | Command | Manual action | Expected |
+| --- | --- | --- | --- |
+| Find unique contact | `find n/Alex Yeoh` | - | Only `Alex Yeoh` is shown. His linked events should also be shown because the match is unique. |
+| Filter by tag | `filter t/friends` | - | `Alex Yeoh` and `Bernice Yu` are shown. |
+| Filter by multiple tags | `filter t/colleagues, family` | - | Contacts tagged with either `colleagues` or `family` are shown. |
+| Reset person list | `list` | - | The full contact list is shown again. |
+| Pin contact | `pin n/Bernice Yu` | - | `Bernice Yu` becomes pinned and appears above unpinned contacts in the full list. |
+| Filter preserves pinned-first ordering | `pin n/Bernice Yu` then `filter t/friends` | Run the commands in sequence | `Alex Yeoh` and `Bernice Yu` are shown, with pinned `Bernice Yu` above `Alex Yeoh`. |
+| Pin already pinned contact | `pin n/Bernice Yu` | - | Error indicating that the contact is already pinned. |
+| Unpin contact | `unpin n/Bernice Yu` | - | `Bernice Yu` is unpinned. |
+| Unpin already unpinned contact | `unpin n/Bernice Yu` | - | Error indicating that the contact is already unpinned. |
+| View events for sample contact | `event view n/Alex Yeoh` | - | Alex's events are shown in the event list panel. |
+| View events for missing contact | `event view n/Person Not In List` | - | Error indicating that no such contact can be found. |
+| Command history | `list` then `find n/Alex Yeoh` then `filter t/friends` | After entering the commands, press the Up and Down arrow keys in the command box | NAB navigates previously entered commands for the current session only. |
+| Clipboard copy | - | Double-click any contact card in the person list, then paste elsewhere | The displayed contact details are copied to the system clipboard line-by-line. |
 
-   1. Prerequisites: Ensure there is a person named `David Li` in the contact list and no conflicting events.
-   2. Test case: `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 n/David Li`<br>
-      Expected: Event is added successfully and linked to `David Li`. A success message is shown in the result display.
+### Add command checks
 
-2. Adding an event with missing required fields
+| Feature | Command | Manual action | Expected |
+| --- | --- | --- | --- |
+| Add minimal contact | `add n/Test User p/84561234` | - | A new contact named `Test User` is added successfully. |
+| Add contact with profile photo | `add n/Photo User p/85672345 pfp/manual_photo.jpg` | Place a valid `.png`, `.jpg`, or `.jpeg` file named `manual_photo.jpg` beside the jar before running the command | The contact is added and the image is copied into NAB's managed image storage. |
+| Reject duplicate phone on add | `add n/Duplicate Phone p/84561234` | - | Error indicating that another contact already uses this phone number. |
+| Reject missing photo file | `add n/Missing Photo p/86783456 pfp/not_found.jpg` | Ensure `not_found.jpg` does not exist at the given path | Error indicating that the image file cannot be found/read. |
 
-   1. Test case: `event add title/Team Sync n/David Li`<br>
-      Expected: No event is added. Error message indicates missing required fields (`start/` and `end/`).
+### Reusable test inputs
 
-3. Adding an event where target person does not exist
+Use the following commands in order to create a controlled setup for the remaining feature tests:
 
-   1. Test case: `event add title/Consultation start/2026-04-01 1400 end/2026-04-01 1500 n/Person Not In List`<br>
-      Expected: No event is added. Error message indicates that the target person cannot be found.
+```text
+list
+add n/John Tan p/81234567 e/johntan@example.com a/PGP House 12 t/cs2103 t/project
+add n/John Tan p/82345678 e/johntan2@example.com a/UTown Residence 3 t/cs2105
+add n/Mary Lim p/83456789 e/marylim@example.com a/College Avenue West 15 t/orbital
+```
+
+Expected:
+
+* Two contacts named `John Tan` now exist, which is useful for disambiguation testing.
+* `Mary Lim` can be used for multi-person tagging and import/export checks.
+
+### Disambiguation, edit, tag, and delete
+
+| Feature | Command | Manual action | Expected |
+| --- | --- | --- | --- |
+| Find duplicate-name contacts | `find n/John Tan` | - | Both `John Tan` contacts are shown. |
+| Ambiguous pin | `pin n/John Tan` | - | Error `Multiple matches identified! Please provide more arguments.` and the conflicting contacts are shown. |
+| Disambiguated pin | `pin n/John Tan p/81234567` | - | The correct `John Tan` is pinned. |
+| Disambiguated unpin | `unpin n/John Tan p/81234567` | - | The same contact is unpinned. |
+| Ambiguous edit | `edit n/John Tan -- e/john.updated@example.com` | - | Ambiguity error because more than one `John Tan` exists. |
+| Disambiguated edit | `edit n/John Tan p/81234567 -- e/john.updated@example.com t/teammate` | - | The contact with phone `81234567` is updated. |
+| Clear tags with edit | `edit n/John Tan p/81234567 -- t/` | - | All tags are cleared for that contact. |
+| Profile photo support | `edit n/John Tan p/81234567 -- pfp/profile.png` | Place any `.png`, `.jpg`, or `.jpeg` file outside NAB's `data/images/` folder, for example `profile.png` beside the jar, before running the command | The selected contact's photo is updated and the image is copied into NAB's managed image storage. |
+| Tag multiple contacts | `tag label/cs2103-team n/Alex Yeoh n/Mary Lim` | - | Both contacts receive the `cs2103-team` tag. |
+| Tag multiple contacts with multiple labels | `tag label/demo label/testing n/John Tan p/81234567 n/Mary Lim` | - | Both contacts receive both tags. |
+| Ambiguous tag target | `tag label/demo n/John Tan` | - | Ambiguity error because the target name is not unique. |
+| Ambiguous delete | `delete n/John Tan` | - | Ambiguity error because both duplicate contacts match. |
+
+### Event add, event view, clash handling, and event delete
+
+| Feature | Command | Manual action | Expected |
+| --- | --- | --- | --- |
+| Ambiguous event view | `event view n/John Tan` | - | Ambiguity error because both duplicate contacts match. |
+| Disambiguated event view | `event view n/John Tan p/81234567` | - | Events linked to the contact with phone `81234567` are shown. |
+| Ambiguous event add | `event add title/John Sync start/2026-10-12 1000 end/2026-10-12 1100 n/John Tan` | - | Ambiguity error because both duplicate contacts match. |
+| Add new event | `event add title/NAB Demo start/2026-10-10 1000 end/2026-10-10 1130 n/John Tan p/81234567` | - | The event is created and linked to that contact. |
+| Add new event with description | `event add title/NAB Debrief desc/Post demo review start/2026-10-11 1400 end/2026-10-11 1500 n/John Tan p/81234567` | - | The event is created with the description and linked to that contact. |
+| View newly added event | `event view n/John Tan p/81234567` | - | The event list shows the newly added event. |
+| Reuse existing global event | `event add title/CS2103 Meeting start/2026-08-19 1400 end/2026-08-19 1530 n/Roy Balakrishnan` | - | The existing sample event is linked to Roy instead of creating a second duplicate event. |
+| Reject clashing event | `event add title/Clash Test start/2026-08-19 1430 end/2026-08-19 1500 n/Mary Lim` | - | Error indicating that the event clashes with an existing event in the calendar. |
+| Reject incomplete event command | `event add title/NAB Demo n/John Tan p/81234567` | - | Format error because `start/` and `end/` are missing. |
+| Ambiguous event delete | `event delete start/2026-10-10 1000 n/John Tan` | - | Ambiguity error because both duplicate contacts match. |
+| Delete linked event | `event delete start/2026-10-10 1000 n/John Tan p/81234567` | - | The `NAB Demo` event is unlinked from that contact. |
+| Delete missing event link | `event delete start/2026-10-10 1000 n/John Tan p/81234567` | - | Error indicating that the contact no longer has that event. |
+
+### Cleanup after disambiguation tests
+
+| Feature | Command | Manual action | Expected |
+| --- | --- | --- | --- |
+| Disambiguated delete | `delete n/John Tan p/82345678` | - | The second `John Tan` is deleted. |
+
+### Export and import
+
+| Feature | Command | Manual action | Expected |
+| --- | --- | --- | --- |
+| Export current filtered list | `filter t/friends` then `export t/current f/manual_test_subset` | Run the commands in sequence | NAB creates `manual_test_subset_persons.csv` and `manual_test_subset_events.csv` in the same folder as the save file. |
+| Export full data | `list` then `export t/all f/manual_test_full` | Run the commands in sequence | NAB creates `manual_test_full_persons.csv` and `manual_test_full_events.csv`. |
+| Reject duplicate export type prefix | `export t/all t/current f/manual_test_full` | - | Error indicating that the export type prefix is specified more than once. |
+| Clear data | `clear` | - | All contacts are removed from the app. |
+| Import exported full data | `import t/add f/manual_test_full` | - | The exported contacts are loaded back into NAB. |
+| Reject duplicate import filename prefix | `import t/add f/manual_test_full f/manual_test_subset` | - | Error indicating that the filename prefix is specified more than once. |
+| Overwrite with exported subset | `import t/overwrite f/manual_test_subset` | - | NAB replaces the current data with only the subset exported earlier. |
+| Invalid import path | `import t/add f/file_that_does_not_exist` | - | Error indicating that NAB cannot read the required CSV files. |

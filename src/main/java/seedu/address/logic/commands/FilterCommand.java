@@ -40,6 +40,7 @@ public class FilterCommand extends Command {
                     String.format(Messages.MESSAGE_ONE_PERSON_LISTED_OVERVIEW));
         }
 
+        model.showNoEvents();
         return new CommandResult(
                 String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, model.getFilteredPersonList().size()));
     }

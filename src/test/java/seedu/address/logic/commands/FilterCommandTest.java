@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.person.Person;
 import seedu.address.model.person.TagContainsKeywordsPredicate;
 import seedu.address.testutil.PersonBuilder;
 
@@ -82,6 +83,29 @@ public class FilterCommandTest {
 
         assertCommandSuccess(command, model, MESSAGE_ONE_PERSON_LISTED_OVERVIEW, expectedModel);
         assertEquals(1, model.getFilteredPersonList().size());
+    }
+
+    @Test
+    public void execute_matchingPinnedPersonShownBeforeUnpinnedMatch() {
+        Person pinnedPerson = new PersonBuilder().withName("Pinned Friend").withPhone("91110003")
+                .withTags("sharedtag").build();
+        Person unpinnedPerson = new PersonBuilder().withName("Unpinned Friend").withPhone("91110004")
+                .withTags("sharedtag").build();
+
+        model.addPerson(unpinnedPerson);
+        model.addPerson(pinnedPerson);
+        model.pinPerson(pinnedPerson);
+
+        TagContainsKeywordsPredicate predicate = new TagContainsKeywordsPredicate(List.of("sharedtag"));
+        FilterCommand command = new FilterCommand(predicate);
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.showPersons(predicate);
+
+        assertCommandSuccess(command, model,
+                String.format(MESSAGE_PERSONS_LISTED_OVERVIEW, 2), expectedModel);
+        assertEquals("Pinned Friend", model.getFilteredPersonList().get(0).getName().fullName);
+        assertEquals("Unpinned Friend", model.getFilteredPersonList().get(1).getName().fullName);
     }
 
     @Test

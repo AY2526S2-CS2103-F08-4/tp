@@ -8,6 +8,10 @@
     <li><a href="{{baseUrl}}/index.html" class="nav-link">Home</a></li>
     <li><a href="{{baseUrl}}/UserGuide.html" class="nav-link">User Guide</a></li>
     <li><a href="{{baseUrl}}/DeveloperGuide.html" class="nav-link">Developer Guide</a></li>
+    <li><a href="{{baseUrl}}/SettingUp.html" class="nav-link">Setup</a></li>
+    <li><a href="{{baseUrl}}/Testing.html" class="nav-link">Testing</a></li>
+    <li><a href="{{baseUrl}}/Documentation.html" class="nav-link">Docs</a></li>
+    <li><a href="{{baseUrl}}/DevOps.html" class="nav-link">DevOps</a></li>
     <li><a href="{{baseUrl}}/AboutUs.html" class="nav-link">About Us</a></li>
     <li><a href="https://github.com/se-edu/addressbook-level3" target="_blank" class="nav-link"><md>:fab-github:</md></a>
     </li>
@@ -20,30 +24,6 @@
 </header>
 
 <div id="flex-body">
-  <nav id="site-nav">
-    <div class="site-nav-top">
-      <div class="fw-bold mb-2" style="font-size: 1.25rem;">Site Map</div>
-    </div>
-    <div class="nav-component slim-scroll">
-      <site-nav>
-* [Home]({{ baseUrl }}/index.html)
-* [User Guide]({{ baseUrl }}/UserGuide.html) :expanded:
-  * [Quick Start]({{ baseUrl }}/UserGuide.html#quick-start)
-  * [Features]({{ baseUrl }}/UserGuide.html#features)
-  * [FAQ]({{ baseUrl }}/UserGuide.html#faq)
-  * [Command Summary]({{ baseUrl }}/UserGuide.html#faq)
-* [Developer Guide]({{ baseUrl }}/DeveloperGuide.html) :expanded:
-  * [Acknowledgements]({{ baseUrl }}/DeveloperGuide.html#acknowledgements)
-  * [Setting Up]({{ baseUrl }}/DeveloperGuide.html#setting-up-getting-started)
-  * [Design]({{ baseUrl }}/DeveloperGuide.html#design)
-  * [Implementation]({{ baseUrl }}/DeveloperGuide.html#implementation)
-  * [Documentation, logging, testing, configuration, dev-ops]({{ baseUrl }}/DeveloperGuide.html#documentation-logging-testing-configuration-dev-ops)
-  * [Appendix: Requirements]({{ baseUrl }}/DeveloperGuide.html#appendix-requirements)
-  * [Appendix: Instructions for manual testing]({{ baseUrl }}/DeveloperGuide.html#appendix-instructions-for-manual-testing)
-* [About Us]({{ baseUrl }}/AboutUs.html)
-      </site-nav>
-    </div>
-  </nav>
   <div id="content-wrapper">
     {{ content }}
   </div>

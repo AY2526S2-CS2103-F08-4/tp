@@ -263,6 +263,28 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void showPersons_pinnedMatchShownBeforeUnpinnedMatch() {
+        Person pinnedMatch = new PersonBuilder()
+                .withName("Pinned Match").withPhone("90000111").withTags("friends").build();
+        Person unpinnedMatch = new PersonBuilder()
+                .withName("Unpinned Match").withPhone("90000112").withTags("friends")
+                .build();
+        Person nonMatch = new PersonBuilder()
+                .withName("Non Match").withPhone("90000113").withTags("colleagues").build();
+
+        modelManager.addPerson(unpinnedMatch);
+        modelManager.addPerson(nonMatch);
+        modelManager.addPerson(pinnedMatch);
+        modelManager.pinPerson(pinnedMatch);
+
+        modelManager.showPersons(person -> person.getTags().contains(new Tag("friends")));
+
+        assertEquals(2, modelManager.getFilteredPersonList().size());
+        assertEquals(pinnedMatch, modelManager.getFilteredPersonList().get(0));
+        assertEquals(unpinnedMatch, modelManager.getFilteredPersonList().get(1));
+    }
+
+    @Test
     public void showAllPersonsPinnedFirst_ordersPinnedPersonsBeforeUnpinnedPersons() {
         Person first = new PersonBuilder().withName("Alpha One").withPhone("90000001").build();
         Person second = new PersonBuilder().withName("Beta Two").withPhone("90000002").build();
