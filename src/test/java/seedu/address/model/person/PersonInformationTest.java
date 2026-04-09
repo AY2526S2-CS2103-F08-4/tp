@@ -26,11 +26,11 @@ public class PersonInformationTest {
         Name name = new Name("Alice");
         PersonInformation info = new PersonInformation(name, null, null, null, null);
 
-        assertEquals(name, info.name);
-        assertEquals(Optional.empty(), info.phone);
-        assertEquals(Optional.empty(), info.email);
-        assertEquals(Optional.empty(), info.address);
-        assertTrue(info.tags.isEmpty());
+        assertEquals(name, info.getName());
+        assertEquals(Optional.empty(), info.getPhone());
+        assertEquals(Optional.empty(), info.getEmail());
+        assertEquals(Optional.empty(), info.getAddress());
+        assertTrue(info.getTags().isEmpty());
     }
 
     @Test
@@ -46,14 +46,22 @@ public class PersonInformationTest {
 
         PersonInformation info = new PersonInformation(name, phone, email, address, tags);
 
-        assertEquals(name, info.name);
-        assertEquals(Optional.of(phone), info.phone);
-        assertEquals(Optional.of(email), info.email);
-        assertEquals(Optional.of(address), info.address);
-        assertTrue(info.tags.contains(friends));
+        assertEquals(name, info.getName());
+        assertEquals(Optional.of(phone), info.getPhone());
+        assertEquals(Optional.of(email), info.getEmail());
+        assertEquals(Optional.of(address), info.getAddress());
+        assertTrue(info.getTags().contains(friends));
 
         tags.add(new Tag("colleagues"));
-        assertFalse(info.tags.contains(new Tag("colleagues")));
+        assertFalse(info.getTags().contains(new Tag("colleagues")));
+    }
+
+    @Test
+    public void getTags_modifyReturnedSet_throwsUnsupportedOperationException() {
+        PersonInformation info = buildInfo("Bob", "12345678", "bob@example.com",
+                "123, Clementi Ave 3", Set.of("friends"));
+
+        assertThrows(UnsupportedOperationException.class, () -> info.getTags().add(new Tag("colleagues")));
     }
 
     @Test

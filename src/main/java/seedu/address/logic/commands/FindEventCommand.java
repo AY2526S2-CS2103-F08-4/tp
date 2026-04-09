@@ -65,7 +65,7 @@ public class FindEventCommand extends Command {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("targetName", targetInfo.name)
+                .add("targetName", targetInfo.getName())
                 .toString();
     }
 }

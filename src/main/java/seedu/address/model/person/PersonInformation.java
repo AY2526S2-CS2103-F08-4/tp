@@ -11,11 +11,11 @@ import seedu.address.model.tag.Tag;
  * Optional parameters: phone, email, address, and tags
  */
 public class PersonInformation {
-    public final Name name;
-    public final Optional<Phone> phone;
-    public final Optional<Email> email;
-    public final Optional<Address> address;
-    public final Set<Tag> tags;
+    private final Name name;
+    private final Optional<Phone> phone;
+    private final Optional<Email> email;
+    private final Optional<Address> address;
+    private final Set<Tag> tags;
 
     /**
      * Creates a {@code PersonInformation} with the given fields.
@@ -39,14 +39,34 @@ public class PersonInformation {
         this.tags = (tags == null) ? Set.of() : Set.copyOf(tags);
     }
 
+    public Name getName() {
+        return name;
+    }
+
+    public Optional<Phone> getPhone() {
+        return phone;
+    }
+
+    public Optional<Email> getEmail() {
+        return email;
+    }
+
+    public Optional<Address> getAddress() {
+        return address;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PersonInformation otherInfo) {
-            return name.equals(otherInfo.name)
-                    && phone.equals(otherInfo.phone)
-                    && email.equals(otherInfo.email)
-                    && address.equals(otherInfo.address)
-                    && tags.equals(otherInfo.tags);
+            return name.equals(otherInfo.getName())
+                    && phone.equals(otherInfo.getPhone())
+                    && email.equals(otherInfo.getEmail())
+                    && address.equals(otherInfo.getAddress())
+                    && tags.equals(otherInfo.getTags());
         }
         return false;
     }

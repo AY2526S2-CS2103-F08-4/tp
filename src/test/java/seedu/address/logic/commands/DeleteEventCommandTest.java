@@ -344,7 +344,7 @@ public class DeleteEventCommandTest {
 
         @Override
         public List<Person> findPersons(PersonInformation info) {
-            if (person.getName().equals(info.name)) {
+            if (person.getName().equals(info.getName())) {
                 return List.of(person);
             }
             return List.of();

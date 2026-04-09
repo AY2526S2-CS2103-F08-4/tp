@@ -152,12 +152,12 @@ public class AddTagCommand extends Command {
 
     private String formatTargetSummary(PersonInformation targetInfo) {
         List<String> parts = new ArrayList<>();
-        parts.add("name=" + targetInfo.name);
-        targetInfo.phone.ifPresent(phone -> parts.add("phone=" + phone));
-        targetInfo.email.ifPresent(email -> parts.add("email=" + email));
-        targetInfo.address.ifPresent(address -> parts.add("address=" + address));
-        if (!targetInfo.tags.isEmpty()) {
-            String tagSummary = targetInfo.tags.stream()
+        parts.add("name=" + targetInfo.getName());
+        targetInfo.getPhone().ifPresent(phone -> parts.add("phone=" + phone));
+        targetInfo.getEmail().ifPresent(email -> parts.add("email=" + email));
+        targetInfo.getAddress().ifPresent(address -> parts.add("address=" + address));
+        if (!targetInfo.getTags().isEmpty()) {
+            String tagSummary = targetInfo.getTags().stream()
                     .map(tag -> tag.tagName)
                     .sorted()
                     .collect(Collectors.joining(", "));

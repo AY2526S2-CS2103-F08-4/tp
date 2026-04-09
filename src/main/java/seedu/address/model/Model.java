@@ -139,7 +139,8 @@ public interface Model {
     List<Person> findPersons(PersonInformation info);
 
     /**
-     * Returns a list of persons whose name contains any of the keywords in {@code info.name} (OR, case-insensitive).
+     * Returns a list of persons whose name contains any of the keywords in {@code info.getName()}
+     * (OR, case-insensitive).
      * Optional fields are applied as additional AND filters when present.
      */
     List<Person> searchPersons(PersonInformation info);

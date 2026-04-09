@@ -296,7 +296,7 @@ public class ModelManager implements Model {
 
     @Override
     public List<Person> searchPersons(PersonInformation info) {
-        String[] keywords = info.name.fullName.trim().split("\\s+");
+        String[] keywords = info.getName().fullName.trim().split("\\s+");
         return addressBook
                 .getPersonList()
                 .stream()
@@ -315,19 +315,21 @@ public class ModelManager implements Model {
     }
 
     private static boolean matchesOptionalFields(Person p, PersonInformation info) {
-        boolean isPhoneMatching = info.phone.map(ph -> ph.equals(p.getPhone())).orElse(true);
-        boolean isEmailMatching = info.email.map(em -> p.getEmail().map(em::equals).orElse(false)).orElse(true);
-        boolean isAddressMatching = info.address.map(ad -> p.getAddress().map(ad::equals).orElse(false)).orElse(true);
-        boolean isTagsMatching = info.tags.isEmpty() || p.getTags().containsAll(info.tags);
+        boolean isPhoneMatching = info.getPhone().map(ph -> ph.equals(p.getPhone())).orElse(true);
+        boolean isEmailMatching = info.getEmail().map(em -> p.getEmail().map(em::equals).orElse(false)).orElse(true);
+        boolean isAddressMatching = info.getAddress().map(ad -> p.getAddress().map(ad::equals).orElse(false))
+                .orElse(true);
+        boolean isTagsMatching = info.getTags().isEmpty() || p.getTags().containsAll(info.getTags());
         return isPhoneMatching && isEmailMatching && isAddressMatching && isTagsMatching;
     }
 
     private static boolean matchesInformation(Person p, PersonInformation info) {
-        boolean isNameMatching = p.getName().equalsIgnoreCase(info.name);
-        boolean isPhoneMatching = info.phone.map(ph -> ph.equals(p.getPhone())).orElse(true);
-        boolean isEmailMatching = info.email.map(em -> p.getEmail().map(em::equals).orElse(false)).orElse(true);
-        boolean isAddressMatching = info.address.map(ad -> p.getAddress().map(ad::equals).orElse(false)).orElse(true);
-        boolean isTagsMatching = info.tags.isEmpty() || p.getTags().containsAll(info.tags);
+        boolean isNameMatching = p.getName().equalsIgnoreCase(info.getName());
+        boolean isPhoneMatching = info.getPhone().map(ph -> ph.equals(p.getPhone())).orElse(true);
+        boolean isEmailMatching = info.getEmail().map(em -> p.getEmail().map(em::equals).orElse(false)).orElse(true);
+        boolean isAddressMatching = info.getAddress().map(ad -> p.getAddress().map(ad::equals).orElse(false))
+                .orElse(true);
+        boolean isTagsMatching = info.getTags().isEmpty() || p.getTags().containsAll(info.getTags());
         return isNameMatching && isPhoneMatching && isEmailMatching && isAddressMatching && isTagsMatching;
     }
 

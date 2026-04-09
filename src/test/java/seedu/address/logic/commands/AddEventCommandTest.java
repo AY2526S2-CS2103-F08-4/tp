@@ -389,7 +389,7 @@ public class AddEventCommandTest {
 
         @Override
         public List<Person> findPersons(PersonInformation info) {
-            if (person.getName().equals(info.name)) {
+            if (person.getName().equals(info.getName())) {
                 return List.of(person);
             }
             return List.of();
@@ -458,7 +458,7 @@ public class AddEventCommandTest {
 
         @Override
         public List<Person> findPersons(PersonInformation info) {
-            if (person.getName().equals(info.name)) {
+            if (person.getName().equals(info.getName())) {
                 return List.of(person);
             }
             return List.of();
