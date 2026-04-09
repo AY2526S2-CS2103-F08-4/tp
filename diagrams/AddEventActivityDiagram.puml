@@ -1,0 +1,35 @@
+@startuml
+skin rose
+skinparam ActivityFontSize 15
+skinparam ArrowFontSize 12
+
+start
+:User executes event add command;
+:Extract event details and target contact information;
+:Find matching persons using targetInfo;
+
+if () then ([no matches or multiple matches])
+  :Throw CommandException\n(no match or ambiguous match);
+  stop
+else ([single match])
+  if () then ([person already linked to event])
+    :Throw CommandException\n(duplicate event);
+    stop
+  else ([person not linked to event])
+    if () then ([event exists in UniqueEventList])
+      :Link person to existing event\n(increment numberOfPersonLinked);
+    else ([event does not exist in UniqueEventList])
+      if () then ([event overlaps with existing event])
+        :Throw CommandException\n(time clash);
+        stop
+      else ([no overlap])
+        :Add new event to UniqueEventList;
+      endif
+    endif
+    :Construct new Person with event appended;
+    :Update AddressBook and UI;
+  endif
+endif
+
+stop
+@enduml

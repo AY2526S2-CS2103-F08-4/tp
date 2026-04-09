@@ -1,0 +1,93 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Logic LOGIC_COLOR_T1
+participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
+participant ":EventCommandParser" as EventCommandParser LOGIC_COLOR
+participant ":AddEventParser" as AddEventParser LOGIC_COLOR
+participant "c:AddEventCommand" as AddEventCommand LOGIC_COLOR
+participant "<<utility>>\nCommandUtil" as CommandUtil LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant ":Model" as Model MODEL_COLOR
+end box
+
+[-> AddressBookParser : parseCommand("event add title/... n/David")
+activate AddressBookParser
+
+AddressBookParser -> EventCommandParser : parse("add title/... n/David")
+activate EventCommandParser
+
+EventCommandParser -> AddEventParser : parse(arguments)
+activate AddEventParser
+
+create AddEventCommand
+AddEventParser -> AddEventCommand
+activate AddEventCommand
+AddEventCommand --> AddEventParser : c
+deactivate AddEventCommand
+
+AddEventParser --> EventCommandParser : c
+deactivate AddEventParser
+
+EventCommandParser --> AddressBookParser : c
+deactivate EventCommandParser
+deactivate AddressBookParser
+
+[-> AddEventCommand : execute(model)
+activate AddEventCommand
+
+AddEventCommand -> CommandUtil : targetPerson(model, targetInfo)
+activate CommandUtil
+CommandUtil --> AddEventCommand : personToEdit
+deactivate CommandUtil
+
+alt person already linked to event
+    [<-- AddEventCommand : <<exception>> CommandException
+
+else event already exists in global UniqueEventList
+    AddEventCommand -> Model : linkPersonToEvent(toAdd)
+    activate Model
+    Model --> AddEventCommand : eventToLink
+    deactivate Model
+
+    AddEventCommand -> Model : setPerson(personToEdit, editedPerson)
+    activate Model
+    Model --> AddEventCommand
+    deactivate Model
+
+    AddEventCommand -> Model : showEventsForPerson(editedPerson)
+    activate Model
+    Model --> AddEventCommand
+    deactivate Model
+
+    [<-- AddEventCommand : result
+
+else event not in global UniqueEventList, clashes with existing event
+    [<-- AddEventCommand : <<exception>> CommandException
+
+else event not in global UniqueEventList, no time clash
+    AddEventCommand -> Model : addEvent(toAdd)
+    activate Model
+    Model --> AddEventCommand
+    deactivate Model
+
+    AddEventCommand -> Model : setPerson(personToEdit, editedPerson)
+    activate Model
+    Model --> AddEventCommand
+    deactivate Model
+
+    AddEventCommand -> Model : showEventsForPerson(editedPerson)
+    activate Model
+    Model --> AddEventCommand
+    deactivate Model
+
+    [<-- AddEventCommand : result
+end
+
+deactivate AddEventCommand
+AddEventCommand -[hidden]-> AddEventCommand
+destroy AddEventCommand
+@enduml
