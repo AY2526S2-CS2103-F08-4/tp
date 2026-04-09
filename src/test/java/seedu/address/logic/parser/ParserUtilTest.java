@@ -3,13 +3,13 @@ package seedu.address.logic.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_PERSONS_FORMAT;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_MISSING_NAME_PREFIX_IN_PERSONS;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_UNEXPECTED_PREAMBLE_IN_PERSONS;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

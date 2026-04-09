@@ -76,8 +76,9 @@ public class PersonInformationParserTest {
                 + PREFIX_TAG + "friends "
                 + PREFIX_TAG + "#invalid");
 
-        assertThrows(ParseException.class, String.format("Invalid tag: %s.\n%s", "#invalid", Tag.MESSAGE_CONSTRAINTS),
-                () -> parser.parse(argsMap));
+        assertThrows(ParseException.class, String.format("Invalid tag: %s.\n%s", "#invalid",
+                Tag.MESSAGE_CONSTRAINTS), () ->
+                        parser.parse(argsMap));
     }
 
     private static ArgumentMultimap tokenize(String args) {
