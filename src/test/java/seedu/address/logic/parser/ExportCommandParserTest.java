@@ -1,5 +1,6 @@
 package seedu.address.logic.parser;
 
+import static seedu.address.logic.Messages.MESSAGE_DUPLICATE_FIELDS;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
@@ -37,6 +38,13 @@ public class ExportCommandParserTest {
         // Invalid export type
         assertParseFailure(parser, " t/fake f/data",
                 String.format(MESSAGE_INVALID_EXPORT_TYPE, ExportCommand.MESSAGE_USAGE));
+
+        // Duplicate export types
+        assertParseFailure(parser, " t/all t/current f/testExport",
+                String.format(MESSAGE_DUPLICATE_FIELDS + "t/"));
+
+        assertParseFailure(parser, " t/all f/testExport1 f/testExport2",
+                String.format(MESSAGE_DUPLICATE_FIELDS + "f/"));
 
         // Empty filename
         assertParseFailure(parser, " t/all f/ ",

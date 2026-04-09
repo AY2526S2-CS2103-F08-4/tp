@@ -1,5 +1,6 @@
 package seedu.address.logic.parser;
 
+import static seedu.address.logic.Messages.MESSAGE_DUPLICATE_FIELDS;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
@@ -39,10 +40,22 @@ public class ImportCommandParserTest {
     }
 
     @Test
+    public void parse_preamblePresent_throwsParseException() {
+        String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, ImportCommand.MESSAGE_USAGE);
+        assertParseFailure(parser, "test t/add f/test", expectedMessage);
+    }
+
+    @Test
     public void parse_invalidValue_throwsParseException() {
         // Invalid import type
-        assertParseFailure(parser, " t/invalid f/testImport",
-                String.format(MESSAGE_INVALID_IMPORT_TYPE, ImportCommand.MESSAGE_USAGE));
+        assertParseFailure(parser, " t/invalid f/testImport", MESSAGE_INVALID_IMPORT_TYPE);
+
+        // Duplicate import types
+        assertParseFailure(parser, " t/add t/overwrite f/testImport",
+                String.format(MESSAGE_DUPLICATE_FIELDS + "t/"));
+
+        assertParseFailure(parser, " t/add f/testImport1 f/testImport2",
+                String.format(MESSAGE_DUPLICATE_FIELDS + "f/"));
 
         // Empty filename
         assertParseFailure(parser, " t/overwrite f/ ",
