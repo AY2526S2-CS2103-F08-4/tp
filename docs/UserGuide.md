@@ -180,7 +180,7 @@ Before examining the individual commands for managing contacts, please refer to 
 | `e/EMAIL` | • Must be of the standard format: `local-part@domain`.<br>• **Local-part:** Can only contain alphanumeric characters and the special characters `+`, `_`, `.`, and `-`. It cannot start or end with a special character.<br>• **Domain:** Made up of domain labels separated by periods (`.`).<br>&nbsp;&nbsp;◦ Must end with a domain label at least 2 characters long.<br>&nbsp;&nbsp;◦ Each label must start and end with alphanumeric characters.<br>&nbsp;&nbsp;◦ Labels can contain hyphens (`-`), but no other special characters. | `e/johnd@example.com` |
 | `a/ADDRESS` | • Can contain alphanumeric characters, spaces, and the following special characters: `#`, `_`, `,` (comma), and `-` (hyphen).<br>• Cannot be blank or consist only of spaces (must start with an alphanumeric or allowed special character).                                                                                                                                                                                                                                                                                              | `a/John street, block 123, #01-01` |
 | `t/TAG` | • Can contain letters, digits, spaces, hyphens (`-`), and underscores (`_`).<br>• Must start with an alphanumeric character (a letter or digit).<br>• Must be between 1 and 20 characters long.                                                                                                                                                                                                                                                                                                                                           | `t/friend` |
-| `pfp/PHOTO_PATH` | • File path must end with a valid image extension: `.png`, `.jpg`, or `.jpeg` (case-insensitive).<br>• Can be absolute (e.g., `C:/Users/Alex/Pictures/me.jpg`) or relative to the app folder (e.g., `images/me.png`).<br>• The specified file must exist on your computer; NAB will copy it into the `data/images/` directory                                                                                                                                                                                                               | `pfp/images/me.png` |
+| `pfp/PHOTO_PATH` | • File path must end with a valid image extension: `.png`, `.jpg`, or `.jpeg` (case-insensitive).<br>• Can be absolute (e.g., `C:/Users/Alex/Pictures/me.jpg`) or relative to the app folder (e.g., `images/me.png`).<br>• The specified file must exist on your computer; NAB will copy it into the `data/images/` directory<br>• File path cannot be referencing any subfolder/files residing in NAB's `data/images/` folder.                                                                                                                                                                                                             | `pfp/images/me.png` |
 
 </panel>
 
@@ -405,10 +405,22 @@ Unpins the person identified by their name.
 
 Format: `unpin n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 
+<panel header=":fa-solid-code: **Examples**" type="info">
 
-Examples:
-* `unpin n/John Doe` unpins John Doe when the name uniquely identifies the contact.
-* `unpin n/John Doe p/91234567` unpins the matching John Doe contact by name and phone number.
+- `unpin n/John Doe`<br>
+Unpins John Doe when the name uniquely identifies the contact.
+
+- `unpin n/John Doe p/91234567`<br>
+Unpins the matching John Doe contact by name and phone number.
+
+</panel>
+
+<panel header=":fa-solid-exclamation-triangle: **Important: Disambiguating contacts with the same name**" type="danger">
+
+- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
+- See [User Disambiguation](#user-disambiguation) for details.
+
+</panel>
 
 ### Assigning tag(s) to person(s): `tag`
 
@@ -416,24 +428,42 @@ Assigns one or more tags to one or more contacts in one command.
 
 Format: `tag label/TAG_TO_ASSIGN [label/TAG_TO_ASSIGN]... n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...]...`
 
-<box type="tip" seamless>
-
-**Tip:** Use optional fields immediately after each `n/NAME` to disambiguate contacts with the same name.
-</box>
-
-How it works:
-* `label/...` are the tags that will be assigned to **all** specified contacts.
-* Contact segments start with `n/NAME`.
-* Optional fields after a given `n/NAME` apply only to that contact segment.
-* The tag-assignment segment (`label/...`) and person segments (`n/...`) cannot be mixed.
-  All `label/...` entries must appear before the first `n/...`.
+* Start by listing the tag(s) using `label/...`; these tags are applied to **every** specified contact.
+* After the tags, add one or more contact segments, each starting with `n/NAME`.
+* Optional fields placed immediately after a contact's `n/NAME` (such as `p/`, `e/`, `a/`, `t/`) apply only to that contact.
+* Do not mix tag and contact segments. All `label/...` entries must come before the first `n/...`.
 * If a tag does not exist yet, NAB creates it automatically.
 * If a person segment matches multiple contacts, NAB shows those matches and asks for a more specific command.
 
-Examples:
-* `tag label/CS2103 label/CS2030S n/Alice n/Bob`
-* Suppose there are multiple `Alice` and `Bob`, an enriched search would be `tag label/CS2103 label/CS2030S n/Alice p/81234567 n/Bob a/Clementi`,
-  where Alice has a phone number of `81234567` and Bob has an address of `Clementi`.
+<panel header=":fa-solid-code: **Examples**" type="info">
+
+- `tag label/CS2103 n/John Doe`<br>
+Assigns 1 tag (`CS2103`) to 1 user (`John Doe`).
+
+- `tag label/CS2103 label/CS2030S label/CS2040 n/John Doe e/johndoe@example.com`<br>
+Assigns 3 tags (`CS2103`, `CS2030S`, `CS2040`) to 1 user (`John Doe`) using additional fields to disambiguate the user.
+
+- `tag label/CS2103 n/John Doe n/Betsy Crower`<br>
+Assigns 1 tag (`CS2103`) to 2 users (`John Doe` and `Betsy Crower`).
+
+- `tag label/CS2103 label/CS2030S n/John Doe p/91234567 n/Betsy Crower e/betsycrower@example.com`<br>
+Assigns 2 tags (`CS2103`, `CS2030S`) to 2 users (`John Doe` and `Betsy Crower`) using additional fields to disambiguate both users.
+
+</panel>
+
+<panel header=":fa-solid-exclamation-triangle: **Important: Disambiguating contacts with the same name**" type="danger">
+
+- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
+- See [User Disambiguation](#user-disambiguation) for details.
+
+</panel>
+
+<panel header=":fa-solid-lightbulb: **Tip**" type="success">
+
+- Can associate 1 or more tags during the tagging process.
+- Can associate 1 or more persons during the tagging process.
+
+</panel>
 
 ### Deleting a person: `delete`
 
@@ -441,16 +471,22 @@ Deletes the specified person from the address book.
 
 Format: `delete n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 
-<box type="tip" seamless>
+<panel header=":fa-solid-code: **Examples**" type="info">
 
-**Tip:** If there are multiple contacts with the same `NAME`, utilize the other optional parameters to narrow down the
-deletion of the correct contact. This can be done by supplying any of the
-following information just after `delete n/NAME`: Phone number, Email, Address or Tag.
-</box>
+- `delete n/John Doe`<br>
+Deletes John Doe when the name uniquely identifies the contact.
 
-Examples:
-* `delete n/Alex Yeoh` deletes the contact with a matching name.
-* Suppose there are multiple `Alex Yeoh`, an enriched search would be `delete n/Alex Yeoh t/cs2103 t/cs2105`
+- `delete n/John Doe p/91234567`<br>
+Deletes the matching John Doe contact by name and phone number.
+
+</panel>
+
+<panel header=":fa-solid-exclamation-triangle: **Important: Disambiguating contacts with the same name**" type="danger">
+
+- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
+- See [User Disambiguation](#user-disambiguation) for details.
+
+</panel>
 
 ### Clearing all entries: `clear`
 
@@ -669,7 +705,7 @@ AddressBook data is saved automatically as a JSON file `[JAR file location]/data
 ## Command summary
 
 Action     | Format, Examples
------------|---------------------------------------------------------------------f-------------------------------------------------------------------------------------------------
+-----------|------
 **Add**    | `add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague pfp/images/james.jpg`
 **Clear**  | `clear`
 **Delete** | `delete n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `delete n/Alex Yeoh t/cs2103 t/cs2105`
