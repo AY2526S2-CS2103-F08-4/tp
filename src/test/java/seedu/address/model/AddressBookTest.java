@@ -149,6 +149,26 @@ public class AddressBookTest {
     }
 
     @Test
+    public void getOverlappingEvents_noOverlap_returnsEmptyList() {
+        Event e1 = newEvent("CS2106", null, "2026-03-25 0900", "2026-03-25 1000");
+        Event e2 = newEvent("CS2109S", null, "2026-03-22 0800", "2026-03-23 1300");
+        addressBook.addEvent(e1);
+
+        assertTrue(addressBook.getOverlappingEvent(e2).isEmpty());
+    }
+
+    @Test
+    public void getOverlappingEvents_withOverlaps_returnsOverlappingEvents() {
+        Event e1 = newEvent("CS2106", null, "2026-03-25 0900", "2026-03-25 1000");
+        addressBook.addEvent(e1);
+        Event overlappingEvent = newEvent("CS2109S", null, "2026-03-25 0800", "2026-03-25 1300");
+
+        List<Event> listOfOverlapEvents = addressBook.getOverlappingEvent(overlappingEvent);
+        assertEquals(1, listOfOverlapEvents.size());
+        assertTrue(listOfOverlapEvents.contains(e1));
+    }
+
+    @Test
     public void addEvent_overlappingEvent_throwsClashingEventException() {
         Event existing = newEvent("Meeting", "Discuss", "2026-03-25 0900", "2026-03-25 1100");
         addressBook.addEvent(existing);

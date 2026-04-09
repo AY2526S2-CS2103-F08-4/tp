@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -133,6 +134,27 @@ public class UniqueEventListTest {
         target.setEvents(source);
         assertTrue(target.contains(e1));
     }
+
+    @Test
+    public void getOverlappingEvents_noOverlap_returnsEmptyList() {
+        UniqueEventList list = new UniqueEventList();
+        list.add(newEvent("CS2106", "2026-03-25 0900", "2026-03-25 1000"));
+        Event nonOverlapping = newEvent("CS2109S", "2026-03-25 1200", "2026-03-25 1300");
+        assertTrue(list.getOverlappingEvent(nonOverlapping).isEmpty());
+    }
+
+    @Test
+    public void getOverlappingEvents_withOverlaps_returnsOverlappingEvents() {
+        UniqueEventList list = new UniqueEventList();
+        Event e1 = newEvent("CS2106", "2026-03-25 0900", "2026-03-25 1000");
+        list.add(e1);
+        Event overlappingEvent = newEvent("CS2109S", "2026-03-25 0800", "2026-03-25 1300");
+
+        List<Event> listOfOverlapEvents = list.getOverlappingEvent(overlappingEvent);
+        assertEquals(1, listOfOverlapEvents.size());
+        assertTrue(listOfOverlapEvents.contains(e1));
+    }
+
 
     @Test
     public void equals_sameContent_returnsTrue() {

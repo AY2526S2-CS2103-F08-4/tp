@@ -175,6 +175,13 @@ public class Event {
     }
 
     /**
+     * Returns a formatted string representation of the event for clash warnings.
+     */
+    public String getClashDisplayString() {
+        return String.format("%s -> (%s)", title.fullTitle, timeRange.toString());
+    }
+
+    /**
      * Return true if both Event have the same title and timeRange
      * @param other   the reference object with which to compare.
      * @return True if the events have the same title and timeRange, else return false

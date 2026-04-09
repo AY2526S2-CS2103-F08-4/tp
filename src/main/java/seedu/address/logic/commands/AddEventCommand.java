@@ -2,6 +2,7 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import seedu.address.commons.core.LogsCenter;
@@ -20,7 +21,7 @@ public class AddEventCommand extends Command {
     public static final String COMMAND_WORD = "add";
     public static final String MESSAGE_SUCCESS = "Added event for %1$s: %2$s";
     public static final String MESSAGE_DUPLICATE_EVENT = "This contact is already linked to this event: %1$s";
-    public static final String MESSAGE_CLASHING_EVENT = "This event clashes with an existing event in the calendar.";
+    public static final String MESSAGE_CLASHING_EVENT = "This event clashes with an existing event in the calendar: ";
     public static final String MESSAGE_USAGE = "event " + COMMAND_WORD
             + ": Adds an event and tags it to a contact.\n"
             + "Parameters: event add title/TITLE [desc/DESCRIPTION] start/START end/END n/NAME "
@@ -62,9 +63,14 @@ public class AddEventCommand extends Command {
             eventToLink = model.linkPersonToEvent(toAdd);
         } else {
             // Case 3: Overlapping event
-            if (model.hasOverlappingEvent(toAdd)) {
+            List<Event> clashingEvents = model.getOverlappingEvent(toAdd);
+            if (!clashingEvents.isEmpty()) {
                 logger.info("AddEvent: event clashes with existing event " + toAdd);
-                throw new CommandException(MESSAGE_CLASHING_EVENT);
+                StringBuilder errorMessage = new StringBuilder(MESSAGE_CLASHING_EVENT + "\n");
+                for (Event conflict : clashingEvents) {
+                    errorMessage.append(String.format("• %s\n", conflict.getClashDisplayString()));
+                }
+                throw new CommandException(errorMessage.toString().trim());
             }
             // Case 4: New event
             logger.info("AddEvent: creating new event " + toAdd + " for " + personToEdit.getName());
