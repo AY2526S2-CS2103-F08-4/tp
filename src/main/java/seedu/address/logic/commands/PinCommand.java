@@ -25,6 +25,7 @@ public class PinCommand extends Command {
 
     public static final String COMMAND_WORD = "pin";
 
+    public static final String MESSAGE_ALREADY_PINNED = "This contact is already pinned.";
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Pins the person identified by their name.\n"
             + "Parameters: "
@@ -55,12 +56,13 @@ public class PinCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        // Get the list of currently unpinned matches
-        List<Person> unpinnedMatches = model.findPersons(this.targetInfo).stream()
-                .filter(person -> !model.isPersonPinned(person))
-                .toList();
-        // Resolve the target person from the unpinned matches
-        Person personToPin = CommandUtil.targetPersonFromMatches(model, unpinnedMatches);
+        // Resolve the target person first so we can give a specific pinned-state error.
+        List<Person> matches = model.findPersons(this.targetInfo);
+        Person personToPin = CommandUtil.targetPersonFromMatches(model, matches);
+
+        if (model.isPersonPinned(personToPin)) {
+            throw new CommandException(MESSAGE_ALREADY_PINNED);
+        }
 
         model.pinPerson(personToPin);
         model.showAllPersonsPinnedFirst();

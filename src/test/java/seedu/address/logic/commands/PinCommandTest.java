@@ -88,6 +88,17 @@ public class PinCommandTest {
     }
 
     @Test
+    public void execute_alreadyPinned_throwsCommandException() {
+        Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
+        Person personToPin = model.getFilteredPersonList().get(0);
+        model.pinPerson(personToPin);
+
+        PinCommand pinCommand = new PinCommand(createNameOnlyInfo(personToPin.getName()));
+
+        assertCommandFailure(pinCommand, model, PinCommand.MESSAGE_ALREADY_PINNED);
+    }
+
+    @Test
     public void equals() {
         PersonInformation firstInfo = new PersonInformation(new Name("Alex Tan"), null, null, null, null);
         PersonInformation secondInfo = new PersonInformation(new Name("Beth Lee"), null, null, null, null);
