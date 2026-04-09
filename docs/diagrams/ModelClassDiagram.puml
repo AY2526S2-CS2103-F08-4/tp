@@ -3,26 +3,37 @@
 skinparam arrowThickness 1.1
 skinparam arrowColor MODEL_COLOR
 skinparam classBackgroundColor MODEL_COLOR
+skinparam classAttributeFontColor #FFFFFF
+skinparam classAttributeIconSize 0
 
 Package Model as ModelPackage <<Rectangle>>{
 Class "<<interface>>\nReadOnlyAddressBook" as ReadOnlyAddressBook
 Class "<<interface>>\nReadOnlyUserPrefs" as ReadOnlyUserPrefs
 Class "<<interface>>\nModel" as Model
+
+Class ModelManager {
+    -filteredPersons: FilteredList<Person>
+    -sortedPersons: SortedList<Person>
+    -filteredEvents: FilteredList<Event>
+}
+
 Class AddressBook
-Class ModelManager
 Class UserPrefs
 
-Class UniquePersonList
-Class Person
-Class Address
-Class Email
-Class Name
-Class Phone
-Class Tag
-class Photo
+Class UniquePersonList {
+    -internalList: ObservableList<Person>
+}
+
+Class UniqueEventList {
+    -internalList: ObservableList<Event>
+}
 
 Class I #FFFFFF
 }
+
+show ModelManager fields
+show UniquePersonList fields
+show UniqueEventList fields
 
 Class HiddenOutside #FFFFFF
 HiddenOutside ..> Model
@@ -36,21 +47,11 @@ ModelManager -left-> "1" AddressBook
 ModelManager -right-> "1" UserPrefs
 UserPrefs .up.|> ReadOnlyUserPrefs
 
-AddressBook *--> "1" UniquePersonList
-UniquePersonList --> "~* all" Person
-Person *--> Name
-Person *--> Phone
-Person *--> Email
-Person *--> Address
-Person *--> "*" Tag
-Person *--> Photo
+AddressBook *--> "1" UniquePersonList : persons
+AddressBook *--> "1" UniquePersonList : pinnedPersons
+AddressBook *--> "1" UniqueEventList : events
 
-Person -[hidden]up--> I
 UniquePersonList -[hidden]right-> I
+UniqueEventList -[hidden]left-> I
 
-Name -[hidden]right-> Phone
-Phone -[hidden]right-> Address
-Address -[hidden]right-> Email
-
-ModelManager --> "~* filtered" Person
 @enduml
