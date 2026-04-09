@@ -520,10 +520,10 @@ Format: `event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE 
 
 <panel header=":fa-solid-code: **Examples**" type="info">
 
-- `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 to/David Li`<br>
+- `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 n/David Li`<br>
   Adds an event titled "CS2109S Meeting" to David Li.
 
-- `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 to/David Li p/99272758`<br>
+- `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 n/David Li p/99272758`<br>
   Adds an event to the David Li with phone number `99272758`, disambiguating between multiple contacts with the same name.
 
 </panel>
@@ -590,10 +590,10 @@ Format: `event delete start/START_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDR
 
 <panel header=":fa-solid-code: **Examples**" type="info">
 
-- `event delete start/2026-03-12 1100 n/David Li`<br>
+- `event delete start/2026-03-12 1100 to/David Li`<br>
   Deletes the event only if David Li has an assigned event that starts at `2026-03-12 1100`.
 
-- `event delete start/2026-03-12 1100 n/David Li p/99272758`<br>
+- `event delete start/2026-03-12 1100 to/David Li p/99272758`<br>
   Deletes the event only if the David Li with phone number `99272758` has an assigned event that starts at `2026-03-12 1100`, disambiguating between multiple contacts with the same name.
 
 </panel>
