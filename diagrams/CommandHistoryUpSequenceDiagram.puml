@@ -20,12 +20,12 @@ activate CommandHistory
 CommandHistory --> CommandBox
 deactivate CommandHistory
 
-CommandBox -> CommandBox
+CommandBox --> CommandBox
 deactivate CommandBox
 
 CommandBox -> CommandBox : setCommandText()
 activate CommandBox #LightBlue
-CommandBox -> CommandBox
+CommandBox --> CommandBox
 deactivate CommandBox
 
 <-- CommandBox
