@@ -31,15 +31,8 @@ public class FindCommandParser implements Parser<FindCommand> {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE));
         }
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS);
-        try {
-            PersonInformation info = new PersonInformationParser().parse(argMultimap);
-            return new FindCommand(info);
-        } catch (ParseException pe) {
-            if (ParserUtil.MESSAGE_DUPLICATE_TAGS.equals(pe.getMessage())) {
-                throw pe;
-            }
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE), pe);
-        }
+
+        PersonInformation info = new PersonInformationParser().parse(argMultimap);
+        return new FindCommand(info);
     }
 }

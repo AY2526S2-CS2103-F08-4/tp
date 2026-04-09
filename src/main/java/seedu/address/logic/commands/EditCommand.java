@@ -109,24 +109,7 @@ public class EditCommand extends Command {
             throw new CommandException(MESSAGE_DUPLICATE_PERSON);
         }
 
-        if (editPersonDescriptor.getPhoto().isPresent()) {
-            Photo newPhoto;
-            try {
-                newPhoto = PhotoStorageUtil.copyPhotoToDirectory(
-                        editPersonDescriptor.getPhoto().get(),
-                        this.targetDirectory);
-                editPersonDescriptor.setPhoto(newPhoto);
-            } catch (IOException e) {
-                throw new CommandException(Messages.MESSAGE_SAVE_PHOTO_FAIL + e.getMessage());
-            }
-
-            if (personToEdit.getPhoto().isPresent()) {
-                Photo oldPhoto = personToEdit.getPhoto().get();
-                if (!oldPhoto.equals(newPhoto)) {
-                    CommandUtil.safelyDeletePhoto(model, personToEdit, oldPhoto, this.targetDirectory);
-                }
-            }
-        }
+        updatePhotoIfPresent(model, personToEdit);
 
         Person editedPerson = createEditedPerson(personToEdit, editPersonDescriptor);
 
@@ -138,6 +121,29 @@ public class EditCommand extends Command {
         model.setPerson(personToEdit, editedPerson);
         model.showPerson(editedPerson);
         return new CommandResult(String.format(MESSAGE_EDIT_PERSON_SUCCESS, Messages.format(editedPerson)));
+    }
+
+    private void updatePhotoIfPresent(Model model, Person personToEdit) throws CommandException {
+        if (editPersonDescriptor.getPhoto().isEmpty()) {
+            return;
+        }
+
+        Photo newPhoto;
+        try {
+            newPhoto = PhotoStorageUtil.copyPhotoToDirectory(
+                    editPersonDescriptor.getPhoto().get(),
+                    this.targetDirectory);
+            editPersonDescriptor.setPhoto(newPhoto);
+        } catch (IOException e) {
+            throw new CommandException(Messages.MESSAGE_SAVE_PHOTO_FAIL + e.getMessage());
+        }
+
+        if (personToEdit.getPhoto().isPresent()) {
+            Photo oldPhoto = personToEdit.getPhoto().get();
+            if (!oldPhoto.equals(newPhoto)) {
+                CommandUtil.safelyDeletePhoto(model, personToEdit, oldPhoto, this.targetDirectory);
+            }
+        }
     }
 
     /**

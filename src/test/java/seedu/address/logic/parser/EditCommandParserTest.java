@@ -1,5 +1,6 @@
 package seedu.address.logic.parser;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.commands.CommandTestUtil.ADDRESS_DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.ADDRESS_DESC_BOB;
@@ -34,6 +35,8 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -41,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
+import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -74,7 +78,7 @@ public class EditCommandParserTest {
         assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // no field specified
-        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER, EditCommand.MESSAGE_NOT_EDITED);
 
         // no target name and no field specified
         assertParseFailure(parser, "", MESSAGE_INVALID_FORMAT);
@@ -96,6 +100,14 @@ public class EditCommandParserTest {
 
         // non-empty preamble before prefixed target name
         assertParseFailure(parser, "oops " + TARGET_IDENTIFIER_AMY + DELIMITER + NAME_DESC_AMY,
+            MESSAGE_INVALID_FORMAT);
+
+        // non-empty preamble with valid delimiter spacing (reaches target-segment preamble branch)
+        assertParseFailure(parser, "oops " + TARGET_IDENTIFIER_AMY + " -- " + PREFIX_NAME + "Bob",
+            MESSAGE_INVALID_FORMAT);
+
+        // missing target name prefix (empty preamble but no n/ value)
+        assertParseFailure(parser, PREFIX_PHONE + "98765432" + DELIMITER + NAME_DESC_AMY.trim(),
             MESSAGE_INVALID_FORMAT);
     }
 
@@ -168,13 +180,13 @@ public class EditCommandParserTest {
                 + VALID_ADDRESS_AMY + VALID_PHONE_AMY,
                 Name.MESSAGE_CONSTRAINTS);
 
-        // invalid values in target segment are wrapped as invalid command format
+        // invalid values in target segment report field constraints directly
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_PHONE_DESC + DELIMITER + NAME_DESC_AMY.trim(),
-            MESSAGE_INVALID_FORMAT);
+            Phone.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_EMAIL_DESC + DELIMITER + NAME_DESC_AMY.trim(),
-            MESSAGE_INVALID_FORMAT);
+            Email.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_ADDRESS_DESC + DELIMITER + NAME_DESC_AMY.trim(),
-            MESSAGE_INVALID_FORMAT);
+            Address.MESSAGE_CONSTRAINTS);
     }
 
     @Test
@@ -327,8 +339,20 @@ public class EditCommandParserTest {
         userInput = TARGET_IDENTIFIER_AMY + DELIMITER + TAG_DESC_FRIEND.trim() + " t/FRIEND";
         assertParseFailure(parser, userInput, ParserUtil.MESSAGE_DUPLICATE_TAGS);
 
-        // duplicate target tags are wrapped as invalid command format
+        // duplicate target tags are rejected directly
         userInput = TARGET_IDENTIFIER_BENSON + TAG_DESC_HUSBAND + " t/HUSBAND" + DELIMITER + PHONE_DESC_AMY.trim();
-        assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, userInput, ParserUtil.MESSAGE_DUPLICATE_TAGS);
+    }
+
+    @Test
+    public void parseUpdateSegment_noEditableFields_throwsParseException() throws Exception {
+        Method parseUpdateSegment = EditCommandParser.class.getDeclaredMethod("parseUpdateSegment", String.class);
+        parseUpdateSegment.setAccessible(true);
+
+        InvocationTargetException thrown = assertThrows(InvocationTargetException.class, (
+                ) -> parseUpdateSegment.invoke(parser, "   "));
+
+        ParseException cause = (ParseException) thrown.getCause();
+        org.junit.jupiter.api.Assertions.assertEquals(EditCommand.MESSAGE_NOT_EDITED, cause.getMessage());
     }
 }

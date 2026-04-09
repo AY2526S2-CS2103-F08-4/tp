@@ -34,12 +34,7 @@ public class PinCommandParser implements Parser<PinCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS);
 
-        try {
-            PersonInformation info = new PersonInformationParser().parse(argMultimap);
-            return new PinCommand(info);
-        } catch (ParseException pe) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, PinCommand.MESSAGE_USAGE), pe);
-        }
+        PersonInformation info = new PersonInformationParser().parse(argMultimap);
+        return new PinCommand(info);
     }
 }

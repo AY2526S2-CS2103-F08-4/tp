@@ -34,12 +34,7 @@ public class UnpinCommandParser implements Parser<UnpinCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS);
 
-        try {
-            PersonInformation info = new PersonInformationParser().parse(argMultimap);
-            return new UnpinCommand(info);
-        } catch (ParseException pe) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, UnpinCommand.MESSAGE_USAGE), pe);
-        }
+        PersonInformation info = new PersonInformationParser().parse(argMultimap);
+        return new UnpinCommand(info);
     }
 }

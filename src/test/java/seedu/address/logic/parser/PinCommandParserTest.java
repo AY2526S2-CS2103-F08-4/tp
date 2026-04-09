@@ -41,7 +41,7 @@ public class PinCommandParserTest {
     @Test
     public void parse_invalidOptionalField_throwsParseException() {
         assertParseFailure(parser, " " + PREFIX_NAME + "Alex Tan " + PREFIX_PHONE + "not-a-phone",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, PinCommand.MESSAGE_USAGE));
+                                Phone.MESSAGE_CONSTRAINTS);
     }
 
     @Test

@@ -33,12 +33,8 @@ public class DeleteCommandParser implements Parser<DeleteCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS);
 
-        try {
-            PersonInformation info = new PersonInformationParser().parse(argMultimap);
-            return new DeleteCommand(info);
-        } catch (ParseException pe) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE), pe);
-        }
+        PersonInformation info = new PersonInformationParser().parse(argMultimap);
+
+        return new DeleteCommand(info);
     }
 }
