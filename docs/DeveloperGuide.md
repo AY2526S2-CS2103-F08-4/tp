@@ -845,41 +845,49 @@ testers are expected to do more *exploratory* testing.
 ### Launch and shutdown
 
 1. Initial launch
-
-   1. Download the jar file and copy into an empty folder
-
-   2. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
+   1. Download the jar file and copy into an empty folder.
+   2. Run `java --jar NAB.jar`.<br>
+      Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
 
 2. Saving window preferences
-
    1. Resize the window to an optimum size. Move the window to a different location. Close the window.
-
    2. Re-launch the app by double-clicking the jar file.<br>
       Expected: The most recent window size and location is retained.
 
-3. _{ more test cases …​ }_
+3. Closing the app with the exit command
+
+   1. Prerequisites: App is running normally.
+   2. Test case: `exit`<br>
+      Expected: Application closes gracefully.
 
 ### Deleting a person
 
 1. Deleting a person while all persons are being shown
 
-   1. Prerequisites: List all persons using the `list` command. Multiple persons in the list.
+   1. Prerequisites: List all persons using the `list` command. Multiple persons are in the list.
+   2. Test case: `delete n/John Doe`<br>
+      Prerequisites: A person named `John Doe` is in the contact list.<br>
+      Expected: Contact matching `John Doe` is deleted from the list.
+   3. Test case: `delete n/David Li p/91234567`<br>
+      Prerequisites: A person named `David Li` with phone number `91234567` is in the contact list.<br>
+      Expected: Contact matching `David Li` with phone number `91234567` is deleted from the list.
+   4. Other incorrect delete commands to try: `delete`, `delete n/`, `delete p/91234567`<br>
+      Expected: Error message.
 
-   2. Test case: `delete 1`<br>
-      Expected: First contact is deleted from the list. Details of the deleted contact shown in the status message. Timestamp in the status bar is updated.
+### Add an event
 
-   2. Test case: `delete 0`<br>
-      Expected: No person is deleted. Error details shown in the status message. Status bar remains the same.
+1. Adding an event to a person using unique name match
 
-   3. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
-      Expected: Similar to previous.
+   1. Prerequisites: Ensure there is a person named `David Li` in the contact list and no conflicting events.
+   2. Test case: `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 n/David Li`<br>
+      Expected: Event is added successfully and linked to `David Li`. A success message is shown in the result display.
 
-2. _{ more test cases …​ }_
+2. Adding an event with missing required fields
 
-### Saving data
+   1. Test case: `event add title/Team Sync n/David Li`<br>
+      Expected: No event is added. Error message indicates missing required fields (`start/` and `end/`).
 
-1. Dealing with missing/corrupted data files
+3. Adding an event where target person does not exist
 
-   1. _{explain how to simulate a missing/corrupted file, and the expected behavior}_
-
-2. _{ more test cases …​ }_
+   1. Test case: `event add title/Consultation start/2026-04-01 1400 end/2026-04-01 1500 n/Person Not In List`<br>
+      Expected: No event is added. Error message indicates that the target person cannot be found.
