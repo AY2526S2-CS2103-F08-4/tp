@@ -49,7 +49,7 @@ public class DeleteCommandParserTest {
     @Test
     public void parse_invalidPhone_throwsParseException() {
         assertParseFailure(parser, " " + PREFIX_NAME + "John Doe " + PREFIX_PHONE + "abc",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
+                                "Phone numbers must be at least 7 digits and at-most 15 digits long.");
     }
 
     @Test

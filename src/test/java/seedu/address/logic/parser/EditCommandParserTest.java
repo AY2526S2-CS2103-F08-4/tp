@@ -74,7 +74,7 @@ public class EditCommandParserTest {
         assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // no field specified
-        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER, EditCommand.MESSAGE_NOT_EDITED);
 
         // no target name and no field specified
         assertParseFailure(parser, "", MESSAGE_INVALID_FORMAT);
@@ -168,13 +168,13 @@ public class EditCommandParserTest {
                 + VALID_ADDRESS_AMY + VALID_PHONE_AMY,
                 Name.MESSAGE_CONSTRAINTS);
 
-        // invalid values in target segment are wrapped as invalid command format
+        // invalid values in target segment report field constraints directly
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_PHONE_DESC + DELIMITER + NAME_DESC_AMY.trim(),
-            MESSAGE_INVALID_FORMAT);
+            Phone.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_EMAIL_DESC + DELIMITER + NAME_DESC_AMY.trim(),
-            MESSAGE_INVALID_FORMAT);
+            Email.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + INVALID_ADDRESS_DESC + DELIMITER + NAME_DESC_AMY.trim(),
-            MESSAGE_INVALID_FORMAT);
+            Address.MESSAGE_CONSTRAINTS);
     }
 
     @Test
@@ -327,8 +327,8 @@ public class EditCommandParserTest {
         userInput = TARGET_IDENTIFIER_AMY + DELIMITER + TAG_DESC_FRIEND.trim() + " t/FRIEND";
         assertParseFailure(parser, userInput, ParserUtil.MESSAGE_DUPLICATE_TAGS);
 
-        // duplicate target tags are wrapped as invalid command format
+        // duplicate target tags are rejected directly
         userInput = TARGET_IDENTIFIER_BENSON + TAG_DESC_HUSBAND + " t/HUSBAND" + DELIMITER + PHONE_DESC_AMY.trim();
-        assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, userInput, ParserUtil.MESSAGE_DUPLICATE_TAGS);
     }
 }

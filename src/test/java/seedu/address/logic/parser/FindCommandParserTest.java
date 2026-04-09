@@ -41,7 +41,7 @@ public class FindCommandParserTest {
     @Test
     public void parse_invalidOptionalField_throwsParseException() {
         assertParseFailure(parser, " " + PREFIX_NAME + "Alex Tan " + PREFIX_PHONE + "not-a-phone",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE));
+                                Phone.MESSAGE_CONSTRAINTS);
     }
 
     @Test
