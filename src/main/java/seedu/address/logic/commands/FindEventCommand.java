@@ -14,15 +14,13 @@ import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonInformation;
 
 /**
- * Finds and displays all events associated with persons whose names contain any of the argument keywords.
- * Keyword matching is case insensitive.
+ * Finds and displays all events for the specified contact.
  */
 public class FindEventCommand extends Command {
     public static final String COMMAND_WORD = "view";
 
     public static final String MESSAGE_USAGE = "event " + COMMAND_WORD
-            + ": Finds all events from persons whose names contain any of "
-            + "the specified keywords (case-insensitive) and displays them as a list.\n"
+            + ": Views all events for a specified person.\n"
             + "Parameters: event view n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...\n"
             + "Example: event " + COMMAND_WORD + " n/yikleong";
 
@@ -30,7 +28,7 @@ public class FindEventCommand extends Command {
     private final PersonInformation targetInfo;
 
     /**
-     * Creates a command that finds events for contacts matching the provided person-identification info.
+     * Creates a command that finds events for the contact matching the provided person-identification info.
      *
      * @param targetInfo required matching criteria with name and optional refinements
      */
@@ -40,10 +38,9 @@ public class FindEventCommand extends Command {
     }
 
     /**
-     * Finds persons matching the provided info and updates person/event lists based on match count:
-     * zero matches clears both lists,
-     * multiple matches shows matching persons only,
-     * one match shows that person details and the corresponding person's events.
+     * Finds the person matching the provided info and updates person/event lists based on match count:
+     * zero matches will clear both lists,
+     * a match shows that person's details and the corresponding person's events.
      */
     @Override
     public CommandResult execute(Model model) throws CommandException {
