@@ -19,7 +19,7 @@ activate CommandHistory
 
 deactivate CommandHistory
 
-CommandBox -> CommandBox
+CommandBox --> CommandBox
 deactivate CommandBox
 
 <-[Hidden]- CommandBox
