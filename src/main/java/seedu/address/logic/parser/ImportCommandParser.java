@@ -39,7 +39,7 @@ public class ImportCommandParser implements Parser<ImportCommand> {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, ImportCommand.MESSAGE_USAGE));
         }
 
-        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_FILENAME);
+        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_TYPE, PREFIX_FILENAME);
 
         String importType = argMultimap.getValue(PREFIX_TYPE).get().trim();
         if (!importType.equalsIgnoreCase("overwrite") && !importType.equalsIgnoreCase("add")) {

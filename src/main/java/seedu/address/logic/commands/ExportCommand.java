@@ -7,7 +7,9 @@ import static seedu.address.logic.parser.ExportCommandParser.PREFIX_TYPE;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import seedu.address.commons.util.FileUtil;
@@ -17,18 +19,20 @@ import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
 
 /**
- * Exports a list of contacts into a CSV formatted file for future use.
+ * Exports a list of contacts into two separate CSV formatted files for future use:
+ * - {filename}_persons.csv containing contact information with event ID references
+ * - {filename}_events.csv containing all unique events
  */
 public class ExportCommand extends Command {
 
     public static final String COMMAND_WORD = "export";
 
-    public static final String MESSAGE_SUCCESS = "Exported list to %1$s";
+    public static final String MESSAGE_SUCCESS = "Exported list to %1$s_persons.csv and %1$s_events.csv";
 
     public static final String MESSAGE_FAILURE = "Failed to export list to %1$s";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Exports a list of contacts into a CSV formatted file for future use.\n"
+            + ": Exports a list of contacts into two CSV formatted files for future use.\n"
             + "Parameters: "
             + PREFIX_TYPE + "EXPORT_TYPE "
             + PREFIX_FILENAME + "FILENAME\n"
@@ -37,13 +41,25 @@ public class ExportCommand extends Command {
             + PREFIX_FILENAME + "myContacts";
 
     private static final String FILENAME_SUFFIX = ".csv";
+    private static final String PERSONS_FILENAME_SUFFIX = "_persons.csv";
+    private static final String EVENTS_FILENAME_SUFFIX = "_events.csv";
+
+    // Person CSV headers
     private static final String NAME_COLUMN_HEADER = "Name";
     private static final String PHONE_COLUMN_HEADER = "Phone";
     private static final String EMAIL_COLUMN_HEADER = "Email";
     private static final String ADDRESS_COLUMN_HEADER = "Address";
     private static final String TAG_COLUMN_HEADER = "Tags";
-    private static final String EVENT_COLUMN_HEADER = "Events";
+    private static final String EVENT_IDS_COLUMN_HEADER = "EventIds";
     private static final String PHOTO_COLUMN_HEADER = "Photo";
+    private static final String PINNED_COLUMN_HEADER = "Pinned";
+
+    // Event CSV headers
+    private static final String EVENT_ID_COLUMN_HEADER = "EventId";
+    private static final String TITLE_COLUMN_HEADER = "Title";
+    private static final String DESCRIPTION_COLUMN_HEADER = "Description";
+    private static final String START_TIME_COLUMN_HEADER = "Start";
+    private static final String END_TIME_COLUMN_HEADER = "End";
 
     private final String exportType;
     private final String filename;
@@ -63,7 +79,8 @@ public class ExportCommand extends Command {
 
     /**
      * Executes the export command, retrieving the appropriate list of contacts based on
-     * the {@code exportType} and writing them to a CSV file at the determined path.
+     * the {@code exportType} and writing them to two CSV files:
+     * one for persons and one for events.
      *
      * @param model {@code Model} which the command should operate on.
      * @return A {@code CommandResult} indicating the success of the export operation.
@@ -75,44 +92,65 @@ public class ExportCommand extends Command {
 
         List<Person> exportedList = getExportedList(model);
 
-        Path exportPath = getExportPath(model);
+        // Collect all unique events referenced by exported persons
+        Set<Event> uniqueEvents = collectUniqueEvents(exportedList);
 
-        exportDataToCsv(exportPath, exportedList);
+        Path personsExportPath = getPersonsExportPath(model);
+        Path eventsExportPath = getEventsExportPath(model);
 
-        return new CommandResult(String.format(MESSAGE_SUCCESS,
-                filename + FILENAME_SUFFIX));
+        exportDataToTwoCsv(personsExportPath, eventsExportPath, exportedList, uniqueEvents, model);
+
+        return new CommandResult(String.format(MESSAGE_SUCCESS, filename));
     }
 
     /**
-     * Writes the specified list of contacts to a CSV file. Creates parent directories if
-     * they do not exist and converts the {@code Person} data into a formatted CSV string.
+     * Writes the specified lists of contacts and events to two separate CSV files.
+     * Creates parent directories if they do not exist.
      *
-     * @param exportPath The {@code Path} where the file will be saved.
+     * @param personsPath The {@code Path} where the persons file will be saved.
+     * @param eventsPath The {@code Path} where the events file will be saved.
      * @param exportedList The list of {@code Person} objects to be serialized.
+     * @param uniqueEvents The set of {@code Event} objects to be serialized.
      * @throws CommandException If an {@code IOException} occurs during file creation or writing.
      */
-    public void exportDataToCsv(Path exportPath, List<Person> exportedList) throws CommandException {
+    public void exportDataToTwoCsv(Path personsPath, Path eventsPath, List<Person> exportedList,
+                                   Set<Event> uniqueEvents, Model model) throws CommandException {
         try {
-            FileUtil.createParentDirsOfFile(exportPath);
+            FileUtil.createParentDirsOfFile(personsPath);
+            FileUtil.createParentDirsOfFile(eventsPath);
 
-            String csvData = convertToCsv(exportedList);
+            String personsCsvData = convertPersonsToCsv(exportedList, model);
+            String eventsCsvData = convertEventsToCsv(uniqueEvents);
 
-            FileUtil.writeToFile(exportPath, csvData);
+            FileUtil.writeToFile(personsPath, personsCsvData);
+            FileUtil.writeToFile(eventsPath, eventsCsvData);
         } catch (IOException e) {
-            throw new CommandException(String.format(MESSAGE_FAILURE, filename + FILENAME_SUFFIX));
+            throw new CommandException(String.format(MESSAGE_FAILURE, filename));
         }
     }
 
     /**
-     * Returns the path to the CSV file to be exported, resolved relative to the
+     * Returns the path to the persons CSV file to be exported, resolved relative to the
      * directory containing the current AddressBook data file.
      *
      * @param model {@code Model} providing the base file path from user preferences.
-     * @return The resolved {@code Path} for the export file.
+     * @return The resolved {@code Path} for the persons export file.
      */
-    protected Path getExportPath(Model model) {
+    protected Path getPersonsExportPath(Model model) {
         Path userPrefParentDirPath = model.getAddressBookFilePath().getParent();
-        return userPrefParentDirPath.resolve(filename + FILENAME_SUFFIX);
+        return userPrefParentDirPath.resolve(filename + PERSONS_FILENAME_SUFFIX);
+    }
+
+    /**
+     * Returns the path to the events CSV file to be exported, resolved relative to the
+     * directory containing the current AddressBook data file.
+     *
+     * @param model {@code Model} providing the base file path from user preferences.
+     * @return The resolved {@code Path} for the events export file.
+     */
+    protected Path getEventsExportPath(Model model) {
+        Path userPrefParentDirPath = model.getAddressBookFilePath().getParent();
+        return userPrefParentDirPath.resolve(filename + EVENTS_FILENAME_SUFFIX);
     }
 
     /**
@@ -129,13 +167,14 @@ public class ExportCommand extends Command {
     }
 
     /**
-     * Converts the specified list of contacts into a single CSV string, including
-     * a header row followed by individual data rows for each person.
+     * Converts the specified list of contacts into a CSV string for persons,
+     * including a header row followed by individual data rows for each person.
+     * Each person row contains references to event IDs instead of full event data.
      *
      * @param exportedList The list of {@code Person} objects to convert.
-     * @return A formatted CSV string representing the entire contact list.
+     * @return A formatted CSV string representing the persons list.
      */
-    public String convertToCsv(List<Person> exportedList) {
+    public String convertPersonsToCsv(List<Person> exportedList, Model model) {
         StringBuilder csvBuilder = new StringBuilder();
 
         csvBuilder.append(NAME_COLUMN_HEADER).append(",")
@@ -143,32 +182,57 @@ public class ExportCommand extends Command {
                 .append(EMAIL_COLUMN_HEADER).append(",")
                 .append(ADDRESS_COLUMN_HEADER).append(",")
                 .append(TAG_COLUMN_HEADER).append(",")
-                .append(EVENT_COLUMN_HEADER).append(",")
-                .append(PHOTO_COLUMN_HEADER).append("\n");
+                .append(EVENT_IDS_COLUMN_HEADER).append(",")
+                .append(PHOTO_COLUMN_HEADER).append(",")
+                .append(PINNED_COLUMN_HEADER).append("\n");
 
         for (Person p : exportedList) {
-            csvBuilder.append(formatPersonToRow(p)).append("\n");
+            csvBuilder.append(formatPersonToRow(p, model)).append("\n");
         }
 
         return csvBuilder.toString();
     }
 
     /**
-     * Formats an individual {@code Person} into a single CSV row, ensuring that
-     * complex fields like addresses and tags are sanitized to prevent formatting errors.
+     * Converts the specified set of events into a CSV string,
+     * including a header row followed by individual data rows for each event.
+     *
+     * @param uniqueEvents The set of {@code Event} objects to convert.
+     * @return A formatted CSV string representing the events list.
+     */
+    public String convertEventsToCsv(Set<Event> uniqueEvents) {
+        StringBuilder csvBuilder = new StringBuilder();
+
+        csvBuilder.append(EVENT_ID_COLUMN_HEADER).append(",")
+                .append(TITLE_COLUMN_HEADER).append(",")
+                .append(DESCRIPTION_COLUMN_HEADER).append(",")
+                .append(START_TIME_COLUMN_HEADER).append(",")
+                .append(END_TIME_COLUMN_HEADER).append("\n");
+
+        for (Event e : uniqueEvents) {
+            csvBuilder.append(formatEventToRow(e)).append("\n");
+        }
+
+        return csvBuilder.toString();
+    }
+
+    /**
+     * Formats an individual {@code Person} into a single CSV row, with event references
+     * as comma-separated event IDs instead of full event data.
      *
      * @param p The {@code Person} object to format.
      * @return A comma-separated string representing the person's data.
      */
-    public String formatPersonToRow(Person p) {
-        return String.format("%s,%s,%s,%s,%s,%s,%s",
+    public String formatPersonToRow(Person p, Model model) {
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s",
                 p.getName().fullName,
                 p.getPhone().value,
                 sanitizeAndWrapValue(getEmailValue(p)),
                 sanitizeAndWrapValue(getAddressValue(p)),
                 sanitizeAndWrapValue(formatTags(p)),
-                sanitizeAndWrapValue(formatEvents(p)),
-                sanitizeAndWrapValue(getPhotoValue())
+                sanitizeAndWrapValue(formatEventIds(p)),
+                sanitizeAndWrapValue(getPhotoValue()),
+                sanitizeAndWrapValue(String.valueOf(model.isPersonPinned(p)))
         );
     }
 
@@ -209,40 +273,50 @@ public class ExportCommand extends Command {
     }
 
     /**
-     * Formats a single {@code Event} into a pipe-separated string.
-     * Special characters like pipe and semicolon are removed from the description
-     * to maintain CSV integrity.
+     * Formats a single {@code Event} into a CSV row.
+     * Special characters like pipe and semicolon are removed to maintain CSV integrity.
      *
      * @param e The {@code Event} object to format.
-     * @return A pipe-separated string of event details.
+     * @return A comma-separated string of event details.
      */
-    // Event column becomes: Title|Description|Start|End|NumberOfPersonLinked|EventId
-    private String formatSingleEvent(Event e) {
-        String title = e.getTitle().fullTitle; // adjust if getter differs
+    private String formatEventToRow(Event e) {
+        String title = e.getTitle().fullTitle;
         String desc = e.getDescription().map(d -> d.fullDescription).orElse("");
-        String sanitizedTitle = title.replace("|", " ").replace(";", " ");
-        String sanitizedDesc = desc.replace("|", " ").replace(";", " ");
+        String sanitizedTitle = title.replace(",", " ").replace("\"", " ");
+        String sanitizedDesc = desc.replace(",", " ").replace("\"", " ");
 
-        return String.format("%s|%s|%s|%s|%d|%d",
-                sanitizedTitle,
-                sanitizedDesc,
-                e.getStartTimeFormatted(), // or timeRange.getStartTimeFormatted()
-                e.getEndTimeFormatted(),
-                e.getNumberOfPersonLinked(),
-                e.getEventId());
+        return String.format("%d,%s,%s,%s,%s",
+                e.getEventId(),
+                sanitizeAndWrapValue(sanitizedTitle),
+                sanitizeAndWrapValue(sanitizedDesc),
+                e.getStartTimeFormatted(),
+                e.getEndTimeFormatted());
     }
 
     /**
-     * Aggregates all events associated with a {@code Person} into a single string,
-     * with individual events separated by semicolons.
+     * Formats a person's event IDs as a semicolon-separated string.
      *
      * @param p The {@code Person} object containing events.
-     * @return A semicolon-separated string of formatted events.
+     * @return A semicolon-separated string of event IDs.
      */
-    private String formatEvents(Person p) {
+    private String formatEventIds(Person p) {
         return p.getEvents().stream()
-                .map(this::formatSingleEvent)
+                .map(event -> String.valueOf(event.getEventId()))
                 .collect(Collectors.joining(";"));
+    }
+
+    /**
+     * Collects all unique events referenced by the exported persons.
+     *
+     * @param exportedList The list of persons to extract events from.
+     * @return A set of unique {@code Event} objects.
+     */
+    private Set<Event> collectUniqueEvents(List<Person> exportedList) {
+        Set<Event> uniqueEvents = new HashSet<>();
+        for (Person person : exportedList) {
+            uniqueEvents.addAll(person.getEvents());
+        }
+        return uniqueEvents;
     }
 
     /**
@@ -277,12 +351,13 @@ public class ExportCommand extends Command {
     }
 
     /**
-     * Returns a string representation of this command, identifying the target file.
+     * Returns a string representation of this command, including the export type and target files.
      *
-     * @return A string summary of the export operation.
+     * @return A string identifying the export operation, export type, and target CSV files.
      */
     @Override
     public String toString() {
-        return String.format("Exporting list to: %s", filename + FILENAME_SUFFIX);
+        return String.format("ExportCommand{type=%s, filename=%s_persons.csv, %s_events.csv}",
+                exportType, filename, filename);
     }
 }
