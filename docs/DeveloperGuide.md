@@ -279,7 +279,7 @@ _{more aspects and alternatives to be added}_
 
 _{Explain here how the data archiving feature will be implemented}_
 
-### \[Proposed\] Retrieval of past entered commands
+### Retrieval of past entered commands
 #### Implementation
 The command retrieval mechanism is implemented as a UI-level feature split between `CommandBox` and `CommandHistory`.
 
