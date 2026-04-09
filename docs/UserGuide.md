@@ -669,7 +669,7 @@ AddressBook data is saved automatically as a JSON file `[JAR file location]/data
 ## Command summary
 
 Action     | Format, Examples
------------|---------------------------------------------------------------------f-------------------------------------------------------------------------------------------------
+-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **Add**    | `add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague pfp/images/james.jpg`
 **Clear**  | `clear`
 **Delete** | `delete n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `delete n/Alex Yeoh t/cs2103 t/cs2105`
