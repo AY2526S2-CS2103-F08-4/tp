@@ -34,12 +34,7 @@ public class FindEventParser implements Parser<FindEventCommand> {
         }
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS);
 
-        try {
-            PersonInformation info = new PersonInformationParser().parse(argMultimap);
-            return new FindEventCommand(info);
-        } catch (ParseException pe) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindEventCommand.MESSAGE_USAGE), pe);
-        }
+        PersonInformation info = new PersonInformationParser().parse(argMultimap);
+        return new FindEventCommand(info);
     }
 }

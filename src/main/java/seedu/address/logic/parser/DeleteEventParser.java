@@ -10,7 +10,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_START;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
 
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 
 import seedu.address.logic.commands.DeleteEventCommand;
@@ -44,17 +43,17 @@ public class DeleteEventParser implements Parser<DeleteEventCommand> {
                 PREFIX_EMAIL, PREFIX_ADDRESS);
 
         String startTimeStr = argMultimap.getValue(PREFIX_START).get().trim();
-        if (!TimeRange.isValidDateTimeFormat(startTimeStr)) {
+        if (!TimeRange.isValidSyntax(startTimeStr)) {
             throw new ParseException(TimeRange.MESSAGE_INVALID_DATETIME_FORMAT);
         }
 
-        try {
-            LocalDateTime startTime = LocalDateTime.parse(startTimeStr, TimeRange.DATE_TIME_FORMATTER);
-            PersonInformation targetInfo = new PersonInformationParser().parse(argMultimap);
-            return new DeleteEventCommand(targetInfo, startTime);
-        } catch (DateTimeException | ParseException pe) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteEventCommand.MESSAGE_USAGE), pe);
+        if (!TimeRange.isValidDateValue(startTimeStr)) {
+            throw new ParseException(TimeRange.MESSAGE_INVALID_DATE_VALUE);
         }
+
+
+        LocalDateTime startTime = LocalDateTime.parse(startTimeStr, TimeRange.DATE_TIME_FORMATTER);
+        PersonInformation targetInfo = new PersonInformationParser().parse(argMultimap);
+        return new DeleteEventCommand(targetInfo, startTime);
     }
 }

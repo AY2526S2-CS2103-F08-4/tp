@@ -155,6 +155,11 @@ public interface Model {
     boolean hasOverlappingEvent(Event event);
 
     /**
+     * Returns a list of events that overlaps with {@code event}.
+     */
+    List<Event> getOverlappingEvent(Event event);
+
+    /**
      * Adds the given event.
      * The event must not already exist in the address book.
      */

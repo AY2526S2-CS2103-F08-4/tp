@@ -17,7 +17,11 @@ public class ExportCommandParser implements Parser<ExportCommand> {
 
     public static final String MESSAGE_INVALID_EXPORT_TYPE = "Invalid export type! Use 'all' or 'current'.";
     public static final String MESSAGE_EMPTY_FILENAME = "Filename cannot be empty!";
-    public static final String MESSAGE_INVALID_FILENAME = "Invalid filename! Use alphanumeric characters. ";
+    public static final String MESSAGE_INVALID_FILENAME = "Invalid filename! "
+            + "Use alphanumeric characters, dashes, or underscores. "
+            + "Do not include file extensions (e.g., .csv).";
+    public static final String FILENAME_VALIDATION_REGEX = "^[\\w\\- ]+$";
+
 
     /**
      * Parses the given {@code String} of arguments in the context of the {@code ExportCommand}
@@ -50,7 +54,7 @@ public class ExportCommandParser implements Parser<ExportCommand> {
             throw new ParseException(String.format(MESSAGE_EMPTY_FILENAME, ExportCommand.MESSAGE_USAGE));
         }
 
-        if (!filename.matches("^[a-zA-Z0-9._-]+$")) {
+        if (!filename.matches(FILENAME_VALIDATION_REGEX)) {
             throw new ParseException(String.format(MESSAGE_INVALID_FILENAME, ExportCommand.MESSAGE_USAGE));
         }
 

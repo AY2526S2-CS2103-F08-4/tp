@@ -49,7 +49,7 @@ public class FindEventParserTest {
     @Test
     public void parse_invalidOptionalField_failure() {
         assertParseFailure(parser, " n/Amy Bee p/abc",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindEventCommand.MESSAGE_USAGE));
+               Phone.MESSAGE_CONSTRAINTS);
     }
 
     @Test

@@ -127,10 +127,17 @@ public class AddEventCommandTest {
         Event eventToAdd = eventOf(VALID_TITLE, VALID_DESC, VALID_START, VALID_END);
         AddEventCommand addEventCommand = new AddEventCommand(infoOf(VALID_NAME), eventToAdd);
 
+        Event existingClash = eventOf("Existing Meeting",
+                "Help Me",
+                "2026-02-21 1000",
+                "2026-02-21 1200");
         Person person = new PersonBuilder().withName(VALID_NAME).build();
-        ModelStubWithOverlappingEvent modelStub = new ModelStubWithOverlappingEvent(person);
+        ModelStubWithOverlappingEvent modelStub = new ModelStubWithOverlappingEvent(person, existingClash);
 
-        assertThrows(CommandException.class, AddEventCommand.MESSAGE_CLASHING_EVENT, () ->
+        String expectedMessage = AddEventCommand.MESSAGE_CLASHING_EVENT + "\n"
+                + "• " + existingClash.getClashDisplayString();
+
+        assertThrows(CommandException.class, expectedMessage, () ->
                 addEventCommand.execute(modelStub));
     }
 
@@ -341,6 +348,11 @@ public class AddEventCommandTest {
         }
 
         @Override
+        public List<Event> getOverlappingEvent(Event event) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
         public void pinPerson(Person person) {
             throw new AssertionError("This method should not be called.");
         }
@@ -424,6 +436,11 @@ public class AddEventCommandTest {
         public boolean hasOverlappingEvent(Event event) {
             return false;
         }
+
+        @Override
+        public List<Event> getOverlappingEvent(Event event) {
+            return List.of();
+        }
     }
 
     private class ModelStubWithPersonExistingEvent extends ModelStub {
@@ -490,9 +507,11 @@ public class AddEventCommandTest {
 
     private class ModelStubWithOverlappingEvent extends ModelStub {
         private final Person person;
+        private final Event clashingEvent;
 
-        ModelStubWithOverlappingEvent(Person person) {
+        ModelStubWithOverlappingEvent(Person person, Event clashingEvent) {
             this.person = person;
+            this.clashingEvent = clashingEvent;
         }
 
         @Override
@@ -508,6 +527,11 @@ public class AddEventCommandTest {
         @Override
         public boolean hasOverlappingEvent(Event event) {
             return true;
+        }
+
+        @Override
+        public List<Event> getOverlappingEvent(Event event) {
+            return List.of(clashingEvent);
         }
 
         @Override

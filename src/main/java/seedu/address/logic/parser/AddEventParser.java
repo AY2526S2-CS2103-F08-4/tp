@@ -50,13 +50,8 @@ public class AddEventParser implements Parser<AddEventCommand> {
                 PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS);
 
         Event event = createEvent(argMultimap);
-        try {
-            PersonInformation targetInfo = new PersonInformationParser().parse(argMultimap);
-            return new AddEventCommand(targetInfo, event);
-        } catch (ParseException pe) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddEventCommand.MESSAGE_USAGE), pe);
-        }
+        PersonInformation targetInfo = new PersonInformationParser().parse(argMultimap);
+        return new AddEventCommand(targetInfo, event);
     }
 
     private static Event createEvent(ArgumentMultimap argMultimap) throws ParseException {
@@ -74,14 +69,11 @@ public class AddEventParser implements Parser<AddEventCommand> {
                 : Optional.empty();
         String startDateTime = argMultimap.getValue(PREFIX_START).get().trim();
         String endDateTime = argMultimap.getValue(PREFIX_END).get().trim();
-        if (!TimeRange.isValidDateTimeFormat(startDateTime) || !TimeRange.isValidDateTimeFormat(endDateTime)) {
-            throw new ParseException(TimeRange.MESSAGE_INVALID_DATETIME_FORMAT);
-        }
         try {
             TimeRange timeRange = new TimeRange(startDateTime, endDateTime);
             return new Event(title, description, timeRange);
         } catch (IllegalArgumentException e) {
-            throw new ParseException(TimeRange.MESSAGE_END_NOT_AFTER_START, e);
+            throw new ParseException(e.getMessage(), e);
         }
     }
 }

@@ -2,6 +2,7 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.ExportCommandParser.FILENAME_VALIDATION_REGEX;
 import static seedu.address.logic.parser.ExportCommandParser.MESSAGE_EMPTY_FILENAME;
 import static seedu.address.logic.parser.ExportCommandParser.MESSAGE_INVALID_FILENAME;
 import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
@@ -18,7 +19,6 @@ public class ImportCommandParser implements Parser<ImportCommand> {
     public static final Prefix PREFIX_FILENAME = new Prefix("f/");
 
     public static final String MESSAGE_INVALID_IMPORT_TYPE = "Invalid import type! Use 'overwrite' or 'add'.";
-
     /**
      * Parses the given {@code String} of arguments in the context of the {@code ImportCommand}
      * and returns an {@code ImportCommand} object for execution.
@@ -50,7 +50,7 @@ public class ImportCommandParser implements Parser<ImportCommand> {
             throw new ParseException(String.format(MESSAGE_EMPTY_FILENAME, ImportCommand.MESSAGE_USAGE));
         }
 
-        if (!filename.matches("^[a-zA-Z0-9._-]+$")) {
+        if (!filename.matches(FILENAME_VALIDATION_REGEX)) {
             throw new ParseException(String.format(MESSAGE_INVALID_FILENAME, ImportCommand.MESSAGE_USAGE));
         }
 

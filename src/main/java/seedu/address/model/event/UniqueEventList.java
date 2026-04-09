@@ -40,6 +40,16 @@ public class UniqueEventList implements Iterable<Event> {
     }
 
     /**
+     * Returns a list of events that overlaps with {@code toCheck}.
+     */
+    public List<Event> getOverlappingEvent(Event toCheck) {
+        requireNonNull(toCheck);
+        return internalList.stream()
+                .filter(toCheck::isClashingWith)
+                .toList();
+    }
+
+    /**
      * Adds an event to the list.
      * The event must not already exist in the list.
      */

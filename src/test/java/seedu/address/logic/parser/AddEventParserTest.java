@@ -102,7 +102,7 @@ public class AddEventParserTest {
         assertParseFailure(parser,
                 " title/Complete feature list desc/All tasks start/" + VALID_START + " end/" + VALID_END
                         + " n/" + VALID_NAME + " p/notaphone",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddEventCommand.MESSAGE_USAGE));
+                Phone.MESSAGE_CONSTRAINTS);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class AddEventParserTest {
         assertParseFailure(parser,
                 " title/Complete feature list desc/All tasks start/" + VALID_START + " end/" + VALID_END
                         + " n/" + VALID_NAME + " e/not-an-email",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddEventCommand.MESSAGE_USAGE));
+                Email.MESSAGE_CONSTRAINTS);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class AddEventParserTest {
     public void parse_nonExistentDate_failure() {
         assertParseFailure(parser,
                 " title/Meeting start/2026-02-30 0900 end/2026-02-30 1000 n/" + VALID_NAME,
-                MESSAGE_INVALID_DATETIME_FORMAT);
+                TimeRange.MESSAGE_INVALID_DATE_VALUE);
     }
 
     @Test

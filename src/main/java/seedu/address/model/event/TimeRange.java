@@ -23,6 +23,8 @@ public class TimeRange {
             "End time must be strictly after start time.";
     public static final String MESSAGE_CONSTRAINTS =
             MESSAGE_INVALID_DATETIME_FORMAT + " " + MESSAGE_END_NOT_AFTER_START;
+    public static final String DATE_TIME_REGEX = "^\\d{4}-\\d{2}-\\d{2} \\d{4}$"; // Regex for YYYY-MM-DD-HHmm format
+    public static final String MESSAGE_INVALID_DATE_VALUE = "The provided date or time does not exist.";
 
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
@@ -35,21 +37,44 @@ public class TimeRange {
     public TimeRange(String startTimeStr, String endTimeStr) {
         requireNonNull(startTimeStr);
         requireNonNull(endTimeStr);
-        checkArgument(isValidTimeRange(startTimeStr, endTimeStr), MESSAGE_CONSTRAINTS);
+
+        // Check for Format Syntax
+        checkArgument(isValidSyntax(startTimeStr) && isValidSyntax(endTimeStr),
+                MESSAGE_INVALID_DATETIME_FORMAT);
+
+        // Check if provided values exists
+        checkArgument(isValidDateValue(startTimeStr) && isValidDateValue(endTimeStr),
+                MESSAGE_INVALID_DATE_VALUE);
+
+        checkArgument(isValidTimeRange(startTimeStr, endTimeStr), MESSAGE_END_NOT_AFTER_START);
         this.startTime = LocalDateTime.parse(startTimeStr, DATE_TIME_FORMATTER);
         this.endTime = LocalDateTime.parse(endTimeStr, DATE_TIME_FORMATTER);
     }
 
     /**
+     * Returns true if the string matches the YYYY-MM-DD HHmm
+     */
+    public static boolean isValidSyntax(String dateTimeStr) {
+        return dateTimeStr.matches(DATE_TIME_REGEX);
+    }
+
+    /**
      * Returns true if {@code dateTimeStr} can be parsed according to {@code DATE_TIME_PATTERN}.
      */
-    public static boolean isValidDateTimeFormat(String dateTimeStr) {
+    public static boolean isValidDateValue(String dateTimeStr) {
         try {
             LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
             return true;
         } catch (DateTimeParseException e) {
             return false;
         }
+    }
+
+    /**
+     * Returns true if {@code dateTimeStr} is fully valid (both syntax and calendar value).
+     */
+    public static boolean isValidDateTimeFormat(String dateTimeStr) {
+        return isValidSyntax(dateTimeStr) && isValidDateValue(dateTimeStr);
     }
 
     private static boolean isValidTimeRange(String startTimeStr, String endTimeStr) {

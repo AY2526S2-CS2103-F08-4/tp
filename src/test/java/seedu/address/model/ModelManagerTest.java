@@ -206,6 +206,24 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void getOverlappingEvent_noOverlap_returnsEmptyList() {
+        Event event = newEvent("Meeting", "Discuss", "2026-03-25 0900", "2026-03-25 1000");
+        modelManager.addEvent(event);
+        Event nonOverlapping = newEvent("Lunch", null, "2026-03-25 1200", "2026-03-25 1300");
+        assertTrue(modelManager.getOverlappingEvent(nonOverlapping).isEmpty());
+    }
+
+    @Test
+    public void getOverlappingEvent_withOverlap_returnsTrue() {
+        Event event = newEvent("Meeting", "Discuss", "2026-03-25 0900", "2026-03-25 1100");
+        modelManager.addEvent(event);
+        Event overlapping = newEvent("Call", null, "2026-03-25 1000", "2026-03-25 1200");
+        List<Event> overlappingEvents = modelManager.getOverlappingEvent(overlapping);
+        assertEquals(1, overlappingEvents.size());
+        assertTrue(overlappingEvents.contains(event));
+    }
+
+    @Test
     public void equals() {
         AddressBook addressBook = new AddressBookBuilder().withPerson(ALICE).withPerson(BENSON)
                 .build();

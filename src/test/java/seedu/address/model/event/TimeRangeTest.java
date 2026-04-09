@@ -134,6 +134,20 @@ public class TimeRangeTest {
     }
 
     @Test
+    public void constructor_invalidDateValue_throwsIllegalArgumentException() {
+        String invalidDate = "2026-02-30 0900";
+        String validDate = "2026-02-20 0900";
+
+        // Test invalid start time
+        assertThrows(IllegalArgumentException.class,
+                TimeRange.MESSAGE_INVALID_DATE_VALUE, () -> new TimeRange(invalidDate, validDate));
+
+        // Test invalid end time
+        assertThrows(IllegalArgumentException.class,
+                TimeRange.MESSAGE_INVALID_DATE_VALUE, () -> new TimeRange(validDate, invalidDate));
+    }
+
+    @Test
     public void toString_formatsRange() {
         TimeRange range = new TimeRange("2026-03-25 0900", "2026-03-25 1000");
         assertEquals("2026-03-25 0900 to 2026-03-25 1000", range.toString());
