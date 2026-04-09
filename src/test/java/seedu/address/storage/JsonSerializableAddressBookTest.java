@@ -166,32 +166,52 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_duplicateEvents_throwsIllegalValueException() throws Exception {
-        // Two events with same title+time produce the same eventId → duplicate
-        String json = """
+    public void toModelType_duplicateEventIds_skipsSecondEntry() throws Exception {
+        // Two events with the same eventId — second is skipped with a warning, not thrown
+        Event sampleEvent = new Event(new Title("Project Review"),
+                Optional.of(new Description("Review scope")),
+                new TimeRange("2026-03-25 0900", "2026-03-25 1000"));
+        int eventId = sampleEvent.getEventId();
+
+        String json = String.format("""
                 {
-                  "persons": [],
+                  "persons": [
+                    {
+                      "name": "Alice Pauline",
+                      "phone": "94351253",
+                      "email": "alice@example.com",
+                      "address": "123, Jurong West Ave 6, #08-111",
+                      "tags": [],
+                      "eventIds": [%d]
+                    }
+                  ],
                   "events": [
                     {
                       "title": "Project Review",
                       "description": "Review scope",
                       "startTime": "2026-03-25 0900",
                       "endTime": "2026-03-25 1000",
-                      "numberOfPersonLinked": 2
+                      "numberOfPersonLinked": 1,
+                      "eventId": %d
                     },
                     {
-                      "title": "Project Review",
-                      "description": "Another description",
+                      "title": "Different Title",
+                      "description": "Different description",
                       "startTime": "2026-03-25 0900",
                       "endTime": "2026-03-25 1000",
-                      "numberOfPersonLinked": 7
+                      "numberOfPersonLinked": 1,
+                      "eventId": %d
                     }
                   ]
                 }
-                """;
+                """, eventId, eventId, eventId);
+
         JsonSerializableAddressBook dataFromJson = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
-        assertThrows(IllegalValueException.class, JsonSerializableAddressBook.MESSAGE_DUPLICATE_EVENT,
-                dataFromJson::toModelType);
+        AddressBook addressBook = dataFromJson.toModelType();
+
+        // Only the first entry should be kept
+        assertEquals(1, addressBook.getEventList().size());
+        assertEquals("Project Review", addressBook.getEventList().get(0).getTitle().fullTitle);
     }
 
     @Test
@@ -219,11 +239,12 @@ public class JsonSerializableAddressBookTest {
                       "description": "Review scope",
                       "startTime": "2026-03-25 0900",
                       "endTime": "2026-03-25 1000",
-                      "numberOfPersonLinked": 4
+                      "numberOfPersonLinked": 4,
+                      "eventId": %d
                     }
                   ]
                 }
-                """, eventId);
+                """, eventId, eventId);
 
         JsonSerializableAddressBook dataFromJson = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
         AddressBook addressBook = dataFromJson.toModelType();
@@ -266,5 +287,47 @@ public class JsonSerializableAddressBookTest {
 
         assertEquals(0, addressBook.getEventList().size());
         assertEquals(1, addressBook.getPersonList().size());
+    }
+
+    @Test
+    public void toModelType_modifiedEventDetails_stillLinkedViaEventId() throws Exception {
+        // Simulate a user modifying event details in the JSON file.
+        // The eventId is preserved, so the person-event link should survive.
+        Event original = new Event(new Title("Project Review"),
+                Optional.of(new Description("Review scope")),
+                new TimeRange("2026-03-25 0900", "2026-03-25 1000"));
+        int eventId = original.getEventId();
+
+        String json = String.format("""
+                {
+                  "persons": [
+                    {
+                      "name": "Alice Pauline",
+                      "phone": "94351253",
+                      "email": "alice@example.com",
+                      "address": "123, Jurong West Ave 6, #08-111",
+                      "tags": [],
+                      "eventIds": [%d]
+                    }
+                  ],
+                  "events": [
+                    {
+                      "title": "Renamed Event",
+                      "description": "Updated description",
+                      "startTime": "2026-03-25 0900",
+                      "endTime": "2026-03-25 1100",
+                      "numberOfPersonLinked": 1,
+                      "eventId": %d
+                    }
+                  ]
+                }
+                """, eventId, eventId);
+
+        JsonSerializableAddressBook dataFromJson = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
+        AddressBook addressBook = dataFromJson.toModelType();
+
+        assertEquals(1, addressBook.getEventList().size());
+        assertEquals("Renamed Event", addressBook.getEventList().get(0).getTitle().fullTitle);
+        assertEquals(1, addressBook.getPersonList().get(0).getEvents().size());
     }
 }
