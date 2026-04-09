@@ -56,7 +56,7 @@ public class UnpinCommandTest {
         Person person = model.getFilteredPersonList().get(0);
         UnpinCommand unpinCommand = new UnpinCommand(createNameOnlyInfo(person.getName()));
 
-        assertCommandFailure(unpinCommand, model, Messages.MESSAGE_NO_MATCH);
+        assertCommandFailure(unpinCommand, model, UnpinCommand.MESSAGE_ALREADY_UNPINNED);
     }
 
     @Test

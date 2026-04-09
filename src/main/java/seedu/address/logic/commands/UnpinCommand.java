@@ -24,6 +24,8 @@ public class UnpinCommand extends Command {
 
     public static final String COMMAND_WORD = "unpin";
 
+    public static final String MESSAGE_ALREADY_UNPINNED = "This contact is already unpinned.";
+
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Unpins the person identified by their name.\n"
             + "Parameters: "
@@ -52,12 +54,14 @@ public class UnpinCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        // Get the list of currently pinned matches
-        List<Person> pinnedMatches = model.findPersons(this.targetInfo).stream()
-                .filter(model::isPersonPinned)
-                .toList();
-        // Resolve the target person from the pinned matches
-        Person personToUnpin = CommandUtil.targetPersonFromMatches(model, pinnedMatches);
+
+        // Resolve the target person first to allow for a specific pinned-state error.
+        List<Person> matches = model.findPersons(this.targetInfo);
+        Person personToUnpin = CommandUtil.targetPersonFromMatches(model, matches);
+
+        if (!model.isPersonPinned(personToUnpin)) {
+            throw new CommandException(MESSAGE_ALREADY_UNPINNED);
+        }
 
         model.unpinPerson(personToUnpin);
         model.showAllPersonsPinnedFirst();
