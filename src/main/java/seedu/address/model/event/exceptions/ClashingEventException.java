@@ -1,7 +1,7 @@
 package seedu.address.model.event.exceptions;
 
 /**
- * Signals that the operation will result in duplicate Events.
+ * Signals that the event clashes with (overlaps) an existing event.
  */
 public class ClashingEventException extends RuntimeException {
     public ClashingEventException() {

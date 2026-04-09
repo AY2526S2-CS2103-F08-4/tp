@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.util.CommandUtil;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonInformation;
 import seedu.address.model.tag.Tag;
@@ -51,6 +52,8 @@ public class AddTagCommand extends Command {
 
     public static final String MESSAGE_TAG_SUCCESS = "Tagged %1$d person(s) with [%2$s]: %3$s";
 
+    private static final Logger logger = LogsCenter.getLogger(AddTagCommand.class);
+
     private final List<PersonInformation> targets;
     private final Set<Tag> tagsToAssign;
 
@@ -77,6 +80,7 @@ public class AddTagCommand extends Command {
 
         // Resolve all persons first
         List<Person> uniquePersons = resolvePersons(model);
+        logger.info("AddTag: tagging " + uniquePersons.size() + " person(s) with " + tagsToAssign);
         // Apply tags for each person
         applyTags(model, uniquePersons);
         // refresh the listing
@@ -121,13 +125,12 @@ public class AddTagCommand extends Command {
             Set<Tag> mergedTags = new HashSet<>(person.getTags());
             mergedTags.addAll(tagsToAssign);
 
-            Person updatedPerson = new Person(
-                    person.getName(), person.getPhone(),
-                    person.getEmail(), person.getAddress(),
-                    mergedTags, person.getPhoto());
-            for (Event event : person.getEvents()) {
-                updatedPerson.addEvent(event);
-            }
+            Person updatedPerson = person.withTags(mergedTags);
+
+            assert updatedPerson.getTags().containsAll(tagsToAssign)
+                    : "Updated person should contain all assigned tags";
+            assert updatedPerson.getEvents().equals(person.getEvents())
+                    : "Updated person should preserve existing events";
 
             model.setPerson(person, updatedPerson);
         }

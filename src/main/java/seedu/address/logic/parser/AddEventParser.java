@@ -11,10 +11,9 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_START;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TITLE;
+import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
 
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
 
 import seedu.address.logic.commands.AddEventCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -22,12 +21,7 @@ import seedu.address.model.event.Description;
 import seedu.address.model.event.Event;
 import seedu.address.model.event.TimeRange;
 import seedu.address.model.event.Title;
-import seedu.address.model.person.Address;
-import seedu.address.model.person.Email;
-import seedu.address.model.person.Name;
 import seedu.address.model.person.PersonInformation;
-import seedu.address.model.person.Phone;
-import seedu.address.model.tag.Tag;
 
 /**
  * Parses input arguments and creates a new {@link AddEventCommand} object.
@@ -57,28 +51,12 @@ public class AddEventParser implements Parser<AddEventCommand> {
 
         Event event = createEvent(argMultimap);
         try {
-            PersonInformation targetInfo = createPersonInformation(argMultimap);
+            PersonInformation targetInfo = new PersonInformationParser().parse(argMultimap);
             return new AddEventCommand(targetInfo, event);
         } catch (ParseException pe) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddEventCommand.MESSAGE_USAGE), pe);
         }
-    }
-
-    private static PersonInformation createPersonInformation(ArgumentMultimap argMultimap) throws ParseException {
-        String taggedContact = argMultimap.getValue(PREFIX_NAME).get().trim();
-        Name name = ParserUtil.parseName(taggedContact);
-        Phone phone = argMultimap.getValue(PREFIX_PHONE).isPresent()
-                ? ParserUtil.parsePhone(argMultimap.getValue(PREFIX_PHONE).get())
-                : null;
-        Email email = argMultimap.getValue(PREFIX_EMAIL).isPresent()
-                ? ParserUtil.parseEmail(argMultimap.getValue(PREFIX_EMAIL).get())
-                : null;
-        Address address = argMultimap.getValue(PREFIX_ADDRESS).isPresent()
-                ? ParserUtil.parseAddress(argMultimap.getValue(PREFIX_ADDRESS).get())
-                : null;
-        Set<Tag> tags = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
-        return new PersonInformation(name, phone, email, address, tags);
     }
 
     private static Event createEvent(ArgumentMultimap argMultimap) throws ParseException {
@@ -105,13 +83,5 @@ public class AddEventParser implements Parser<AddEventCommand> {
         } catch (IllegalArgumentException e) {
             throw new ParseException(TimeRange.MESSAGE_END_NOT_AFTER_START, e);
         }
-    }
-
-    /**
-     * Returns true if none of the prefixes contains empty {@code Optional} values in the given
-     * {@code ArgumentMultimap}.
-     */
-    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
-        return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
     }
 }

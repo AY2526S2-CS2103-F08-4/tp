@@ -12,18 +12,15 @@ import java.util.Optional;
  */
 public class Event {
 
-    // Identify fields
+    private static final int INITIAL_PERSON_LINK_COUNT = 1;
+
     private final Title title;
     private final TimeRange timeRange;
 
-    // Fields required for relations with Person
     private final int eventId;
     private int numberOfPersonLinked;
 
-    // Optional Data fields
     private final Optional<Description> description;
-
-
 
     /**
      * Creates an Event. Title and time range are required. Description is optional.
@@ -34,7 +31,7 @@ public class Event {
         this.title = title;
         this.description = description;
         this.timeRange = timeRange;
-        this.numberOfPersonLinked = 1;
+        this.numberOfPersonLinked = INITIAL_PERSON_LINK_COUNT;
         this.eventId = Objects.hash(title.fullTitle, timeRange.getStartTimeFormatted(),
             timeRange.getEndTimeFormatted());
     }
@@ -104,6 +101,7 @@ public class Event {
             throw new IllegalStateException("numberOfPersonLinked cannot be negative.");
         }
         numberOfPersonLinked -= 1;
+        assert numberOfPersonLinked >= 0 : "numberOfPersonLinked must stay non-negative after decrement";
     }
 
     /**

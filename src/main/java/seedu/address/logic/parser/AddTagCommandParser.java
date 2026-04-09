@@ -1,6 +1,7 @@
 package seedu.address.logic.parser;
 
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG_ASSIGN;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class AddTagCommandParser implements Parser<AddTagCommand> {
      */
     public AddTagCommand parse(String args) throws ParseException {
         // Splitting the Person segment and Tag segment
-        int personSectionStart = args.indexOf(" n/");
+        int personSectionStart = args.indexOf(" " + PREFIX_NAME.getPrefix());
         if (personSectionStart == -1) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTagCommand.MESSAGE_USAGE));
@@ -66,13 +67,11 @@ public class AddTagCommandParser implements Parser<AddTagCommand> {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTagCommand.MESSAGE_USAGE));
         }
-        Set<Tag> tagsToAssign;
         try {
-            tagsToAssign = ParserUtil.parseTags(tagValues);
+            return ParserUtil.parseTags(tagValues);
         } catch (ParseException pe) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTagCommand.MESSAGE_USAGE), pe);
         }
-        return tagsToAssign;
     }
 }

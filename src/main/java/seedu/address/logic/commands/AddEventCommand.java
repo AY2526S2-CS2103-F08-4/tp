@@ -73,27 +73,13 @@ public class AddEventCommand extends Command {
         }
 
         // Update person's event list
-        Person editedPerson = createPersonWithEvent(personToEdit, eventToLink);
+        Person editedPerson = personToEdit.withAddedEvent(eventToLink);
         model.setPerson(personToEdit, editedPerson);
         logger.info("AddEvent: person updated " + personToEdit.getName()
                 + ", total events=" + editedPerson.getEvents().size());
 
         model.showEventsForPerson(editedPerson);
         return new CommandResult(String.format(MESSAGE_SUCCESS, personToEdit.getName(), toAdd));
-    }
-
-    private static Person createPersonWithEvent(Person personToEdit, Event eventToAdd) {
-        Person editedPerson = new Person(personToEdit.getName(), personToEdit.getPhone(), personToEdit.getEmail(),
-                personToEdit.getAddress(), personToEdit.getTags(), personToEdit.getPhoto());
-
-        // Adding back the events from old person to new person
-        for (Event existingEvent : personToEdit.getEvents()) {
-            editedPerson.addEvent(existingEvent);
-        }
-
-        // Add the new event and return the NEW Person
-        editedPerson.addEvent(eventToAdd);
-        return editedPerson;
     }
 
     @Override

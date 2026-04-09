@@ -1,5 +1,6 @@
 package seedu.address.model.person;
 
+import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.time.LocalDateTime;
@@ -63,6 +64,20 @@ public class Person {
         this.tags.addAll(tags);
         this.events = events;
         this.photo = photo;
+    }
+
+    /**
+     * Copy constructor.
+     */
+    public Person(Person source) {
+        requireNonNull(source);
+        this.name = source.getName();
+        this.phone = source.getPhone();
+        this.email = source.getEmail();
+        this.address = source.getAddress();
+        this.tags.addAll(source.getTags());
+        this.events = new ArrayList<>(source.getEvents());
+        this.photo = source.getPhoto();
     }
 
     /**
@@ -184,6 +199,28 @@ public class Person {
     }
 
     /**
+     * Returns a copy of this person with the specified tags and existing events preserved.
+     */
+    public Person withTags(Set<Tag> newTags) {
+        requireNonNull(newTags);
+        Person updatedPerson = new Person(name, phone, email, address, newTags, photo);
+        for (Event event : events) {
+            updatedPerson.addEvent(event);
+        }
+        return updatedPerson;
+    }
+
+    /**
+     * Returns a copy of this person with the specified event added.
+     */
+    public Person withAddedEvent(Event eventToAdd) {
+        requireNonNull(eventToAdd);
+        Person updatedPerson = new Person(this);
+        updatedPerson.addEvent(eventToAdd);
+        return updatedPerson;
+    }
+
+    /**
      * Returns true if this person is linked to an event that is the same as {@code event}.
      */
     public boolean hasEvent(Event event) {
@@ -195,6 +232,16 @@ public class Person {
      */
     public void removeEvent(Event event) {
         events.removeIf(e -> e.isSameEvent(event));
+    }
+
+    /**
+     * Returns a copy of this person with the specified event removed.
+     */
+    public Person withRemovedEvent(Event eventToRemove) {
+        requireNonNull(eventToRemove);
+        Person updatedPerson = new Person(this);
+        updatedPerson.removeEvent(eventToRemove);
+        return updatedPerson;
     }
 
     /**

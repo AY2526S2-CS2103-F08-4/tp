@@ -65,28 +65,13 @@ public class DeleteEventCommand extends Command {
         logger.info("DeleteEvent: unlinking event " + eventToDelete + " from " + personToEdit.getName()
                 + ", remaining links=" + eventToUnlink.getNumberOfPersonLinked());
 
-        Person editedPerson = createPersonWithoutEvent(personToEdit, eventToUnlink);
+        Person editedPerson = personToEdit.withRemovedEvent(eventToUnlink);
         model.setPerson(personToEdit, editedPerson);
         logger.info("DeleteEvent: person updated " + personToEdit.getName()
                 + ", total events=" + editedPerson.getEvents().size());
 
         model.showEventsForPerson(editedPerson);
         return new CommandResult(String.format(MESSAGE_SUCCESS, personToEdit.getName(), eventToDelete));
-    }
-
-    /**
-     * Creates a new {@code Person} with all fields from {@code person} except {@code eventToRemove}.
-     */
-    private static Person createPersonWithoutEvent(Person personToEdit, Event eventToRemove) {
-        Person editedPerson = new Person(personToEdit.getName(), personToEdit.getPhone(), personToEdit.getEmail(),
-                personToEdit.getAddress(), personToEdit.getTags(), personToEdit.getPhoto());
-
-        for (Event existingEvent : personToEdit.getEvents()) {
-            if (!existingEvent.equals(eventToRemove)) {
-                editedPerson.addEvent(existingEvent);
-            }
-        }
-        return editedPerson;
     }
 
     @Override
