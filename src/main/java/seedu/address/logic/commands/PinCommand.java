@@ -56,7 +56,7 @@ public class PinCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        // Resolve the target person first so we can give a specific pinned-state error.
+        // Resolve the target person first to allow for a specific pinned-state error.
         List<Person> matches = model.findPersons(this.targetInfo);
         Person personToPin = CommandUtil.targetPersonFromMatches(model, matches);
 
