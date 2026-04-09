@@ -343,7 +343,8 @@ public class EditCommandParserTest {
 
         // duplicate target tags are rejected directly
         userInput = TARGET_IDENTIFIER_BENSON + TAG_DESC_HUSBAND + " t/HUSBAND" + DELIMITER + PHONE_DESC_AMY.trim();
-        assertParseFailure(parser, userInput, ParserUtil.MESSAGE_DUPLICATE_TAGS);
+        assertParseFailure(parser, userInput,
+                String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, "HUSBAND"));
     }
 
     @Test

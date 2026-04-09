@@ -348,6 +348,11 @@ public class AddTagCommandTest {
         public boolean isPhotoShared(Photo photo, Person personToExclude) {
             throw new AssertionError("This method should not be called.");
         }
+
+        @Override
+        public List<Event> getOverlappingEvent(Event e) {
+            throw new AssertionError("This method should not be called.");
+        }
     }
 
     private static class ModelStubThrowingCommandException extends ModelStub {
