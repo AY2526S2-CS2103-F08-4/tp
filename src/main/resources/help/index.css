@@ -21,9 +21,10 @@ body {
 }
 
 a {
-    color: #003D7C;
+    color: #005d7c;
     text-decoration: none;
     transition: color 0.2s ease-in-out;
+    font-weight: bold;
 }
 
 a:hover {
@@ -225,4 +226,237 @@ code {
 .command-table td:first-child {
     font-weight: bold;
     width: 15%;
+}
+
+/* Style for the collapsible container */
+details.parameter-requirements {
+    background-color: #ffffff;
+    border: 1px solid #003D7C;
+    border-radius: 8px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+/* Style for the clickable header bar */
+details.parameter-requirements summary {
+    background-color: #003D7C;
+    color: white;
+    padding: 12px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    list-style: none; /* Removes default arrow */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Custom Arrow */
+details.parameter-requirements summary::after {
+    content: '▼';
+    font-size: 0.8em;
+    transition: transform 0.2s;
+}
+
+/* Flip logic on click and vice versa */
+details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+/* Container for the table padding */
+.table-container {
+    padding: 15px;
+}
+
+/* Ensure the table within uses full width */
+.parameter-requirements .command-table {
+    margin: 0;
+    width: 100%;
+}
+
+/* Main container for the error box */
+.error-callout {
+    background-color: #FDE2E4;
+    border: 1px solid #E5989B;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Header with the icon and "ERROR MESSAGE" text */
+.error-header {
+    display: flex;
+    align-items: center;
+    color: #641212; /* dark red for the title */
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.error-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+/* The pink-highlighted code line */
+.error-code-line {
+    display: block;
+    background-color: #FFF0F1;
+    color: #D63384;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.95em;
+    width: fit-content;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.error-content p {
+    margin: 0;
+    color: #641212;
+    line-height: 1.5;
+}
+
+.error-callout:hover {
+    background-color: #FCD5D9;
+    transition: background-color 0.2s ease;
+}
+
+/* Main container for the tip box */
+.tip-callout {
+    background-color: #DDEFD9; /* Light green background */
+    border: 1px solid #B5D7A8; /* Green border */
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Header with the icon and "TIP" text */
+.tip-header {
+    display: flex;
+    align-items: center;
+    color: #0C4128;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.tip-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+/* The descriptive text */
+.tip-content p {
+    margin: 0;
+    color: #0C4128;
+    line-height: 1.5;
+}
+
+.tip-callout:hover {
+    background-color: #D4EACF;
+    transition: background-color 0.2s ease;
+}
+
+/* Main container for the collapsible box */
+.important-callout {
+    background-color: #ffffff;
+    border: 1px solid #E5989B; /* Soft red border */
+    border-radius: 8px;
+    margin: 20px 0;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Clickable header bar */
+.important-header {
+    background-color: #FDE2E4; /* Light pink background */
+    color: #8C1C1C; /* Dark red text */
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    list-style: none; /* Removes default browser triangle */
+    user-select: none;
+}
+
+/* Fallback to hide default triangle in WebKit browsers */
+.important-header::-webkit-details-marker {
+    display: none;
+}
+
+/* Clean up focus outline */
+.important-header:focus {
+    outline: none;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    font-size: 1.05em;
+}
+
+.important-icon {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+/* Visual control buttons styling (x and arrow) */
+.header-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.control-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #8C1C1C;
+    border-radius: 4px;
+    font-size: 0.7em;
+    font-weight: bold;
+    color: #8C1C1C;
+}
+
+/* Setup the arrows to change direction based on open/closed state */
+.toggle-arrow::after,
+.bottom-arrow::after {
+    content: '▲';
+    transition: transform 0.3s ease;
+}
+
+/* When the details tag is closed, flip the top arrow */
+details:not([open]) .toggle-arrow::after {
+    transform: rotate(180deg);
+}
+
+/* Smooth opening animation wrapper */
+.important-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease-out, opacity 0.3s ease-out;
+    opacity: 0;
+}
+
+details[open] .important-wrapper {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+/* The actual content area */
+.important-content {
+    overflow: hidden;
+}
+
+.important-content ul {
+    padding: 15px 20px 5px 40px;
+    margin: 0;
+    color: #333;
+}
+
+.important-content li {
+    margin-bottom: 8px;
 }

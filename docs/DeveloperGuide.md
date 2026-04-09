@@ -439,7 +439,7 @@ The following sequence diagram illustrates the functional path taken when a user
 
 **Note:** Due to a PlantUML rendering limitation, the `:XYZCommand` lifeline is shown to prematurely end at the 1st alt path. The unified destroy marker (X) at the bottom represents the termination of the command's lifecycle for all three alternative paths.
 
-</box>                
+</box>
 
 The following activity diagram summarizes the command's match-resolution flow:
 
