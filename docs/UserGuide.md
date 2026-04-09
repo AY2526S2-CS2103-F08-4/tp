@@ -582,10 +582,10 @@ Format: `event delete start/START_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDR
 
 <panel header=":fa-solid-code: **Examples**" type="info">
 
-- `event delete start/2026-03-12 1100 to/David Li`<br>
+- `event delete start/2026-03-12 1100 n/David Li`<br>
   Deletes the event only if David Li has an assigned event that starts at `2026-03-12 1100`.
 
-- `event delete start/2026-03-12 1100 to/David Li p/99272758`<br>
+- `event delete start/2026-03-12 1100 n/David Li p/99272758`<br>
   Deletes the event only if the David Li with phone number `99272758` has an assigned event that starts at `2026-03-12 1100`, disambiguating between multiple contacts with the same name.
 
 </panel>
