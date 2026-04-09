@@ -158,7 +158,7 @@
             <h2 class="feature-header" id="contact-parameter-constraint">Parameters constraints & format</h2>
             <p>Before examining the individual commands for managing contacts, please refer to the formatting requirements
                 and constraints for each parameter. Unless stated otherwise, ensure all inputs adhere to the rules
-                stated in this section.</p><br><br>
+                stated in this section.</p>
             <details class="parameter-requirements">
                 <summary>Parameters Requirements and Constraints</summary>
                 <div class="table-container">
@@ -246,8 +246,13 @@
                                     <li>Can be absolute (e.g., <code>C:/Users/Alex/Pictures/me.jpg</code>)
                                         or relative to the app folder (e.g., <code>images/me.png</code>).
                                     </li><br>
-                                    <li>The specified file must exist on your computer;
+                                    <li>
+                                        The specified file must exist on your computer;
                                         NAB will copy it into the <code>data/images/</code> directory
+                                    </li><br>
+                                    <li>
+                                        File path cannot be referencing any subfolder/files residing in NAB's
+                                        <code>data/images/</code> folder.
                                     </li>
                                 </ul>
                             </td>
@@ -337,7 +342,6 @@
                         <strong>Important</strong>
                     </div>
                     <div class="header-controls">
-                        <span class="control-btn">✖</span>
                         <span class="control-btn toggle-arrow"></span>
                     </div>
                 </summary>
@@ -394,7 +398,6 @@
                         <strong>Important: Disambiguating contacts with the same name</strong>
                     </div>
                     <div class="header-controls">
-                        <span class="control-btn">✖</span>
                         <span class="control-btn toggle-arrow"></span>
                     </div>
                 </summary>
@@ -430,7 +433,6 @@
                         <strong>Important: Disambiguating contacts with the same name</strong>
                     </div>
                     <div class="header-controls">
-                        <span class="control-btn">✖</span>
                         <span class="control-btn toggle-arrow"></span>
                     </div>
                 </summary>
@@ -465,7 +467,6 @@
                         <strong>Important: Disambiguating contacts with the same name</strong>
                     </div>
                     <div class="header-controls">
-                        <span class="control-btn">✖</span>
                         <span class="control-btn toggle-arrow"></span>
                     </div>
                 </summary>
@@ -500,7 +501,6 @@
                         <strong>Important: Disambiguating contacts with the same name</strong>
                     </div>
                     <div class="header-controls">
-                        <span class="control-btn">✖</span>
                         <span class="control-btn toggle-arrow"></span>
                     </div>
                 </summary>
@@ -542,22 +542,60 @@
             <h2 class="feature-header" id="tagging-person">Assigning tag(s) to person(s): <code>tag</code></h2>
             <p>Assigns one or more tags to one or more contacts in one command.</p>
             <p>Format: <code>tag label/TAG_TO_ASSIGN [label/TAG_TO_ASSIGN]... n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...]...</code></p>
-            <p><b>Tip: </b>Use optional fields immediately after each <code>n/NAME</code> to disambiguate contacts with the same name.</p>
             <ul>
-                <li><code>label/...</code> are the tags that will be assigned to all specified contacts.</li>
-                <li>Contact segments start with <code>n/NAME</code>.</li>
-                <li>Optional fields after a given <code>n/NAME</code> apply only to that contact segment.</li>
-                <li>The tag-assignment segment (<code>label/...</code>) and person segments (<code>n/...</code>) cannot be mixed.
-                    All <code>label/...</code> entries must appear before the first <code>n/...</code>.</li>
+                <li>Start by listing the tag(s) using <code>label/...</code>; these tags are applied to <b>every</b>
+                    specified contact.
+                </li>
+                <li>After the tags, add one or more contact segments, each starting with <code>n/NAME</code>.</li>
+                <li>Optional fields placed immediately after a contact's <code>n/NAME</code>
+                    (such as <code>p/</code>, <code>e/</code>, <code>a/</code>, <code>t/</code>)
+                    apply only to that contact.
+                </li>
+                <li>
+                    Do not mix tag and contact segments. All <code>label/...</code>
+                    entries must come before the first <code>n/...</code>.
+                </li>
                 <li>If a tag does not exist yet, NAB creates it automatically.</li>
-                <li>If a person segment matches multiple contacts, NAB shows those matches and asks for a more specific command.</li>
+                <li>If a person segment matches multiple contacts,
+                    NAB shows those matches and asks for a more specific command.
+                </li>
+                <li>Can associate 1 or more tags during the tagging process.</li>
+                <li>Can associate 1 or more persons during the tagging process.</li>
             </ul>
+            <details class="important-callout">
+                <summary class="important-header">
+                    <div class="header-left">
+                        <span class="important-icon">⚠</span>
+                        <strong>Important: Disambiguating contacts with the same name</strong>
+                    </div>
+                    <div class="header-controls">
+                        <span class="control-btn toggle-arrow"></span>
+                    </div>
+                </summary>
+
+                <div class="important-wrapper">
+                    <div class="important-content">
+                        <ul>
+                            <li>
+                                If you encounter the error <code>Multiple matches identified! Please provide more arguments.</code>,
+                                add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
+                            </li>
+                            <li>
+                                See <a href="#user-disambiguation">user disambiguation</a> for details.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
             <div class="command-box">
-                <span class="code-comment"># Assign CS2103 and CS2030S to Alice and Bob.<br></span>
-                > tag label/CS2103 label/CS2030S n/Alice n/Bob<br><br>
-                <span class="code-comment"># Suppose there are multiple Alice and Bob, an enriched search would be<br></span>
-                > tag label/CS2103 label/CS2030S n/Alice p/81234567 n/Bob a/Clementi<br>
-                <span class="code-comment"># where Alice has phone 81234567 and Bob has address Clementi.</span>
+                <span class="code-comment"># Assigns 1 tag (`CS2103`) to 1 user (`John Doe`).<br></span>
+                > tag label/CS2103 n/John Doe<br><br>
+                <span class="code-comment"># Assigns 3 tags (`CS2103`, `CS2030S`, `CS2040`) to 1 user (`John Doe`) using additional fields to disambiguate the user.<br></span>
+                > tag label/CS2103 label/CS2030S label/CS2040 n/John Doe e/johndoe@example.com<br><br>
+                <span class="code-comment"># Assigns 1 tag (`CS2103`) to 2 users (`John Doe` and `Betsy Crower`).<br></span>
+                > tag label/CS2103 n/John Doe n/Betsy Crower<br><br>
+                <span class="code-comment"># Assigns 2 tags (`CS2103`, `CS2030S`) to 2 users (`John Doe` and `Betsy Crower`) using additional fields to disambiguate both users.<br></span>
+                > tag label/CS2103 label/CS2030S n/John Doe p/91234567 n/Betsy Crower e/betsycrower@example.com<br><br>
             </div>
         </div>
 
@@ -565,19 +603,38 @@
             <h2 class="feature-header" id="deleting-person">Deleting a person: <code>delete</code></h2>
             <p>Deletes the specified person from the address book.</p>
             <p>Format: <code>delete n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...</code></p>
-            <p><b>Tip: </b>If there are multiple contacts with the same <code>NAME</code>, utilize the other optional
-                parameters to narrow down the deletion of the correct contact. This can be done by supplying any of the
-                following information just after <code>delete n/NAME</code>: Phone number, Email, Address or Tag.</p>
-            <ul>
-                <li> The <code>NAME</code> is case-insensitive. e.g. <code>aLeX YeOH</code> will match <code>Alex Yeoh</code></li>
-                <li> Only full words will be matched e.g. <code>Alex Yeo</code> will not match <code>Alex Yeoh</code></li>
-                <li> Order of parameters does not matter.</li>
-            </ul>
+
+            <details class="important-callout">
+                <summary class="important-header">
+                    <div class="header-left">
+                        <span class="important-icon">⚠</span>
+                        <strong>Important: Disambiguating contacts with the same name</strong>
+                    </div>
+                    <div class="header-controls">
+                        <span class="control-btn toggle-arrow"></span>
+                    </div>
+                </summary>
+
+                <div class="important-wrapper">
+                    <div class="important-content">
+                        <ul>
+                            <li>
+                                If you encounter the error <code>Multiple matches identified! Please provide more arguments.</code>,
+                                add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
+                            </li>
+                            <li>
+                                See <a href="#user-disambiguation">user disambiguation</a> for details.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+
             <div class="command-box">
-                <span class="code-comment"># Deletes the contact with a matching name.<br></span>
-                > delete n/Alex Yeoh<br><br>
-                <span class="code-comment"># Suppose there are multiple Alex Yeoh, an enriched search would be<br></span>
-                > delete n/Alex Yeoh t/cs2103 t/cs2105
+                <span class="code-comment"># Deletes John Doe when the name uniquely identifies the contact.<br></span>
+                > delete n/John Doe<br><br>
+                <span class="code-comment"># Deletes the matching John Doe contact by name and phone number.<br></span>
+                > delete n/John Doe p/91234567
             </div>
         </div>
 
@@ -678,7 +735,6 @@
                     <strong>Important: Disambiguating contacts with the same name</strong>
                 </div>
                 <div class="header-controls">
-                    <span class="control-btn">✖</span>
                     <span class="control-btn toggle-arrow"></span>
                 </div>
             </summary>
@@ -715,7 +771,6 @@
                     <strong>Important: Disambiguating contacts with the same name</strong>
                 </div>
                 <div class="header-controls">
-                    <span class="control-btn">✖</span>
                     <span class="control-btn toggle-arrow"></span>
                 </div>
             </summary>
@@ -749,7 +804,6 @@
                     <strong>Important: Disambiguating contacts with the same name</strong>
                 </div>
                 <div class="header-controls">
-                    <span class="control-btn">✖</span>
                     <span class="control-btn toggle-arrow"></span>
                 </div>
             </summary>
@@ -786,8 +840,8 @@
 
     <div class="feature-block">
         <h2 class="feature-header" id="export">Exporting Contacts: <code>export</code></h2>
-        <p>Back up your NAB contacts in seconds so you can share, archive, or migrate your data anytime.<br>
-            This <code>export</code> feature allows you to write contacts from NAB into a CSV file.</p>
+        <p>Back up your NAB contacts in seconds so you can share, archive, or migrate your data anytime.<br><br>
+            This <code>export</code> feature allows you to write contacts from NAB into 2 CSV files. (<code>&lt;FILENAME&gt;_persons.csv</code> and <code>&lt;FILENAME&gt;_events.csv</code>).</p>
         <p>Format: <code>export t/EXPORT_TYPE f/FILENAME</code></p>
         <ul>
             <li>Use <code>export t/current ...</code> after <code>find</code> or <code>filter</code> to quickly export a specific subset of contacts.</li>
@@ -799,7 +853,6 @@
                     <strong>Important</strong>
                 </div>
                 <div class="header-controls">
-                    <span class="control-btn">✖</span>
                     <span class="control-btn toggle-arrow"></span>
                 </div>
             </summary>
@@ -813,10 +866,10 @@
                                 <li><code>current</code> (export only the contacts currently shown in the contact list).</li>
                             </ul>
                         </li>
-                        <li>Enter <code>FILENAME</code> without <code>.csv</code>, as NAB automatically appends the <code>.csv</code>
+                        <li>Enter <code>FILENAME</code> without specifying the <code>_persons.csv</code> or <code>_events.csv</code>. NAB will automatically append it for you.
                             extension for you.
                         </li>
-                        <li>The exported file is saved in the same directory that contains the current NAB data file.<br>
+                        <li>The exported files are saved in the same directory that contains the current NAB data file.<br>
                             If a file with the same name already exists, it will be overwritten.
                         </li>
                         <li> Order of parameters does not matter.</li>
@@ -825,17 +878,17 @@
             </div>
         </details>
         <div class="command-box">
-            <span class="code-comment"># Exports all contacts in NAB to save_file.csv<br></span>
+            <span class="code-comment"># Exports all contact information in NAB to save_file_persons.csv and save_file_events.csv<br></span>
             > export t/all f/save_file<br><br>
-            <span class="code-comment"># Exports only the currently displayed contacts to save_file.csv<br></span>
+            <span class="code-comment"># Exports only the currently displayed contact information to save_file_persons.csv and save_file_events.csv<br></span>
             > export t/current f/save_file
         </div>
     </div>
 
     <div class="feature-block">
         <h2 class="feature-header" id="import">Importing Contacts: <code>import</code></h2>
-        <p>Bring your contact data into NAB quickly when switching devices or restoring from a backup.<br>
-            This <code>import</code> feature allows you to load contacts from a CSV file into NAB.</p>
+        <p>Bring your contact data into NAB quickly when switching devices or restoring from a backup.<br><br>
+            This <code>import</code> feature allows you to load contacts from 2 CSV files (<code>&lt;FILENAME&gt;_persons.csv</code> and <code>&lt;FILENAME&gt;_events.csv</code>) into NAB.</p>
         <p>Format: <code>import t/IMPORT_TYPE f/FILENAME</code></p>
         <ul>
             <li>If you are unsure, run <code>import t/add ...</code> first to avoid accidental data loss. Use <code>import t/overwrite ...</code> only when you want a full replacement.</li>
@@ -847,7 +900,6 @@
                     <strong>Important</strong>
                 </div>
                 <div class="header-controls">
-                    <span class="control-btn">✖</span>
                     <span class="control-btn toggle-arrow"></span>
                 </div>
             </summary>
@@ -861,21 +913,21 @@
                                 <li><code>overwrite</code> (replaces the current address book with imported contacts).</li>
                             </ul>
                         </li>
-                        <li>Enter <code>FILENAME</code> without <code>.csv</code>, as NAB automatically looks for the file with the <code>.csv</code>
-                            extension.
+                        <li>Enter <code>FILENAME</code> without specifying the <code>_persons.csv</code> or <code>_events.csv</code>, as NAB automatically looks for the 2 CSV files belonging to the specified <code>FILENAME</code>
+                            extension for you.
                         </li>
-                        <li>The CSV file must be placed in the same directory as the current NAB data file.</li>
+                        <li>The CSV files must be placed in the same directory as the current NAB data file.</li>
                         <li>Contacts in the CSV file that already exist in NAB are skipped to avoid duplicates.</li>
                         <li>Rows with invalid or missing required fields are skipped.</li>
-                        <li> Order of parameters does not matter.</li>
+                        <li>Order of parameters does not matter.</li>
                     </ul>
                 </div>
             </div>
         </details>
         <div class="command-box">
-            <span class="code-comment"># Imports contacts from save_file.csv and replaces the current address book<br></span>
+            <span class="code-comment"># Imports contacts from save_file_persons.csv and event definitions from save_file_events.csv, replacing the existing data on the address book<br></span>
             > import t/overwrite f/save_file<br><br>
-            <span class="code-comment"># Imports contacts from save_file.csv and adds them to the current address book.<br></span>
+            <span class="code-comment"># Imports contacts from save_file_persons.csv and event definitions from save_file_events.csv, adding them to the current address book<br></span>
             > import t/add f/save_file<br><br>
         </div>
     </div>
