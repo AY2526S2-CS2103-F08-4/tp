@@ -114,18 +114,7 @@ public class AddTagCommand extends Command {
         Set<Person> seenPersons = new HashSet<>();
         for (PersonInformation targetInfo : targets) {
             Person person;
-            try {
-                person = CommandUtil.targetPerson(model, targetInfo);
-            } catch (CommandException e) {
-                String targetSummary = formatTargetSummary(targetInfo);
-                if (Messages.MESSAGE_NO_MATCH.equals(e.getMessage())) {
-                    throw new CommandException(String.format(MESSAGE_NO_MATCH_FOR_TARGET, targetSummary), e);
-                }
-                if (Messages.MESSAGE_MULTIPLE_MATCH.equals(e.getMessage())) {
-                    throw new CommandException(String.format(MESSAGE_MULTIPLE_MATCHES_FOR_TARGET, targetSummary), e);
-                }
-                throw e;
-            }
+            person = getPerson(model, targetInfo);
             if (!seenPersons.add(person)) {
                 throw new CommandException(String.format(MESSAGE_DUPLICATE_TARGET_PERSON,
                         person.getNameString()));
@@ -133,6 +122,23 @@ public class AddTagCommand extends Command {
             resolvedPersons.add(person);
         }
         return resolvedPersons;
+    }
+
+    private Person getPerson(Model model, PersonInformation targetInfo) throws CommandException {
+        Person person;
+        try {
+            person = CommandUtil.targetPerson(model, targetInfo);
+        } catch (CommandException e) {
+            String targetSummary = formatTargetSummary(targetInfo);
+            if (Messages.MESSAGE_NO_MATCH.equals(e.getMessage())) {
+                throw new CommandException(String.format(MESSAGE_NO_MATCH_FOR_TARGET, targetSummary), e);
+            }
+            if (Messages.MESSAGE_MULTIPLE_MATCH.equals(e.getMessage())) {
+                throw new CommandException(String.format(MESSAGE_MULTIPLE_MATCHES_FOR_TARGET, targetSummary), e);
+            }
+            throw e;
+        }
+        return person;
     }
 
     /**

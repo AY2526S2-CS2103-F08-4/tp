@@ -40,21 +40,7 @@ public class AddTagCommandParser implements Parser<AddTagCommand> {
         int personSectionStart = args.indexOf(" " + PREFIX_NAME.getPrefix());
 
         if (personSectionStart == -1) {
-            boolean hasTagAssignPrefix = args.contains(PREFIX_TAG_ASSIGN.getPrefix());
-            boolean hasNamePrefix = args.contains(PREFIX_NAME.getPrefix());
-
-            if (hasTagAssignPrefix && !hasNamePrefix) {
-                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
-                        MESSAGE_MISSING_TARGET_PERSONS + AddTagCommand.MESSAGE_USAGE));
-            }
-
-            if (hasNamePrefix && !hasTagAssignPrefix) {
-                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
-                        MESSAGE_MISSING_ASSIGN_TAGS + AddTagCommand.MESSAGE_USAGE));
-            }
-
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
-                    AddTagCommand.MESSAGE_USAGE));
+            checkPrefix(args);
         }
 
         // Splitting the commands into 2 sections, personsSection and tagsSection
@@ -71,6 +57,24 @@ public class AddTagCommandParser implements Parser<AddTagCommand> {
         }
 
         return new AddTagCommand(targets, tagsToAssign);
+    }
+
+    private static void checkPrefix(String args) throws ParseException {
+        boolean hasTagAssignPrefix = args.contains(PREFIX_TAG_ASSIGN.getPrefix());
+        boolean hasNamePrefix = args.contains(PREFIX_NAME.getPrefix());
+
+        if (hasTagAssignPrefix && !hasNamePrefix) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
+                    MESSAGE_MISSING_TARGET_PERSONS + AddTagCommand.MESSAGE_USAGE));
+        }
+
+        if (hasNamePrefix && !hasTagAssignPrefix) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
+                    MESSAGE_MISSING_ASSIGN_TAGS + AddTagCommand.MESSAGE_USAGE));
+        }
+
+        throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
+                AddTagCommand.MESSAGE_USAGE));
     }
 
     /**
