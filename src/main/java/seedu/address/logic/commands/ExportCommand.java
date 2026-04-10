@@ -17,6 +17,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.event.Event;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Photo;
 
 /**
  * Exports a list of contacts into two separate CSV formatted files for future use:
@@ -40,7 +41,6 @@ public class ExportCommand extends Command {
             + PREFIX_TYPE + "all "
             + PREFIX_FILENAME + "myContacts";
 
-    private static final String FILENAME_SUFFIX = ".csv";
     private static final String PERSONS_FILENAME_SUFFIX = "_persons.csv";
     private static final String EVENTS_FILENAME_SUFFIX = "_events.csv";
 
@@ -231,7 +231,7 @@ public class ExportCommand extends Command {
                 sanitizeAndWrapValue(getAddressValue(p)),
                 sanitizeAndWrapValue(formatTags(p)),
                 sanitizeAndWrapValue(formatEventIds(p)),
-                sanitizeAndWrapValue(getPhotoValue()),
+                sanitizeAndWrapValue(getPhotoValue(p)),
                 sanitizeAndWrapValue(String.valueOf(model.isPersonPinned(p)))
         );
     }
@@ -320,12 +320,10 @@ public class ExportCommand extends Command {
     }
 
     /**
-     * Returns an empty string when exported. Photo paths should not carry over.
-     *
-     * @return Returns an empty string
+     * Returns the stored photo path for export, or an empty string when no photo exists.
      */
-    private String getPhotoValue() {
-        return "";
+    private String getPhotoValue(Person p) {
+        return p.getPhoto().map(Photo::getPath).orElse("");
     }
 
     /**

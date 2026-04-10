@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
@@ -164,6 +165,7 @@ public class ImportCommandTest {
 
     @Test
     public void execute_overwriteImportType_handlesPhotoField() throws Exception {
+        Path photoPath = Files.createFile(testFolder.resolve("hello_world.jpg"));
         Person expectedTest1 = new PersonBuilder()
                 .withName("Alice")
                 .withPhone("12345678")
@@ -171,10 +173,10 @@ public class ImportCommandTest {
                 .withAddress("Blk 123")
                 .withTags()
                 .withEvents()
-                .withPhoto("hello_world.jpg")
+                .withPhoto(photoPath.toString())
                 .build();
 
-        String testPersonStr = "\nAlice,12345678,alice@u.nus.edu,Blk 123,,,hello_world.jpg,false";
+        String testPersonStr = "\nAlice,12345678,alice@u.nus.edu,Blk 123,,," + photoPath + ",false";
         createEventsCsvFile("photo", eventsHeader);
         createPersonsCsvFile("photo", personsHeader + testPersonStr);
 
@@ -183,7 +185,11 @@ public class ImportCommandTest {
 
         assertTrue(model.hasPerson(expectedTest1));
         assertEquals(1, model.getAddressBook().getPersonList().size());
-        assertTrue(command.execute(model).getFeedbackToUser().contains("1 row(s) added"));
+        Optional<Person> importedPerson = model.getAddressBook().getPersonList().stream()
+                .filter(person -> person.getPhone().value.equals("12345678"))
+                .findFirst();
+        assertTrue(importedPerson.isPresent());
+        assertEquals(expectedTest1.getPhoto(), importedPerson.get().getPhoto());
     }
 
     @Test
@@ -218,7 +224,7 @@ public class ImportCommandTest {
         ImportCommand command = createTestCommand("overwrite", "pinnedAndLegacy");
         CommandResult result = command.execute(modelWithPins);
 
-        assertTrue(result.getFeedbackToUser().contains("2 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("2 contact(s) added"));
         assertTrue(modelWithPins.hasPerson(pinnedPerson));
         assertTrue(modelWithPins.hasPerson(legacyPerson));
         assertTrue(modelWithPins.isPersonPinned(pinnedPerson));
@@ -247,7 +253,7 @@ public class ImportCommandTest {
         ImportCommand command = createTestCommand("overwrite", "pinnedFalse");
         CommandResult result = command.execute(modelWithPins);
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
         assertTrue(modelWithPins.hasPerson(person));
         assertFalse(modelWithPins.isPersonPinned(person));
     }
@@ -340,7 +346,9 @@ public class ImportCommandTest {
 
     @Test
     public void execute_rowsWithAndWithoutPhoto_importsBothPersons() throws Exception {
-        String personData = "Photo User,81234567,photo@u.nus.edu,Blk 123,,,avatar.png,false\n"
+        Path photoPath = Files.createFile(testFolder.resolve("avatar.png"));
+
+        String personData = "Photo User,81234567,photo@u.nus.edu,Blk 123,,," + photoPath + ",false\n"
                 + "No Photo,82345678,nophoto@u.nus.edu,Blk 456,,,,false";
 
         createEventsCsvFile("mixedPhoto", eventsHeader);
@@ -354,7 +362,7 @@ public class ImportCommandTest {
                 .withPhone("81234567")
                 .withEmail("photo@u.nus.edu")
                 .withAddress("Blk 123")
-                .withPhoto("avatar.png")
+                .withPhoto(photoPath.toString())
                 .build();
         Person withoutPhoto = new PersonBuilder()
                 .withName("No Photo")
@@ -366,6 +374,128 @@ public class ImportCommandTest {
 
         assertTrue(model.hasPerson(withPhoto));
         assertTrue(model.hasPerson(withoutPhoto));
+
+        Optional<Person> importedWithPhoto = model.getAddressBook().getPersonList().stream()
+                .filter(person -> person.getPhone().value.equals("81234567"))
+                .findFirst();
+        Optional<Person> importedWithoutPhoto = model.getAddressBook().getPersonList().stream()
+                .filter(person -> person.getPhone().value.equals("82345678"))
+                .findFirst();
+        assertTrue(importedWithPhoto.isPresent());
+        assertTrue(importedWithoutPhoto.isPresent());
+        assertEquals(withPhoto.getPhoto(), importedWithPhoto.get().getPhoto());
+        assertTrue(importedWithoutPhoto.get().getPhoto().isEmpty());
+    }
+
+    @Test
+    public void execute_rowWithInvalidPhotoExtension_importsWithoutPhoto() throws Exception {
+        String personData = "Invalid Photo,81112222,invalid@u.nus.edu,Blk 9,,,not-a-photo.txt,false";
+
+        createEventsCsvFile("invalidPhotoExtension", eventsHeader);
+        createPersonsCsvFile("invalidPhotoExtension", personsHeader + "\n" + personData);
+
+        ImportCommand command = createTestCommand("overwrite", "invalidPhotoExtension");
+        command.execute(model);
+
+        Optional<Person> importedPerson = model.getAddressBook().getPersonList().stream()
+                .filter(person -> person.getPhone().value.equals("81112222"))
+                .findFirst();
+        assertTrue(importedPerson.isPresent());
+        assertTrue(importedPerson.get().getPhoto().isEmpty());
+    }
+
+    @Test
+    public void execute_rowWithPhotoPathAsDirectory_importsWithoutPhoto() throws Exception {
+        Path photoDirectoryPath = Files.createDirectory(testFolder.resolve("folder.jpg"));
+        String personData = "Directory Photo,82223333,directory@u.nus.edu,Blk 10,,,"
+                + photoDirectoryPath + ",false";
+
+        createEventsCsvFile("directoryPhoto", eventsHeader);
+        createPersonsCsvFile("directoryPhoto", personsHeader + "\n" + personData);
+
+        ImportCommand command = createTestCommand("overwrite", "directoryPhoto");
+        command.execute(model);
+
+        Optional<Person> importedPerson = model.getAddressBook().getPersonList().stream()
+                .filter(person -> person.getPhone().value.equals("82223333"))
+                .findFirst();
+        assertTrue(importedPerson.isPresent());
+        assertTrue(importedPerson.get().getPhoto().isEmpty());
+    }
+
+    @Test
+    public void execute_rowWithMissingPhotoPath_usesManagedPhotoWhenAvailable() throws Exception {
+        String managedPhotoFileName = "managed-import-photo.jpg";
+        Path managedPhotoPath = Path.of(PhotoStorageUtil.DEFAULT_IMAGE_DIR).resolve(managedPhotoFileName);
+        Files.createDirectories(managedPhotoPath.getParent());
+        Files.writeString(managedPhotoPath, "dummy");
+
+        try {
+            String personData = "Managed Photo,83334444,managed@u.nus.edu,Blk 11,,,"
+                    + managedPhotoFileName + ",false";
+            createEventsCsvFile("managedPhoto", eventsHeader);
+            createPersonsCsvFile("managedPhoto", personsHeader + "\n" + personData);
+
+            ImportCommand command = createTestCommand("overwrite", "managedPhoto");
+            command.execute(model);
+
+            Optional<Person> importedPerson = model.getAddressBook().getPersonList().stream()
+                    .filter(person -> person.getPhone().value.equals("83334444"))
+                    .findFirst();
+            assertTrue(importedPerson.isPresent());
+            assertTrue(importedPerson.get().getPhoto().isPresent());
+            assertEquals("data/images/" + managedPhotoFileName,
+                    importedPerson.get().getPhoto().orElseThrow().getPath());
+        } finally {
+            Files.deleteIfExists(managedPhotoPath);
+        }
+    }
+
+    @Test
+    public void execute_rowWithMissingPhotoPathAndNoManagedFallback_importsWithoutPhoto() throws Exception {
+        String missingPhotoFileName = "non-existent-import-photo.jpg";
+        Path managedPhotoPath = Path.of(PhotoStorageUtil.DEFAULT_IMAGE_DIR).resolve(missingPhotoFileName);
+        Files.deleteIfExists(managedPhotoPath);
+
+        String personData = "Missing Photo,84445555,missing@u.nus.edu,Blk 12,,,"
+                + missingPhotoFileName + ",false";
+        createEventsCsvFile("missingPhoto", eventsHeader);
+        createPersonsCsvFile("missingPhoto", personsHeader + "\n" + personData);
+
+        ImportCommand command = createTestCommand("overwrite", "missingPhoto");
+        command.execute(model);
+
+        Optional<Person> importedPerson = model.getAddressBook().getPersonList().stream()
+                .filter(person -> person.getPhone().value.equals("84445555"))
+                .findFirst();
+        assertTrue(importedPerson.isPresent());
+        assertTrue(importedPerson.get().getPhoto().isEmpty());
+    }
+
+    @Test
+    public void execute_rowWithManagedPhotoPathAsDirectory_importsWithoutPhoto() throws Exception {
+        String managedPhotoDirectoryName = "managed-import-directory.jpg";
+        Path managedPhotoPath = Path.of(PhotoStorageUtil.DEFAULT_IMAGE_DIR).resolve(managedPhotoDirectoryName);
+        Files.deleteIfExists(managedPhotoPath);
+        Files.createDirectories(managedPhotoPath);
+
+        try {
+            String personData = "Managed Directory Photo,85556666,manageddir@u.nus.edu,Blk 13,,,"
+                    + managedPhotoDirectoryName + ",false";
+            createEventsCsvFile("managedPhotoDirectory", eventsHeader);
+            createPersonsCsvFile("managedPhotoDirectory", personsHeader + "\n" + personData);
+
+            ImportCommand command = createTestCommand("overwrite", "managedPhotoDirectory");
+            command.execute(model);
+
+            Optional<Person> importedPerson = model.getAddressBook().getPersonList().stream()
+                    .filter(person -> person.getPhone().value.equals("85556666"))
+                    .findFirst();
+            assertTrue(importedPerson.isPresent());
+            assertTrue(importedPerson.get().getPhoto().isEmpty());
+        } finally {
+            Files.deleteIfExists(managedPhotoPath);
+        }
     }
 
     @Test
@@ -379,8 +509,8 @@ public class ImportCommandTest {
         ImportCommand command = createTestCommand("add", "invalidRow");
         CommandResult result = command.execute(model);
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) skipped"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) skipped"));
     }
 
     @Test
@@ -410,7 +540,7 @@ public class ImportCommandTest {
         ImportCommand command = createTestCommand("add", "eventExists");
         CommandResult result = command.execute(addModel);
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
         assertEquals(eventCountBeforeImport, addModel.getAddressBook().getEventList().size());
         assertEquals(2, addModel.getAddressBook().getEventList().get(0).getNumberOfPersonLinked());
 
@@ -422,7 +552,7 @@ public class ImportCommandTest {
     }
 
     @Test
-    public void execute_rowWithOverlappingGlobalEvent_skipsOverlappingGlobalEventAdd() throws Exception {
+    public void execute_rowWithOverlappingGlobalEvent_throwsCommandException() throws Exception {
         Event existingEvent = new Event(
                 new Title("Meeting"),
                 Optional.of(new Description("Kickoff")),
@@ -435,14 +565,14 @@ public class ImportCommandTest {
         createPersonsCsvFile("eventOverlap", personsHeader + "\nEve,81234567,eve@u.nus.edu,Blk 321,,888,,false");
 
         ImportCommand command = createTestCommand("add", "eventOverlap");
-        CommandResult result = command.execute(model);
+        CommandException exception = assertThrows(CommandException.class, () -> command.execute(model));
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertEquals(ImportCommand.MESSAGE_EVENT_CLASH_IN_IMPORT, exception.getMessage());
         assertEquals(eventCountBeforeImport, model.getAddressBook().getEventList().size());
     }
 
     @Test
-    public void execute_duplicateComputedEventId_allowsImportWhenCsvEventIdsDiffer() throws Exception {
+    public void execute_duplicateComputedEventId_throwsCommandException() throws Exception {
         int personCountBeforeImport = model.getAddressBook().getPersonList().size();
         int eventCountBeforeImport = model.getAddressBook().getEventList().size();
 
@@ -453,10 +583,10 @@ public class ImportCommandTest {
                 + "Eve,81234567,eve@u.nus.edu,Blk 321,,,,false");
 
         ImportCommand command = createTestCommand("add", "duplicateComputedEventId");
-        CommandResult result = command.execute(model);
+        CommandException exception = assertThrows(CommandException.class, () -> command.execute(model));
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
-        assertEquals(personCountBeforeImport + 1, model.getAddressBook().getPersonList().size());
+        assertEquals(ImportCommand.MESSAGE_EVENT_CLASH_IN_IMPORT, exception.getMessage());
+        assertEquals(personCountBeforeImport, model.getAddressBook().getPersonList().size());
         assertEquals(eventCountBeforeImport, model.getAddressBook().getEventList().size());
     }
 
@@ -610,7 +740,7 @@ public class ImportCommandTest {
         ImportCommand command = createTestCommand("add", "tagged");
         CommandResult result = command.execute(model);
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
     }
 
     @Test
@@ -624,22 +754,11 @@ public class ImportCommandTest {
         ImportCommand command = createTestCommand("add", "withevents");
         CommandResult result = command.execute(model);
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
     }
 
     @Test
     public void execute_distinctEventPayloads_generateDistinctComputedIdsAndLinkSuccessfully() throws Exception {
-        int computedMeetingEventId = new Event(
-                new Title("Meeting"),
-                Optional.of(new Description("Kickoff")),
-                new TimeRange("2026-05-06 1000", "2026-05-06 1100"),
-                0).getEventId();
-        int computedLunchEventId = new Event(
-                new Title("Lunch"),
-                Optional.empty(),
-                new TimeRange("2026-05-06 1200", "2026-05-06 1300"),
-                0).getEventId();
-
         String eventsData = eventsHeader + "\n"
                 + "111,Meeting,Kickoff,2026-05-06 1000,2026-05-06 1100\n"
                 + "222,Lunch,,2026-05-06 1200,2026-05-06 1300";
@@ -653,7 +772,7 @@ public class ImportCommandTest {
         ImportCommand command = createTestCommand("overwrite", "distinctComputedIds");
         CommandResult result = command.execute(model);
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
         assertEquals(2, model.getAddressBook().getEventList().size());
         assertNotEquals(model.getAddressBook().getEventList().get(0).getEventId(),
                 model.getAddressBook().getEventList().get(1).getEventId());
@@ -763,7 +882,7 @@ public class ImportCommandTest {
                 .withoutPhoto()
                 .build();
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
         assertTrue(model.hasPerson(expectedPerson));
         assertEquals(0, model.getAddressBook().getEventList().size());
     }
@@ -786,7 +905,7 @@ public class ImportCommandTest {
                 .withoutPhoto()
                 .build();
 
-        assertTrue(result.getFeedbackToUser().contains("1 row(s) added"));
+        assertTrue(result.getFeedbackToUser().contains("1 contact(s) added"));
         assertTrue(model.hasPerson(expectedPerson));
         assertEquals(0, model.getAddressBook().getEventList().size());
     }

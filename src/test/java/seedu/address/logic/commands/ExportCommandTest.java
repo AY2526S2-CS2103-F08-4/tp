@@ -255,6 +255,41 @@ public class ExportCommandTest {
     }
 
     @Test
+    public void execute_exportPersonWithPhoto_writesPhotoPathColumn() throws Exception {
+        Path photoPath = Files.createFile(testFolder.resolve("profile.jpg"));
+        Person photoPerson = new PersonBuilder()
+                .withName("Photo Person")
+                .withPhone("90000001")
+                .withEmail("photo.person@example.com")
+                .withAddress("Blk Photo")
+                .withPhoto(photoPath.toString())
+                .build();
+
+        Model photoModel = new ModelManager();
+        photoModel.addPerson(photoPerson);
+
+        Path personsFilePath = testFolder.resolve("exportPhoto_persons.csv");
+        Path eventsFilePath = testFolder.resolve("exportPhoto_events.csv");
+        ExportCommand exportCommand = new ExportCommand("all", "exportPhoto") {
+            @Override
+            protected Path getPersonsExportPath(Model model) {
+                return personsFilePath;
+            }
+
+            @Override
+            protected Path getEventsExportPath(Model model) {
+                return eventsFilePath;
+            }
+        };
+
+        exportCommand.execute(photoModel);
+
+        List<String> lines = Files.readAllLines(personsFilePath);
+        String[] rowColumns = splitCsvLine(lines.get(1));
+        assertEquals(photoPerson.getPhoto().orElseThrow().getPath(), unwrapValue(rowColumns[6]));
+    }
+
+    @Test
     public void splitCsvLine_complexAddress_integrityMaintained() {
         String line = "David,91234567,,\"Blk 123, Jurong West, #01-01\",friends,";
         String[] columns = splitCsvLine(line);
@@ -271,13 +306,14 @@ public class ExportCommandTest {
 
     @Test
     public void execute_exportImport_dataIntegrityMaintained() throws Exception {
+        Path photoPath = Files.createFile(testFolder.resolve("roundtrip-photo.jpg"));
         Person originalPerson = new PersonBuilder()
                 .withName("David Ng")
                 .withPhone("91234567")
                 .withEmail("david@u.nus.edu")
                 .withAddress("Blk 123, Clementi Ave 2, #10-10")
                 .withTags("friends", "nus")
-                .withoutPhoto()
+                .withPhoto(photoPath.toString())
                 .build();
 
         Model model = new ModelManager();
@@ -325,6 +361,8 @@ public class ExportCommandTest {
         Person importedPerson = importedPersonOpt.get();
         assertEquals(originalPerson.getAddress(), importedPerson.getAddress(),
                 "Address with commas failed round-trip integrity!");
+        assertEquals(originalPerson.getPhoto(), importedPerson.getPhoto(),
+                "Photo path failed round-trip integrity!");
     }
 
     @Test

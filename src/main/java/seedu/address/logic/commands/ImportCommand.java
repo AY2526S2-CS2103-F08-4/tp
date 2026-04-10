@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.util.CsvUtil;
+import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
@@ -45,7 +46,8 @@ public class ImportCommand extends Command {
 
     public static final String COMMAND_WORD = "import";
 
-    public static final String FILENAME_SUFFIX = ".csv";
+    public static final String MESSAGE_EVENT_CLASH_IN_IMPORT =
+            "Import failed: the import file contains clashing events.";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Imports a list of contacts from a CSV formatted file.\n"
@@ -60,8 +62,8 @@ public class ImportCommand extends Command {
             + " do not match the expected format.";
     public static final String MESSAGE_ERROR_READING_FILE = "Error reading data from %1$s";
     public static final String MESSAGE_EMPTY_FILE = "The file %1$s is empty.";
-    public static final String MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED = "Successfully imported list from %1$s.csv with "
-            + "%2$d row(s) added, %3$d row(s) skipped.";
+    public static final String MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED = "Successfully imported %1$s_events.csv "
+            + "and %1$s_persons.csv with %2$d contact(s) added, %3$d contact(s) skipped.";
 
     private static final Logger logger = LogsCenter.getLogger(ImportCommand.class);
 
@@ -100,34 +102,50 @@ public class ImportCommand extends Command {
         List<String> personLines = readLinesFromCsv(personsPath);
 
 
-        if (hasHeaderOnly(personLines)) {
+        if (isHeaderOnly(personLines)) {
             return new CommandResult(String.format(MESSAGE_EMPTY_FILE, filename + "_persons.csv"));
         }
 
-        AddressBook tempAddressBook;
-        Model tempModel = new ModelManager();
-        if (importType.equalsIgnoreCase("overwrite")) {
-            tempAddressBook = new AddressBook();
-        } else {
-            tempAddressBook = new AddressBook(model.getAddressBook());
-        }
-        tempModel.setAddressBook(tempAddressBook);
-
-        Map<Integer, Event> eventMap = new HashMap<>();
-        processImportedEventsFromCsv(tempModel, eventsLines, eventMap);
+        Model tempModel = createWorkingModel(model);
+        Map<Integer, Event> eventMap = importEvents(tempModel, eventsLines);
         int addedRows = processImportedPersonsFromCsv(tempModel, personLines, eventMap);
 
-        int totalRows = personLines.size() - 1;
-        int skippedRows = totalRows - addedRows;
-
-        // Reaches here if successful, copies over what was performed to the current model
-        model.setAddressBook(tempModel.getAddressBook());
-        model.showAllPersonsPinnedFirst();
-        model.showNoEvents();
+        int skippedRows = calculateSkippedRows(personLines, addedRows);
+        applyImportResult(model, tempModel);
         return new CommandResult(String.format(MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED,
                 filename,
                 addedRows,
                 skippedRows));
+    }
+
+    private Model createWorkingModel(Model sourceModel) {
+        Model tempModel = new ModelManager();
+        tempModel.setAddressBook(createWorkingAddressBook(sourceModel));
+        return tempModel;
+    }
+
+    private AddressBook createWorkingAddressBook(Model sourceModel) {
+        if (importType.equalsIgnoreCase("overwrite")) {
+            return new AddressBook();
+        }
+        return new AddressBook(sourceModel.getAddressBook());
+    }
+
+    private Map<Integer, Event> importEvents(Model model, List<String> eventsLines) throws CommandException {
+        Map<Integer, Event> eventMap = new HashMap<>();
+        processImportedEventsFromCsv(model, eventsLines, eventMap);
+        return eventMap;
+    }
+
+    private int calculateSkippedRows(List<String> personLines, int addedRows) {
+        int totalRows = personLines.size() - 1;
+        return totalRows - addedRows;
+    }
+
+    private void applyImportResult(Model targetModel, Model importedModel) {
+        targetModel.setAddressBook(importedModel.getAddressBook());
+        targetModel.showAllPersonsPinnedFirst();
+        targetModel.showNoEvents();
     }
 
     /**
@@ -155,7 +173,7 @@ public class ImportCommand extends Command {
      * @param lines The list of strings read from the CSV file.
      * @return True if there are no data rows to process.
      */
-    private boolean hasHeaderOnly(List<String> lines) {
+    private boolean isHeaderOnly(List<String> lines) {
         return lines.size() <= 1;
     }
 
@@ -170,27 +188,32 @@ public class ImportCommand extends Command {
      */
     private void processImportedEventsFromCsv(Model model, List<String> lines,
             Map<Integer, Event> eventMap) throws CommandException {
+        List<Event> importedEvents = new ArrayList<>();
         for (int i = 1; i < lines.size(); i++) {
-            try {
-                Optional<ParsedEvent> eventOpt = parseLineToEvent(lines.get(i));
-                if (eventOpt.isPresent()) {
-                    ParsedEvent parsedEvent = eventOpt.get();
-                    if (eventMap.containsKey(parsedEvent.csvEventId)) {
-                        throw new CommandException(
-                                String.format("Duplicate event detected in import: EventId %d already exists",
-                                        parsedEvent.csvEventId));
-                    }
-
-                    Event canonicalEvent = resolveCanonicalEvent(model, parsedEvent.event);
-                    if (canonicalEvent != null) {
-                        eventMap.put(parsedEvent.csvEventId, canonicalEvent);
-                    }
-                }
-            } catch (IllegalArgumentException e) {
-                logger.info(String.format("ImportCommand: Skipping malformed event entry: %s",
-                        lines.get(i)));
+            ParsedEvent parsedEvent = parseEventOrSkip(lines.get(i));
+            if (parsedEvent != null) {
+                ensureUniqueCsvEventId(eventMap, parsedEvent.csvEventId);
+                Event canonicalEvent = resolveCanonicalEvent(model, parsedEvent.event, importedEvents);
+                eventMap.put(parsedEvent.csvEventId, canonicalEvent);
             }
         }
+    }
+
+    private ParsedEvent parseEventOrSkip(String line) {
+        try {
+            return parseLineToEvent(line).orElse(null);
+        } catch (IllegalArgumentException e) {
+            logger.info(String.format("ImportCommand: Skipping malformed event entry: %s", line));
+            return null;
+        }
+    }
+
+    private void ensureUniqueCsvEventId(Map<Integer, Event> eventMap, int csvEventId) throws CommandException {
+        if (!eventMap.containsKey(csvEventId)) {
+            return;
+        }
+        throw new CommandException(
+                String.format("Duplicate event detected in import: EventId %d already exists", csvEventId));
     }
 
     /**
@@ -207,26 +230,40 @@ public class ImportCommand extends Command {
 
         for (int i = 1; i < lines.size(); i++) {
             Optional<ParsedPerson> person = parseLineToPerson(lines.get(i), eventMap);
-            if (person.isPresent()) {
-                ParsedPerson parsedPerson = person.get();
-                Person p = parsedPerson.person;
-                if (!model.hasPerson(p)) {
-                    for (Event event : p.getEvents()) {
-                        if (!model.hasEvent(event)) {
-                            model.addEvent(event);
-                        }
-                        event.incrementNumberOfPersonLinked();
-                    }
-                    model.addPerson(p);
-                    if (parsedPerson.isPinned) {
-                        model.pinPerson(p);
-                    }
-                    added++;
-                }
+            if (person.isPresent() && isParsedPersonAdded(model, person.get())) {
+                added++;
             }
         }
 
         return added;
+    }
+
+    private boolean isParsedPersonAdded(Model model, ParsedPerson parsedPerson) {
+        Person person = parsedPerson.person;
+        if (model.hasPerson(person)) {
+            return false;
+        }
+
+        linkEventsToModel(model, person);
+        model.addPerson(person);
+        if (parsedPerson.isPinned) {
+            model.pinPerson(person);
+        }
+        return true;
+    }
+
+    private void linkEventsToModel(Model model, Person person) {
+        for (Event event : person.getEvents()) {
+            addEventIfMissing(model, event);
+            event.incrementNumberOfPersonLinked();
+        }
+    }
+
+    private void addEventIfMissing(Model model, Event event) {
+        if (model.hasEvent(event)) {
+            return;
+        }
+        model.addEvent(event);
     }
 
 
@@ -256,7 +293,7 @@ public class ImportCommand extends Command {
      * @return An {@code Optional} containing the parsed event if parsing was successful,
      *         otherwise an empty {@code Optional}.
      */
-    Optional<ParsedEvent> parseLineToEvent(String line) {
+    protected Optional<ParsedEvent> parseLineToEvent(String line) {
         // Blank event rows are treated as empty entries.
         if (line == null || line.trim().isEmpty()) {
             return Optional.empty();
@@ -272,33 +309,46 @@ public class ImportCommand extends Command {
      * @param row A single comma-separated string from the events CSV file.
      * @return A parsed event containing the CSV event ID and reconstructed event object.
      */
-    ParsedEvent createEventFromCsvRow(String row) {
+    protected ParsedEvent createEventFromCsvRow(String row) {
         String[] columns = CsvUtil.splitCsvLine(row);
-        if (columns.length < 5) {
-            throw new IllegalArgumentException("Event row does not have required columns");
+        validateEventColumnCount(columns);
+
+        int csvEventId = parseCsvEventId(columns[0]);
+        Event event = parseEventFromColumns(columns);
+        return new ParsedEvent(csvEventId, event);
+    }
+
+    private void validateEventColumnCount(String[] columns) {
+        if (columns.length >= 5) {
+            return;
         }
+        throw new IllegalArgumentException("Event row does not have required columns");
+    }
 
+    private int parseCsvEventId(String csvEventIdText) {
         try {
-            int csvEventId = Integer.parseInt(columns[0].trim());
-            String titleStr = unwrapValue(columns[1]).trim();
-            String descStr = unwrapValue(columns[2]).trim();
-            String startStr = columns[3].trim();
-            String endStr = columns[4].trim();
-
-            if (titleStr.isEmpty() || startStr.isEmpty() || endStr.isEmpty()) {
-                throw new IllegalArgumentException("Event has missing required fields");
-            }
-
-            Title title = new Title(titleStr);
-            Optional<Description> desc = descStr.isEmpty()
-                    ? Optional.empty()
-                    : Optional.of(new Description(descStr));
-            TimeRange timeRange = new TimeRange(startStr, endStr);
-
-            return new ParsedEvent(csvEventId, new Event(title, desc, timeRange, 0));
+            return Integer.parseInt(csvEventIdText.trim());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Event ID must be a valid integer");
         }
+    }
+
+    private Event parseEventFromColumns(String[] columns) {
+        String titleStr = unwrapValue(columns[1]).trim();
+        String descStr = unwrapValue(columns[2]).trim();
+        String startStr = columns[3].trim();
+        String endStr = columns[4].trim();
+
+        if (titleStr.isEmpty() || startStr.isEmpty() || endStr.isEmpty()) {
+            throw new IllegalArgumentException("Event has missing required fields");
+        }
+
+        Title title = new Title(titleStr);
+        Optional<Description> desc = descStr.isEmpty()
+                ? Optional.empty()
+                : Optional.of(new Description(descStr));
+        TimeRange timeRange = new TimeRange(startStr, endStr);
+        return new Event(title, desc, timeRange, 0);
     }
 
     /**
@@ -317,7 +367,7 @@ public class ImportCommand extends Command {
         Person person = populatePersonInfo(columns);
         populateEventInfo(person, unwrapValue(columns[5]), eventMap);
 
-        boolean isPinned = parsePinnedValue(columns);
+        boolean isPinned = isPinnedFromColumns(columns);
 
         return new ParsedPerson(person, isPinned);
     }
@@ -337,7 +387,7 @@ public class ImportCommand extends Command {
     /**
      * Parses pinned value from supported person CSV schema variants.
      */
-    private boolean parsePinnedValue(String[] columns) {
+    private boolean isPinnedFromColumns(String[] columns) {
         return Boolean.parseBoolean(unwrapValue(columns[7]));
     }
 
@@ -361,11 +411,35 @@ public class ImportCommand extends Command {
 
         Set<Tag> tags = parseTags(unwrapValue(columns[4]));
 
-        String photoStr = unwrapValue(columns[6]);
-        Optional<Photo> photo = photoStr.isEmpty() ? Optional.empty() : Optional.of(new Photo(photoStr));
+        String photoStr = unwrapValue(columns[6]).trim();
+        Optional<Photo> photo = parseImportedPhoto(photoStr);
 
         return new Person(name, phone, email, address, tags, photo);
     }
+
+    private Optional<Photo> parseImportedPhoto(String photoStr) {
+        if (photoStr.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (!Photo.isValidPhoto(photoStr)) {
+            return Optional.empty();
+        }
+
+        Path importedPath = Path.of(photoStr);
+        if (Files.exists(importedPath) && Files.isRegularFile(importedPath)) {
+            return Optional.of(new Photo(photoStr));
+        }
+
+        Path localManagedPath = Path.of(PhotoStorageUtil.DEFAULT_IMAGE_DIR).resolve(importedPath.getFileName());
+        if (Files.exists(localManagedPath) && Files.isRegularFile(localManagedPath)) {
+            return Optional.of(new Photo(localManagedPath.toString()));
+        }
+
+        logger.info(String.format("ImportCommand: Photo file not found, using default image instead: %s", photoStr));
+        return Optional.empty();
+    }
+
 
     /**
      * Parses the CSV event ID string (semicolon-separated event IDs) and
@@ -390,7 +464,7 @@ public class ImportCommand extends Command {
      * @return A {@code List} of {@code Event} objects.
      *         Returns an empty list if input is empty or if event IDs are not found.
      */
-    List<Event> parseEventIds(String eventIdString, Map<Integer, Event> eventMap) {
+    protected List<Event> parseEventIds(String eventIdString, Map<Integer, Event> eventMap) {
         List<Event> events = new ArrayList<>();
         Set<Event> seenEvents = new HashSet<>();
 
@@ -399,23 +473,35 @@ public class ImportCommand extends Command {
         }
 
         String[] eventIds = eventIdString.split(";");
-        for (String idStr : eventIds) {
-            try {
-                int eventId = Integer.parseInt(idStr.trim());
-                Event event = eventMap.get(eventId);
-                if (event != null && seenEvents.add(event)) {
-                    events.add(event);
-                } else if (event == null) {
-                    logger.info(String.format(
-                            "ImportCommand: Event with CSV ID %d not found in events map", eventId));
-                }
-            } catch (NumberFormatException e) {
-                logger.info(String.format(
-                        "ImportCommand: Invalid event ID format in persons CSV: %s", idStr));
-            }
+        for (String eventIdText : eventIds) {
+            Optional<Integer> eventId = parseEventIdOrSkip(eventIdText);
+            eventId.ifPresent(parsedEventId -> addMappedEventIfPresent(eventMap, seenEvents, events, parsedEventId));
         }
 
         return events;
+    }
+
+    private Optional<Integer> parseEventIdOrSkip(String eventIdText) {
+        try {
+            return Optional.of(Integer.parseInt(eventIdText.trim()));
+        } catch (NumberFormatException e) {
+            logger.info(String.format(
+                    "ImportCommand: Invalid event ID format in persons CSV: %s", eventIdText));
+            return Optional.empty();
+        }
+    }
+
+    private void addMappedEventIfPresent(Map<Integer, Event> eventMap, Set<Event> seenEvents,
+            List<Event> events, int eventId) {
+        Event event = eventMap.get(eventId);
+        if (event == null) {
+            logger.info(String.format("ImportCommand: Event with CSV ID %d not found in events map", eventId));
+            return;
+        }
+
+        if (seenEvents.add(event)) {
+            events.add(event);
+        }
     }
 
     /**
@@ -425,7 +511,7 @@ public class ImportCommand extends Command {
         private final Person person;
         private final boolean isPinned;
 
-        ParsedPerson(Person person, boolean isPinned) {
+        private ParsedPerson(Person person, boolean isPinned) {
             this.person = person;
             this.isPinned = isPinned;
         }
@@ -434,11 +520,11 @@ public class ImportCommand extends Command {
     /**
      * Helper container for a parsed event row and its CSV EventId.
      */
-    static class ParsedEvent {
+    protected static class ParsedEvent {
         private final int csvEventId;
         private final Event event;
 
-        ParsedEvent(int csvEventId, Event event) {
+        private ParsedEvent(int csvEventId, Event event) {
             this.csvEventId = csvEventId;
             this.event = event;
         }
@@ -475,7 +561,7 @@ public class ImportCommand extends Command {
      * @param tagString The raw string containing tags (e.g. "friends; colleagues").
      * @return A {@code Set} of {@code Tag} objects. Returns an empty set if input is empty.
      */
-    Set<Tag> parseTags(String tagString) {
+    protected Set<Tag> parseTags(String tagString) {
         if (tagString == null || tagString.trim().isEmpty()) {
             return new HashSet<>();
         }
@@ -512,21 +598,42 @@ public class ImportCommand extends Command {
 
     /**
      * Resolves the canonical event instance to use for imported person links.
-     * Returns {@code null} when the imported event should be dropped, such as when it clashes.
+     * Reuses an existing matching event when present.
+     * Throws a {@code CommandException} if the imported event clashes with either
+     * an existing event in the address book or another event in the same import file.
      */
-    private Event resolveCanonicalEvent(Model model, Event importedEvent) {
+    private Event resolveCanonicalEvent(Model model, Event importedEvent,
+            List<Event> importedEvents) throws CommandException {
         Event existingEvent = findExistingEvent(model, importedEvent);
         if (existingEvent != null) {
             return existingEvent;
         }
 
-        if (model.hasOverlappingEvent(importedEvent)) {
-            logger.info(String.format("ImportCommand: Skipping overlapping event entry: %s", importedEvent));
-            return null;
-        }
+        rejectIfOverlappingExistingEvent(model, importedEvent);
+        rejectIfClashingWithinImport(importedEvents, importedEvent);
 
+        importedEvents.add(importedEvent);
         return importedEvent;
     }
+
+    private void rejectIfOverlappingExistingEvent(Model model, Event importedEvent) throws CommandException {
+        if (!model.hasOverlappingEvent(importedEvent)) {
+            return;
+        }
+        logger.info(String.format("ImportCommand: Skipping overlapping event entry: %s", importedEvent));
+        throw new CommandException(MESSAGE_EVENT_CLASH_IN_IMPORT);
+    }
+
+    private void rejectIfClashingWithinImport(List<Event> importedEvents, Event importedEvent)
+            throws CommandException {
+        boolean isClashWithinImport = importedEvents.stream().anyMatch(importedEvent::isClashingWith);
+        if (!isClashWithinImport) {
+            return;
+        }
+        logger.info(String.format("ImportCommand: Event clashes within import file: %s", importedEvent));
+        throw new CommandException(MESSAGE_EVENT_CLASH_IN_IMPORT);
+    }
+
 
     /**
      * Finds the existing event object in the model that matches {@code targetEvent}.
