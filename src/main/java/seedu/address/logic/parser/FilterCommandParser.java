@@ -26,20 +26,7 @@ public class FilterCommandParser implements Parser<FilterCommand> {
     public FilterCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_TAG);
 
-        if (argMultimap.getAllValues(PREFIX_TAG).size() > 1) {
-            throw new ParseException("Please provide all tags after a single 't/' prefix, separated by commas.");
-        }
-
-        // Check for the presence of the tag prefix 't/'
-        if (!arePrefixesPresent(argMultimap, PREFIX_TAG)) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
-                    "Missing required tag prefix 't/'.\n" + FilterCommand.MESSAGE_USAGE));
-        }
-
-        // throw an exception if unnecessary info is typed
-        if (!argMultimap.getPreamble().isEmpty()) {
-            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, FilterCommand.MESSAGE_USAGE));
-        }
+        checkingTagPrefixes(argMultimap);
 
         String allTags = argMultimap.getValue(PREFIX_TAG).get();
 
@@ -60,6 +47,21 @@ public class FilterCommandParser implements Parser<FilterCommand> {
         }
 
         return new FilterCommand(new TagContainsKeywordsPredicate(tagKeywords));
+    }
+
+    private static void checkingTagPrefixes(ArgumentMultimap argMultimap) throws ParseException {
+        if (argMultimap.getAllValues(PREFIX_TAG).size() > 1) {
+            throw new ParseException("Please provide all tags after a single 't/' prefix, separated by commas.");
+        }
+
+        if (!arePrefixesPresent(argMultimap, PREFIX_TAG)) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
+                    "Missing required tag prefix 't/'.\n" + FilterCommand.MESSAGE_USAGE));
+        }
+
+        if (!argMultimap.getPreamble().isEmpty()) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, FilterCommand.MESSAGE_USAGE));
+        }
     }
 }
 

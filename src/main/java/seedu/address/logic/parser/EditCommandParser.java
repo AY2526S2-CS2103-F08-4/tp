@@ -40,8 +40,21 @@ public class EditCommandParser implements Parser<EditCommand> {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE));
         }
 
-        String targetSegment = trimmedArgs.substring(0, delimiterIndex);
         String updateSegmentRaw = trimmedArgs.substring(delimiterIndex + SEGMENT_DELIMITER.length());
+        String targetSegment = checkingTargetSegment1(trimmedArgs, delimiterIndex, updateSegmentRaw);
+        String updateSegment = updateSegmentRaw.trim();
+        if (updateSegment.isEmpty()) {
+            throw new ParseException(EditCommand.MESSAGE_NOT_EDITED);
+        }
+
+        PersonInformation targetInfo = parseTargetSegment(targetSegment);
+        EditPersonDescriptor editPersonDescriptor = parseUpdateSegment(updateSegment);
+        return new EditCommand(targetInfo, editPersonDescriptor);
+    }
+
+    private static String checkingTargetSegment1(String trimmedArgs, int delimiterIndex, String updateSegmentRaw) throws ParseException {
+        String targetSegment = trimmedArgs.substring(0, delimiterIndex);
+
         // Reject additional spaces adjacent to the delimiter.
         if (targetSegment.endsWith(" ")
                 || (!updateSegmentRaw.isEmpty() && !updateSegmentRaw.startsWith(" "))
@@ -50,18 +63,11 @@ public class EditCommandParser implements Parser<EditCommand> {
         }
 
         targetSegment = targetSegment.trim();
-        String updateSegment = updateSegmentRaw.trim();
 
         if (targetSegment.isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE));
         }
-        if (updateSegment.isEmpty()) {
-            throw new ParseException(EditCommand.MESSAGE_NOT_EDITED);
-        }
-
-        PersonInformation targetInfo = parseTargetSegment(targetSegment);
-        EditPersonDescriptor editPersonDescriptor = parseUpdateSegment(updateSegment);
-        return new EditCommand(targetInfo, editPersonDescriptor);
+        return targetSegment;
     }
 
     private PersonInformation parseTargetSegment(String targetSegment) throws ParseException {

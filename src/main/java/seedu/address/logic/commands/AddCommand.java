@@ -70,7 +70,6 @@ public class AddCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-
         if (model.hasPerson(toAdd)) {
             throw new CommandException(MESSAGE_DUPLICATE_PERSON);
         }
@@ -94,7 +93,6 @@ public class AddCommand extends Command {
                 throw new CommandException(Messages.MESSAGE_SAVE_PHOTO_FAIL + e.getMessage());
             }
         }
-
         model.addPerson(finalPersonToAdd);
         model.showAllPersonsPinnedFirst();
         return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(finalPersonToAdd)));
