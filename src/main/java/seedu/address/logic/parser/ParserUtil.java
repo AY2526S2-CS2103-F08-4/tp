@@ -33,7 +33,8 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_INDEX = "Index is not a non-zero unsigned integer.";
     public static final String MESSAGE_DUPLICATE_TAGS = "Duplicate tag specified in the command";
     public static final String MESSAGE_RESERVED_EDIT_SEGMENT_DELIMITER =
-            "The token '" + EditCommandParser.EDIT_SEGMENT_DELIMITER + "' is reserved and cannot appear in contact fields.";
+            "The token '" + EditCommandParser.EDIT_SEGMENT_DELIMITER
+            + "' is reserved and cannot appear in contact fields.";
     public static final String MESSAGE_INVALID_PERSONS_FORMAT = "Invalid persons format.";
     public static final String MESSAGE_MISSING_NAME_PREFIX_IN_PERSONS =
             "Each target person must start with 'n/'.";
@@ -154,7 +155,7 @@ public class ParserUtil {
 
     /**
      * Validates that values for the specified prefixes do not contain the reserved edit delimiter token.
-     * 
+     *
      * @param argumentMultimap the map of parsed arguments to check
      * @param prefixes the prefixes whose values should be checked for the reserved token
      * @throws ParseException if any value for the specified prefixes contains the reserved edit delimiter token
