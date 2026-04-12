@@ -718,7 +718,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
     * 1a1. NAB returns the user’s own event list.
     <br> *Use case resumes from step 5.*<br><br>
 * 2a. NAB detects invalid characters in the provided name.
-    * 2b1. NAB returns an error message.
+    * 2a1. NAB returns an error message.
     <br> *Use case ends.*<br><br>
 * 3a. NAB is unable to find a contact matching the provided name.
     * 3a1. NAB informs the user that contact does not exist.
