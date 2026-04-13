@@ -4,9 +4,8 @@ skinparam ActivityFontSize 15
 skinparam ArrowFontSize 12
 
 start
-:Parse pin command into PinCommand;
+:Parse pin/unpin command;
 :Find matching persons using targetInfo;
-:Remove already pinned matches;
 
 if () then ([no matches])
   :Show no match error;
@@ -14,8 +13,21 @@ else ([matches found])
   if () then ([multiple matches])
     :Show ambiguous matches\nin list, show error;
   else ([single match])
-    :Pin the contact;
-    :Reorder list with pinned contacts first;
+    if () then ([pin command])
+      if () then ([already pinned])
+        :Show already pinned error;
+      else ([not pinned])
+        :Pin the contact;
+        :Reorder list with pinned contacts first;
+      endif
+    else ([unpin command])
+      if () then ([already unpinned])
+        :Show already unpinned error;
+      else ([pinned])
+        :Unpin the contact;
+        :Reorder list with pinned contacts first;
+      endif
+    endif
   endif
 endif
 

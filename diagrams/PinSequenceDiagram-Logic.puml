@@ -42,17 +42,27 @@ activate CommandUtil
 CommandUtil --> PinCommand : personToPin
 deactivate CommandUtil
 
-PinCommand -> Model : pinPerson(personToPin)
+PinCommand -> Model : isPersonPinned(personToPin)
 activate Model
-Model --> PinCommand
+Model --> PinCommand : isPinned
 deactivate Model
 
-PinCommand -> Model : showAllPersonsPinnedFirst()
-activate Model
-Model --> PinCommand
-deactivate Model
+alt isPinned
+    [<-- PinCommand : throw CommandException
+else not pinned
+    PinCommand -> Model : pinPerson(personToPin)
+    activate Model
+    Model --> PinCommand
+    deactivate Model
 
-[<-- PinCommand : result
+    PinCommand -> Model : showAllPersonsPinnedFirst()
+    activate Model
+    Model --> PinCommand
+    deactivate Model
+
+    [<-- PinCommand : result
+end
+
 deactivate PinCommand
 PinCommand -[hidden]-> PinCommand
 destroy PinCommand

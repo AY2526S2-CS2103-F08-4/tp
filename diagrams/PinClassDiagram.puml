@@ -8,14 +8,17 @@ package Logic as LogicPackage {
   class UnpinCommandParser LOGIC_COLOR
   class PinCommand LOGIC_COLOR
   class UnpinCommand LOGIC_COLOR
-  class CommandUtil LOGIC_COLOR
-  class PersonInformation LOGIC_COLOR
+}
+
+package Commons as CommonsPackage {
+  class CommandUtil #666666
 }
 
 package Model as ModelPackage {
   class "<<interface>>\nModel" as Model MODEL_COLOR
   class ModelManager MODEL_COLOR
   class AddressBook MODEL_COLOR
+  class PersonInformation MODEL_COLOR
   class "UniquePersonList\n(persons)" as PersonsList MODEL_COLOR
   class "UniquePersonList\n(pinnedPersons)" as PinnedList MODEL_COLOR
 }
