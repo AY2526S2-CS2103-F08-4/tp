@@ -286,6 +286,12 @@ public class ModelManager implements Model {
         sortedPersons.setComparator(null);
         updateFilteredEventList(person::hasEvent);
     }
+    @Override
+    public boolean isShowingEventsFor(Person person) {
+        requireNonNull(person);
+        return filteredPersons.size() == 1
+                && filteredPersons.get(0).isSamePerson(person) && !filteredEvents.isEmpty();
+    }
 
     /**
      * Returns a list of persons matching the provided {@link PersonInformation}.

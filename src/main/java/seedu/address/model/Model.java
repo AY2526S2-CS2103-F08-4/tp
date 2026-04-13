@@ -200,6 +200,10 @@ public interface Model {
      * and the filtered person list to show only {@code person}.
      */
     void showEventsForPerson(Person person);
+    /**
+     * Returns true if the current view is showing only {@code person} together with that person's events.
+     */
+    boolean isShowingEventsFor(Person person);
 
     /**
      * Returns true if the given photo is used by any person in the address book,
