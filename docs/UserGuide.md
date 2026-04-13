@@ -216,8 +216,9 @@ NAB cannot determine which one you meant, and will display the following error:
 
 **ERROR MESSAGE**<br>
 `Multiple matches identified! Please provide more arguments.`<br>
-This error means your command matched more than one contact. No changes have been made —
-retry the command with additional details to uniquely identify the contact you want.
+This error means your command matched more than one contact. No changes have been made. 
+
+Add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag to uniquely identify the contact you want.
 
 </box>
 
@@ -349,8 +350,7 @@ Edits an existing person in the address book.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -396,8 +396,7 @@ Finds persons by name, with optional additional fields used to narrow the match.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -463,8 +462,7 @@ Pins the matching John Doe contact by name and phone number.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -492,8 +490,7 @@ Unpins the matching John Doe contact by name and phone number.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -538,8 +535,7 @@ Assigns 2 tags (`CS2103`, `CS2030S`) to 2 users (`John Doe` and `Betsy Crower`) 
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -577,8 +573,7 @@ Deletes the matching John Doe contact by name and phone number.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -650,8 +645,7 @@ Creates a new event for a specified person.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -684,8 +678,7 @@ Views all events for a specified person.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
@@ -718,8 +711,7 @@ Deletes an event for a specified person.
 **Disambiguating contacts with the same name**
 
 
-- If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
-- See [User Disambiguation](#user-disambiguation) for details.
+See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 </box>
 
