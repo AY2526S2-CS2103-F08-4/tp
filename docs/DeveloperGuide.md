@@ -1034,6 +1034,6 @@ Team Size: 5
 
 2. **Enhance `export` with the ability to back up profile photos**: When exporting data, allow for the copying of profile photos for all contacts.
 
-3. **Enhance `event view` with the ability to sort events**: When viewing events, allow the user to sort them by start time or end time. 
+3. **Enhance `event view` with the ability to sort events**: When viewing events, allow the user to sort them by start time or end time.
 
 4. **Enhance `event view` with the ability to filter events**: When viewing events, allow the user to filter them by a time range.
