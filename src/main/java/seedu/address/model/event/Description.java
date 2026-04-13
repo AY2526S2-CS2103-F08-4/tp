@@ -9,7 +9,7 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
  */
 public class Description {
     public static final String MESSAGE_CONSTRAINTS =
-            "Description must be 1 to 1000 characters if provided, alphanumeric and spaces only, "
+            "Description must be 0 to 1000 characters if provided, alphanumeric and spaces only, "
                     + "with some special characters (. - : ()) allowed, "
                     + "no leading/trailing spaces, and no consecutive spaces.";
 
