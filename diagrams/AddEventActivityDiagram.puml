@@ -8,10 +8,14 @@ start
 :Extract event details and target contact information;
 :Find matching persons using targetInfo;
 
-if () then ([no matches or multiple matches])
-  :Throw CommandException\n(no match or ambiguous match);
+if () then ([no matches])
+  :Throw CommandException\n(no match);
   stop
-else ([single match])
+else ([matches found])
+  if () then ([multiple matches])
+    :Update UI to show ambiguous matches\nin list, then show error;
+    stop
+  else ([single match])
   if () then ([person already linked to event])
     :Throw CommandException\n(duplicate event);
     stop
@@ -28,6 +32,7 @@ else ([single match])
     endif
     :Construct new Person with event appended;
     :Update AddressBook and UI;
+  endif
   endif
 endif
 

@@ -8,10 +8,11 @@ start
 :Find matching persons using targetInfo;
 
 if () then ([no matches])
-  :Show no match error;
+  :Show no match error only;
 else ([matches found])
   if () then ([multiple matches])
-    :Show ambiguous matches\nin list, show error;
+    :Update UI to show ambiguous matches\nin list;
+    :Show error;
   else ([single match])
     if () then ([pin command])
       if () then ([already pinned])
