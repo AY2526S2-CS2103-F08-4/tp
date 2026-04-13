@@ -5,7 +5,7 @@ skinparam ArrowFontStyle plain
 box Logic LOGIC_COLOR_T1
 participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
 participant ":PinCommandParser" as PinCommandParser LOGIC_COLOR
-participant "p:PinCommand" as PinCommand LOGIC_COLOR
+participant "c:PinCommand" as PinCommand LOGIC_COLOR
 participant "<<utility>>\nCommandUtil" as CommandUtil LOGIC_COLOR
 end box
 
@@ -22,11 +22,14 @@ activate PinCommandParser
 create PinCommand
 PinCommandParser -> PinCommand
 activate PinCommand
-PinCommand --> PinCommandParser : p
+PinCommand --> PinCommandParser : c
 deactivate PinCommand
 
-PinCommandParser --> AddressBookParser : p
+PinCommandParser --> AddressBookParser : c
 deactivate PinCommandParser
+destroy PinCommandParser
+
+[<-- AddressBookParser : c
 deactivate AddressBookParser
 
 [-> PinCommand : execute(model)
