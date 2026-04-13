@@ -464,6 +464,8 @@ NAB treats tags as case-insensitive labels. To keep the UI and stored data consi
 
 NAB also enforces a hard limit of 30 characters for each tag. This is an intentional tradeoff: tags are meant to remain short, scannable labels rather than long free-form descriptions, but 30 characters still provides enough room for realistic module, project, and CCA-related labels.
 
+The `tag` command is intentionally designed as a bulk-assignment operation that ensures the specified tags are present on the matched contacts. Its purpose is not to guarantee that every target contact is modified. If a contact already has a tag, NAB does not create a duplicate tag, and the command still succeeds because the desired postcondition has already been met.
+
 ### Event Add feature
 
 The event add feature allows users to create and link a new event to a contact. It spans the `Logic` and `Model` components, and reuses the contact disambiguation mechanism from `CommandUtil`.

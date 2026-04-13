@@ -487,6 +487,8 @@ Unpins the matching John Doe contact by name and phone number.
 
 Assigns one or more tags to one or more contacts in one command.
 
+`tag` is intended as a bulk assignment command that ensures the specified tag(s) are present on each matched contact.
+
 Format: `tag label/TAG_TO_ASSIGN [label/TAG_TO_ASSIGN]... n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...]...`
 
 <div style="text-align: center;">
@@ -498,6 +500,7 @@ Format: `tag label/TAG_TO_ASSIGN [label/TAG_TO_ASSIGN]... n/NAME [p/PHONE_NUMBER
 * Optional fields placed immediately after a contact's `n/NAME` (such as `p/`, `e/`, `a/`, `t/`) apply only to that contact.
 * Do not mix tag and contact segments. All `label/...` entries must come before the first `n/...`.
 * If a tag does not exist yet, NAB creates it automatically.
+* If a contact already has a given tag, NAB leaves that tag unchanged and still treats the command as successful, since the intended final state has already been satisfied.
 * If a person segment matches multiple contacts, NAB shows those matches and asks for a more specific command.
 
 <box type="important">
