@@ -216,7 +216,7 @@ NAB cannot determine which one you meant, and will display the following error:
 
 **ERROR MESSAGE**<br>
 `Multiple matches identified! Please provide more arguments.`<br>
-This error means your command matched more than one contact. No changes have been made. 
+This error means your command matched more than one contact. No changes have been made.
 
 Add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag to uniquely identify the contact you want.
 
