@@ -126,6 +126,22 @@ public class ExportCommandTest {
     }
 
     @Test
+    public void execute_exportCurrentEmptyFilteredList_throwsCommandException() {
+        model.updateFilteredPersonList(p -> false);
+        ExportCommand exportCommand = new ExportCommand("current", testFileName);
+        CommandException thrown = assertThrows(CommandException.class, () -> exportCommand.execute(model));
+        assertEquals(ExportCommand.MESSAGE_EMPTY_EXPORT, thrown.getMessage());
+    }
+
+    @Test
+    public void execute_exportAllEmptyAddressBook_throwsCommandException() {
+        model.setAddressBook(new AddressBook());
+        ExportCommand exportCommand = new ExportCommand("all", testFileName);
+        CommandException thrown = assertThrows(CommandException.class, () -> exportCommand.execute(model));
+        assertEquals(ExportCommand.MESSAGE_EMPTY_EXPORT, thrown.getMessage());
+    }
+
+    @Test
     public void execute_exportPinnedPerson_writesPinnedColumn() throws Exception {
         Person pinnedPerson = new PersonBuilder()
                 .withName("Pinned Person")

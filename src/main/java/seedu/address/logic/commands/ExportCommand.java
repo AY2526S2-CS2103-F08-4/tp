@@ -25,6 +25,7 @@ import seedu.address.model.person.Photo;
  * - {filename}_events.csv containing all unique events
  */
 public class ExportCommand extends Command {
+    public static final String MESSAGE_EMPTY_EXPORT = "Nothing to export: There are no contacts.";
 
     public static final String COMMAND_WORD = "export";
 
@@ -91,8 +92,10 @@ public class ExportCommand extends Command {
         requireNonNull(model);
 
         List<Person> exportedList = getExportedList(model);
+        if (exportedList.isEmpty()) {
+            throw new CommandException(MESSAGE_EMPTY_EXPORT);
+        }
 
-        // Collect all unique events referenced by exported persons
         Set<Event> uniqueEvents = collectUniqueEvents(exportedList);
 
         Path personsExportPath = getPersonsExportPath(model);
