@@ -10,10 +10,11 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 public class Title {
     public static final String MESSAGE_CONSTRAINTS =
             "Title must be 1 to 50 characters, alphanumeric and spaces only, "
+                    + "with some special characters (. - : ()) allowed, "
                     + "no leading/trailing spaces, and no consecutive spaces.";
 
     private static final String VALIDATION_REGEX =
-            "^(?=.{1,50}$)[A-Za-z0-9]+(?: [A-Za-z0-9]+)*$";
+            "^(?=.{1,50}$)[A-Za-z0-9.()\\-:]+(?: [A-Za-z0-9.()\\-:]+)*$";
 
     public final String fullTitle;
 

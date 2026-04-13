@@ -10,11 +10,12 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 public class Description {
     public static final String MESSAGE_CONSTRAINTS =
             "Description must be 1 to 1000 characters if provided, alphanumeric and spaces only, "
+                    + "with some special characters (. - : ()) allowed, "
                     + "no leading/trailing spaces, and no consecutive spaces.";
 
-    // 1-1000 chars, alphanumeric words separated by single spaces.
+    // 1-1000 chars, alphanumeric words (with . - : ( ) allowed) separated by single spaces.
     private static final String VALIDATION_REGEX =
-            "^(?=.{1,1000}$)[A-Za-z0-9]+(?: [A-Za-z0-9]+)*$";
+            "^(?=.{1,1000}$)[A-Za-z0-9.()\\-:]+(?: [A-Za-z0-9.()\\-:]+)*$";
 
     public final String fullDescription;
 
