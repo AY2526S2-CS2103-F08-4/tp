@@ -55,13 +55,17 @@ public class UnpinCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        // Resolve the target person first to allow for a specific pinned-state error.
         List<Person> matches = model.findPersons(this.targetInfo);
-        Person personToUnpin = CommandUtil.targetPersonFromMatches(model, matches);
-
-        if (!model.isPersonPinned(personToUnpin)) {
+        // Get the list of currently pinned matches
+        List<Person> pinnedMatches = matches.stream()
+                .filter(model::isPersonPinned)
+                .toList();
+        if (pinnedMatches.isEmpty()) {
+            CommandUtil.targetPersonFromMatches(model, matches);
             throw new CommandException(MESSAGE_ALREADY_UNPINNED);
         }
+        // Resolve the target person from the pinned matches
+        Person personToUnpin = CommandUtil.targetPersonFromMatches(model, pinnedMatches);
 
         model.unpinPerson(personToUnpin);
         model.showAllPersonsPinnedFirst();
