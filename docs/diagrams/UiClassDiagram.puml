@@ -13,6 +13,8 @@ Class HelpWindow
 Class ResultDisplay
 Class PersonListPanel
 Class PersonCard
+Class EventListPanel
+Class EventCard
 Class StatusBarFooter
 Class CommandBox
 Class CommandHistory
@@ -34,10 +36,12 @@ UiManager -down-> "1" MainWindow
 MainWindow *-down->  "1" CommandBox
 MainWindow *-down-> "1" ResultDisplay
 MainWindow *-down-> "1" PersonListPanel
+MainWindow *-down-> "1" EventListPanel
 MainWindow *-down-> "1" StatusBarFooter
 MainWindow --> "0..1" HelpWindow
 
 PersonListPanel -down-> "*" PersonCard
+EventListPanel -down-> "*" EventCard
 
 MainWindow -left-|> UiPart
 
@@ -45,19 +49,22 @@ ResultDisplay --|> UiPart
 CommandBox --|> UiPart
 PersonListPanel --|> UiPart
 PersonCard --|> UiPart
+EventListPanel --|> UiPart
+EventCard --|> UiPart
 StatusBarFooter --|> UiPart
 HelpWindow --|> UiPart
 
 CommandBox *-down-> "1" CommandHistory
 
 PersonCard ..> Model
+EventCard ..> Model
 UiManager -right-> Logic
 MainWindow -left-> Logic
 
+EventListPanel -[hidden]left- PersonListPanel
 PersonListPanel -[hidden]left- HelpWindow
-HelpWindow -[hidden]left- ResultDisplay
-ResultDisplay -[hidden]left- StatusBarFooter
-StatusBarFooter -[hidden]left- CommandBox
+HelpWindow -[hidden]left- StatusBarFooter
+ResultDisplay -[hidden]left- CommandBox
 
 MainWindow -[hidden]-|> UiPart
 @enduml
