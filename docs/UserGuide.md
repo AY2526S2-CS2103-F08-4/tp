@@ -154,7 +154,7 @@ Each field is placed on a separate line.
 
 NAB provides quick access to both the online and offline versions of the User Guide, allowing you to refer to it whenever you need guidance on NAB’s features and commands.
 
-This feature displays a message explaining how to access the online and offline help pages.
+This feature opens the help window, which shows how to access the online and offline help pages.
 
 ![help message](images/helpMessage.png)
 
