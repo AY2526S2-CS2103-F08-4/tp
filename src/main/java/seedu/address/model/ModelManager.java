@@ -203,6 +203,7 @@ public class ModelManager implements Model {
     public void showPersons(Predicate<Person> predicate) {
         requireNonNull(predicate);
         updateFilteredPersonList(predicate);
+        showNoEvents();
         sortedPersons.setComparator(createPinnedComparator());
     }
 
