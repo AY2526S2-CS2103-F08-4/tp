@@ -209,6 +209,7 @@ Before examining the individual commands for managing contacts, please refer to 
     * `n/aLeX YeOH` will match `Alex Yeoh`.<br><br>
 * Only full words will be matched
     * e.g. `Han` will not match `Hans`.
+* The token `>>` is reserved and cannot appear in contact field values.
 </box>
 
 ### User Disambiguation
@@ -317,33 +318,38 @@ Shows a list of all persons in the address book.
 
 Edits an existing person in the address book.
 
-**Format**: `edit n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... -- [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]`
+Format: `edit n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... >> [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]`
 
-* The segment before `--` identifies which contact to edit.
-* The segment after `--` specifies fields to be updated.
+* The segment before `>>` identifies which contact to edit.
+* The segment after `>>` specifies fields to be updated.
   * Updatable fields: `n/NAME`, `p/PHONE_NUMBER`, `e/EMAIL`, `a/ADDRESS`, `t/TAG`, `pfp/PHOTO_PATH`.
+* Use exactly one space before and after `>>`.
 * `n/NAME` in the target segment is required and must match the contact's full name exactly.
 * Partial name matching is not supported for `edit`. If multiple contacts share the same name, add optional fields such as `p/`, `e/`, `a/`, or `t/` immediately after `n/NAME` to disambiguate the target.
 * Existing values will be updated to the input values.
 * To add tags, you can specify new tags by typing `t/TAG` in the updated field.
 * To delete a specific tag, type an existing tag in the updated field.
 * You can remove all the person’s tags by typing `t/` without specifying any tags after it.
+* You can remove address, email, or revert the profile photo to the default by typing `a/`, `e/`, or `pfp/` respectively in the updated segment.
 
 <box type="info">
 
 **Examples**
 
 
-- `edit n/John Doe -- p/91234567 e/johndoe@example.com`<br>
+- `edit n/John Doe >> p/91234567 e/johndoe@example.com`<br>
   Edits John Doe's phone and email.
 
-- `edit n/John Doe p/98765432 -- n/Johnathan Doe t/teammate`<br>
+- `edit n/John Doe p/98765432 >> n/Johnathan Doe t/teammate`<br>
   Uniquely identifies John Doe by phone number, then updates name and tags.
 
-- `edit n/Betsy Crower -- t/`<br>
+- `edit n/Betsy Crower >> t/`<br>
   Clears all tags for Betsy Crower.
 
-- `edit n/Alex Yeoh -- pfp/C:/Users/Alex/Pictures/profile.jpg`<br>
+- `edit n/John Doe p/98765432 >> a/ e/ pfp/`<br>
+  Clears John Doe's address and email, and reverts the profile photo to the default image.
+
+- `edit n/Alex Yeoh >> pfp/C:/Users/Alex/Pictures/profile.jpg`<br>
   Updates Alex Yeoh's profile picture.
 
 </box>
@@ -889,7 +895,7 @@ Action     | Format, Examples
 **Add**    | `add n/NAME p/PHONE_NUMBER [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague pfp/images/james.jpg`
 **Clear**  | `clear`
 **Delete** | `delete n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `delete n/Alex Yeoh t/cs2103 t/cs2105`
-**Edit**   | `edit n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... -- [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]`<br> e.g.,`edit n/James Lee e/jameslee@example.com -- t/CS2100 pfp/images/james.jpg`
+**Edit**   | `edit n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... >> [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [pfp/PHOTO_PATH]`<br> e.g.,`edit n/James Lee e/jameslee@example.com >> t/CS2100 pfp/images/james.jpg`
 **Event Add** | `event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `event add title/CS2109S Meeting desc/Final discussion on problem set 1 start/2026-03-25 0900 end/2026-03-25 1000 n/David Li`
 **Event Delete** | `event delete start/START_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `event delete start/2026-03-12 1100 n/David Li`
 **Event View** | `event view n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br> e.g., `event view n/Bernice Yu`

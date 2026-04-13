@@ -24,7 +24,7 @@ import seedu.address.model.tag.Tag;
  * Parses input arguments and creates a new EditCommand object
  */
 public class EditCommandParser implements Parser<EditCommand> {
-    private static final String SEGMENT_DELIMITER = " --";
+    public static final String EDIT_SEGMENT_DELIMITER = ">>";
 
     /**
      * Parses the given {@code String} of arguments in the context of the EditCommand
@@ -35,15 +35,18 @@ public class EditCommandParser implements Parser<EditCommand> {
         requireNonNull(args);
         String trimmedArgs = args.trim();
 
-        int delimiterIndex = trimmedArgs.indexOf(SEGMENT_DELIMITER);
+        int delimiterIndex = trimmedArgs.indexOf(EDIT_SEGMENT_DELIMITER);
         if (delimiterIndex < 1) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE));
+        }
+        if (trimmedArgs.indexOf(EDIT_SEGMENT_DELIMITER, delimiterIndex + EDIT_SEGMENT_DELIMITER.length()) != -1) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE));
         }
 
         String targetSegment = trimmedArgs.substring(0, delimiterIndex);
-        String updateSegmentRaw = trimmedArgs.substring(delimiterIndex + SEGMENT_DELIMITER.length());
+        String updateSegmentRaw = trimmedArgs.substring(delimiterIndex + EDIT_SEGMENT_DELIMITER.length());
         // Reject additional spaces adjacent to the delimiter.
-        if (targetSegment.endsWith(" ")
+        if (!targetSegment.endsWith(" ")
                 || (!updateSegmentRaw.isEmpty() && !updateSegmentRaw.startsWith(" "))
                 || updateSegmentRaw.startsWith("  ")) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE));
@@ -69,6 +72,8 @@ public class EditCommandParser implements Parser<EditCommand> {
             ArgumentTokenizer.tokenize(" " + targetSegment, PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL,
                 PREFIX_ADDRESS, PREFIX_TAG);
         targetMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS);
+        ParserUtil.verifyNoReservedEditDelimiterInValues(targetMultimap,
+            PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS, PREFIX_TAG);
 
         if (!targetMultimap.getPreamble().trim().isEmpty() || targetMultimap.getValue(PREFIX_NAME).isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE));
@@ -94,6 +99,8 @@ public class EditCommandParser implements Parser<EditCommand> {
                 PREFIX_EMAIL, PREFIX_ADDRESS, PREFIX_TAG, PREFIX_PHOTO);
         updateMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS,
                 PREFIX_PHOTO);
+        ParserUtil.verifyNoReservedEditDelimiterInValues(updateMultimap,
+            PREFIX_NAME, PREFIX_PHONE, PREFIX_EMAIL, PREFIX_ADDRESS, PREFIX_TAG, PREFIX_PHOTO);
 
         if (!updateMultimap.getPreamble().trim().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE));
@@ -110,14 +117,20 @@ public class EditCommandParser implements Parser<EditCommand> {
         if (updateMultimap.getValue(PREFIX_PHONE).isPresent()) {
             editPersonDescriptor.setPhone(ParserUtil.parsePhone(updateMultimap.getValue(PREFIX_PHONE).get()));
         }
-        if (updateMultimap.getValue(PREFIX_EMAIL).isPresent()) {
-            editPersonDescriptor.setEmail(ParserUtil.parseEmail(updateMultimap.getValue(PREFIX_EMAIL).get()));
+        Optional<String> updatedEmailValue = updateMultimap.getValue(PREFIX_EMAIL);
+        if (updatedEmailValue.isPresent()) {
+            editPersonDescriptor.setEmail(updatedEmailValue.get().isBlank() ? null
+                : ParserUtil.parseEmail(updatedEmailValue.get()));
         }
-        if (updateMultimap.getValue(PREFIX_ADDRESS).isPresent()) {
-            editPersonDescriptor.setAddress(ParserUtil.parseAddress(updateMultimap.getValue(PREFIX_ADDRESS).get()));
+        Optional<String> updatedAddressValue = updateMultimap.getValue(PREFIX_ADDRESS);
+        if (updatedAddressValue.isPresent()) {
+            editPersonDescriptor.setAddress(updatedAddressValue.get().isBlank() ? null
+                : ParserUtil.parseAddress(updatedAddressValue.get()));
         }
-        if (updateMultimap.getValue(PREFIX_PHOTO).isPresent()) {
-            editPersonDescriptor.setPhoto(ParserUtil.parsePhoto(updateMultimap.getValue(PREFIX_PHOTO).get()));
+        Optional<String> updatedPhotoValue = updateMultimap.getValue(PREFIX_PHOTO);
+        if (updatedPhotoValue.isPresent()) {
+            editPersonDescriptor.setPhoto(updatedPhotoValue.get().isBlank() ? null
+                : ParserUtil.parsePhoto(updatedPhotoValue.get()));
         }
         return editPersonDescriptor;
     }

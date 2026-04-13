@@ -1,7 +1,6 @@
 package seedu.address.logic.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
@@ -20,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.Messages;
@@ -242,6 +242,31 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void verifyNoReservedEditDelimiterInValues_noReservedToken_success() throws Exception {
+        ArgumentMultimap argumentMultimap = ArgumentTokenizer.tokenize(
+                " n/" + VALID_NAME + " p/1234567 e/rachel@example.com a/123 Main Street #0505 t/friend",
+            CliSyntax.PREFIX_NAME, CliSyntax.PREFIX_PHONE, CliSyntax.PREFIX_EMAIL,
+            CliSyntax.PREFIX_ADDRESS, CliSyntax.PREFIX_TAG);
+
+        ParserUtil.verifyNoReservedEditDelimiterInValues(argumentMultimap,
+            CliSyntax.PREFIX_NAME, CliSyntax.PREFIX_PHONE, CliSyntax.PREFIX_EMAIL,
+            CliSyntax.PREFIX_ADDRESS, CliSyntax.PREFIX_TAG);
+    }
+
+    @Test
+    public void verifyNoReservedEditDelimiterInValues_reservedTokenInValue_throwsParseException() {
+        ArgumentMultimap argumentMultimap = ArgumentTokenizer.tokenize(
+                " n/" + VALID_NAME + " >> p/1234567 e/rachel@example.com a/123 Main Street #0505 t/friend",
+            CliSyntax.PREFIX_NAME, CliSyntax.PREFIX_PHONE, CliSyntax.PREFIX_EMAIL,
+            CliSyntax.PREFIX_ADDRESS, CliSyntax.PREFIX_TAG);
+
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_RESERVED_EDIT_SEGMENT_DELIMITER, () ->
+            ParserUtil.verifyNoReservedEditDelimiterInValues(argumentMultimap,
+                CliSyntax.PREFIX_NAME, CliSyntax.PREFIX_PHONE, CliSyntax.PREFIX_EMAIL,
+                CliSyntax.PREFIX_ADDRESS, CliSyntax.PREFIX_TAG));
+    }
+
+    @Test
     public void parsePersons_validMultiplePersons_success() throws Exception {
         String personsSection = " n/Alice n/Joe t/Family n/Bob p/81234567 e/bob@example.com a/NUS";
         List<PersonInformation> actual = ParserUtil.parsePersons(personsSection);
@@ -284,7 +309,7 @@ public class ParserUtilTest {
         Method parseEachPerson = ParserUtil.class.getDeclaredMethod("parseEachPerson", String.class, List.class);
         parseEachPerson.setAccessible(true);
 
-        InvocationTargetException ex = assertThrows(InvocationTargetException.class, () ->
+        InvocationTargetException ex = Assertions.assertThrows(InvocationTargetException.class, () ->
                 parseEachPerson.invoke(null, " n/Alice", new ArrayList<Integer>()));
         assertTrue(ex.getCause() instanceof ParseException);
         assertEquals(MESSAGE_INVALID_PERSONS_FORMAT, ex.getCause().getMessage());
@@ -296,7 +321,7 @@ public class ParserUtilTest {
         parseEachPerson.setAccessible(true);
 
         List<Integer> invalidNamePositions = List.of(0);
-        InvocationTargetException ex = assertThrows(InvocationTargetException.class, () ->
+        InvocationTargetException ex = Assertions.assertThrows(InvocationTargetException.class, () ->
                 parseEachPerson.invoke(null, " abc", invalidNamePositions));
         assertTrue(ex.getCause() instanceof ParseException);
         assertEquals(MESSAGE_MISSING_NAME_PREFIX_IN_PERSONS, ex.getCause().getMessage());

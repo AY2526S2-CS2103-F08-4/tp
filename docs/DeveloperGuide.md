@@ -1062,10 +1062,10 @@ Expected:
 | Ambiguous pin | `pin n/John Tan` | - | Error `Multiple matches identified! Please provide more arguments.` and the conflicting contacts are shown. |
 | Disambiguated pin | `pin n/John Tan p/81234567` | - | The correct `John Tan` is pinned. |
 | Disambiguated unpin | `unpin n/John Tan p/81234567` | - | The same contact is unpinned. |
-| Ambiguous edit | `edit n/John Tan -- e/john.updated@example.com` | - | Ambiguity error because more than one `John Tan` exists. |
-| Disambiguated edit | `edit n/John Tan p/81234567 -- e/john.updated@example.com t/teammate` | - | The contact with phone `81234567` is updated. |
-| Clear tags with edit | `edit n/John Tan p/81234567 -- t/` | - | All tags are cleared for that contact. |
-| Profile photo support | `edit n/John Tan p/81234567 -- pfp/profile.png` | Place any `.png`, `.jpg`, or `.jpeg` file outside NAB's `data/images/` folder, for example `profile.png` beside the jar, before running the command | The selected contact's photo is updated and the image is copied into NAB's managed image storage. |
+| Ambiguous edit | `edit n/John Tan >> e/john.updated@example.com` | - | Ambiguity error because more than one `John Tan` exists. |
+| Disambiguated edit | `edit n/John Tan p/81234567 >> e/john.updated@example.com t/teammate` | - | The contact with phone `81234567` is updated. |
+| Clear tags with edit | `edit n/John Tan p/81234567 >> t/` | - | All tags are cleared for that contact. |
+| Profile photo support | `edit n/John Tan p/81234567 >> pfp/profile.png` | Place any `.png`, `.jpg`, or `.jpeg` file outside NAB's `data/images/` folder, for example `profile.png` beside the jar, before running the command | The selected contact's photo is updated and the image is copied into NAB's managed image storage. |
 | Tag multiple contacts | `tag label/cs2103-team n/Alex Yeoh n/Mary Lim` | - | Both contacts receive the `cs2103-team` tag. |
 | Tag multiple contacts with multiple labels | `tag label/demo label/testing n/John Tan p/81234567 n/Mary Lim` | - | Both contacts receive both tags. |
 | Ambiguous tag target | `tag label/demo n/John Tan` | - | Ambiguity error because the target name is not unique. |

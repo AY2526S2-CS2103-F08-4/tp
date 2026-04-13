@@ -559,4 +559,33 @@ public class EditCommandTest {
         assertNotEquals(oldPhotoPath, editedPerson.getPhoto().get().getPath());
         assertTrue(Files.exists(Path.of(editedPerson.getPhoto().get().getPath())));
     }
+
+    @Test
+    public void execute_clearProfilePhoto_deletesOldPhotoAndResetsToDefault(@TempDir Path tempDir) throws Exception {
+        Path appFolder = tempDir.resolve("app_storage");
+        Files.createDirectory(appFolder);
+        String tempDirPath = PhotoStorageUtil.formatPath(appFolder);
+
+        Path oldPhotoFile = appFolder.resolve("old_photo.jpg");
+        Files.createFile(oldPhotoFile);
+        String oldPhotoPath = PhotoStorageUtil.formatPath(oldPhotoFile);
+
+        Index indexLastPerson = Index.fromOneBased(model.getFilteredPersonList().size());
+        Person lastPerson = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+        Person personWithOldPhoto = new PersonBuilder(lastPerson).withPhoto(oldPhotoPath).build();
+        model.setPerson(lastPerson, personWithOldPhoto);
+        model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+
+        EditPersonDescriptor descriptor = new EditPersonDescriptor();
+        descriptor.setPhoto(null);
+
+        EditCommand editCommand = new EditCommand(targetInfoFromPerson(personWithOldPhoto), descriptor, tempDirPath);
+        CommandResult result = editCommand.execute(model);
+
+        assertTrue(result.getFeedbackToUser().startsWith("Edited Person:"));
+        assertFalse(Files.exists(oldPhotoFile));
+
+        Person editedPerson = model.getFilteredPersonList().get(0);
+        assertTrue(editedPerson.getPhoto().isEmpty());
+    }
 }

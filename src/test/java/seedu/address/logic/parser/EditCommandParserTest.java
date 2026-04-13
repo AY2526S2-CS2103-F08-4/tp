@@ -31,6 +31,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PHOTO;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
@@ -59,7 +60,7 @@ public class EditCommandParserTest {
 
     private static final String MESSAGE_INVALID_FORMAT =
             String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditCommand.MESSAGE_USAGE);
-    private static final String DELIMITER = " -- ";
+    private static final String DELIMITER = " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " ";
     private static final String TARGET_NAME_AMY = "Amy Bee";
     private static final String TARGET_NAME_BENSON = "Benson Meier";
     private static final String TARGET_NAME_CARL = "Carl Kurz";
@@ -72,13 +73,16 @@ public class EditCommandParserTest {
     @Test
     public void parse_missingParts_failure() {
         // no target name specified
-        assertParseFailure(parser, DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " " + NAME_DESC_AMY,
+            MESSAGE_INVALID_FORMAT);
 
         // no target name prefix specified
-        assertParseFailure(parser, TARGET_NAME_AMY + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_NAME_AMY + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " "
+            + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // no field specified
-        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER, EditCommand.MESSAGE_NOT_EDITED);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " ",
+            EditCommand.MESSAGE_NOT_EDITED);
 
         // no target name and no field specified
         assertParseFailure(parser, "", MESSAGE_INVALID_FORMAT);
@@ -87,42 +91,60 @@ public class EditCommandParserTest {
     @Test
     public void parse_invalidPreamble_failure() {
         // invalid name in preamble
-        assertParseFailure(parser, "Amy & Bee" + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, "Amy & Bee" + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " "
+            + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // numeric preamble is not a valid name
-        assertParseFailure(parser, "0" + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, "0" + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " " + NAME_DESC_AMY,
+            MESSAGE_INVALID_FORMAT);
 
         // invalid arguments being parsed as preamble
-        assertParseFailure(parser, "i/ string" + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, "i/ string" + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " "
+            + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // only whitespace preamble
-        assertParseFailure(parser, "   " + DELIMITER + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, "   " + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " " + NAME_DESC_AMY,
+            MESSAGE_INVALID_FORMAT);
 
         // non-empty preamble before prefixed target name
-        assertParseFailure(parser, "oops " + TARGET_IDENTIFIER_AMY + DELIMITER + NAME_DESC_AMY,
-            MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, "oops " + TARGET_IDENTIFIER_AMY + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER
+            + " " + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // non-empty preamble with valid delimiter spacing (reaches target-segment preamble branch)
-        assertParseFailure(parser, "oops " + TARGET_IDENTIFIER_AMY + " -- " + PREFIX_NAME + "Bob",
-            MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, "oops " + TARGET_IDENTIFIER_AMY + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER
+            + " " + PREFIX_NAME + "Bob", MESSAGE_INVALID_FORMAT);
 
         // missing target name prefix (empty preamble but no n/ value)
-        assertParseFailure(parser, PREFIX_PHONE + "98765432" + DELIMITER + NAME_DESC_AMY.trim(),
-            MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, PREFIX_PHONE + "98765432" + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " "
+            + NAME_DESC_AMY.trim(), MESSAGE_INVALID_FORMAT);
     }
 
     @Test
     public void parse_invalidDelimiterSpacing_failure() {
         // no space before delimiter
-        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + "-- " + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + EditCommandParser.EDIT_SEGMENT_DELIMITER
+            + " " + NAME_DESC_AMY, MESSAGE_INVALID_FORMAT);
 
         // no space after delimiter
-        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + " --" + NAME_DESC_AMY.trim(), MESSAGE_INVALID_FORMAT);
+        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER
+            + NAME_DESC_AMY.trim(), MESSAGE_INVALID_FORMAT);
     }
 
     @Test
     public void parse_multipleSpacesAroundDelimiter_failure() {
-        String userInput = TARGET_IDENTIFIER_AMY + "   --    " + PHONE_DESC_AMY;
+        String userInput = TARGET_IDENTIFIER_AMY + "   " + EditCommandParser.EDIT_SEGMENT_DELIMITER + "    "
+            + PHONE_DESC_AMY;
+        assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
+    }
+
+    @Test
+    public void parse_reservedDelimiterTokenInFields_failure() {
+        String userInput = TARGET_IDENTIFIER_AMY + " a/Block 50 >> West Coast"
+            + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " " + PHONE_DESC_AMY.trim();
+        assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
+
+        userInput = TARGET_IDENTIFIER_AMY + " " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " "
+            + "a/Block 50 >> West Coast";
         assertParseFailure(parser, userInput, MESSAGE_INVALID_FORMAT);
     }
 
@@ -154,8 +176,6 @@ public class EditCommandParserTest {
             Phone.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_EMAIL_DESC.trim(),
             Email.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_ADDRESS_DESC.trim(),
-            Address.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, TARGET_IDENTIFIER_AMY + DELIMITER + INVALID_TAG_DESC.trim(),
             String.format("Invalid tag: %s.\n%s", "hubby*", Tag.MESSAGE_CONSTRAINTS));
 
@@ -308,6 +328,42 @@ public class EditCommandParserTest {
         String userInput = TARGET_IDENTIFIER_CARL + DELIMITER + TAG_EMPTY.trim();
 
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withTags().build();
+        EditCommand expectedCommand = new EditCommand(
+                new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
+
+        assertParseSuccess(parser, userInput, expectedCommand);
+    }
+
+    @Test
+    public void parse_clearAddress_success() {
+        String userInput = TARGET_IDENTIFIER_CARL + DELIMITER + PREFIX_ADDRESS;
+
+        EditPersonDescriptor descriptor = new EditPersonDescriptor();
+        descriptor.setAddress(null);
+        EditCommand expectedCommand = new EditCommand(
+                new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
+
+        assertParseSuccess(parser, userInput, expectedCommand);
+    }
+
+    @Test
+    public void parse_clearEmail_success() {
+        String userInput = TARGET_IDENTIFIER_CARL + DELIMITER + PREFIX_EMAIL;
+
+        EditPersonDescriptor descriptor = new EditPersonDescriptor();
+        descriptor.setEmail(null);
+        EditCommand expectedCommand = new EditCommand(
+                new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
+
+        assertParseSuccess(parser, userInput, expectedCommand);
+    }
+
+    @Test
+    public void parse_clearPhoto_success() {
+        String userInput = TARGET_IDENTIFIER_CARL + DELIMITER + PREFIX_PHOTO;
+
+        EditPersonDescriptor descriptor = new EditPersonDescriptor();
+        descriptor.setPhoto(null);
         EditCommand expectedCommand = new EditCommand(
                 new PersonInformation(new Name(TARGET_NAME_CARL), null, null, null, null), descriptor);
 

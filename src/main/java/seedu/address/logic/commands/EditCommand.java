@@ -21,6 +21,7 @@ import seedu.address.commons.util.PhotoStorageUtil;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.logic.parser.EditCommandParser;
 import seedu.address.model.Model;
 import seedu.address.model.event.Event;
 import seedu.address.model.person.Address;
@@ -47,7 +48,7 @@ public class EditCommand extends Command {
             + "[" + PREFIX_EMAIL + "EMAIL] "
             + "[" + PREFIX_ADDRESS + "ADDRESS] "
             + "[" + PREFIX_TAG + "TAG]... "
-            + "-- "
+            + EditCommandParser.EDIT_SEGMENT_DELIMITER + " "
             + "[" + PREFIX_NAME + "NAME] "
             + "[" + PREFIX_PHONE + "PHONE_NUMBER] "
             + "[" + PREFIX_EMAIL + "EMAIL] "
@@ -55,7 +56,7 @@ public class EditCommand extends Command {
             + "[" + PREFIX_TAG + "TAG]... "
             + "[" + PREFIX_PHOTO + "PHOTO_PATH]\n"
             + "Example: " + COMMAND_WORD + " " + PREFIX_NAME + "John Doe "
-            + PREFIX_PHONE + "91234567 -- "
+            + PREFIX_PHONE + "91234567 " + EditCommandParser.EDIT_SEGMENT_DELIMITER + " "
             + PREFIX_EMAIL + "john.new@example.com "
             + PREFIX_TAG + "friends";
 
@@ -124,7 +125,14 @@ public class EditCommand extends Command {
     }
 
     private void updatePhotoIfPresent(Model model, Person personToEdit) throws CommandException {
+        if (!editPersonDescriptor.isPhotoEdited()) {
+            return;
+        }
+
         if (editPersonDescriptor.getPhoto().isEmpty()) {
+            if (personToEdit.getPhoto().isPresent()) {
+                CommandUtil.safelyDeletePhoto(model, personToEdit, personToEdit.getPhoto().get(), this.targetDirectory);
+            }
             return;
         }
 
@@ -164,13 +172,15 @@ public class EditCommand extends Command {
         Phone updatedPhone = editPersonDescriptor.getPhone().isPresent()
             ? editPersonDescriptor.getPhone().get()
             : personToEdit.getPhone();
-        Optional<Email> updatedEmail = editPersonDescriptor.getEmail().isPresent()
-                ? editPersonDescriptor.getEmail() : personToEdit.getEmail();
-        Optional<Address> updatedAddress = editPersonDescriptor.getAddress().isPresent()
-                ? editPersonDescriptor.getAddress() : personToEdit.getAddress();
+        Optional<Email> updatedEmail = editPersonDescriptor.isEmailEdited()
+            ? editPersonDescriptor.getEmail()
+            : personToEdit.getEmail();
+        Optional<Address> updatedAddress = editPersonDescriptor.isAddressEdited()
+            ? editPersonDescriptor.getAddress()
+            : personToEdit.getAddress();
         Set<Tag> updatedTags = createEditedTags(personToEdit.getTags(), editPersonDescriptor.getTags());
-        Optional<Photo> updatedPhoto = editPersonDescriptor.getPhoto().isPresent()
-                ? editPersonDescriptor.getPhoto()
+        Optional<Photo> updatedPhoto = editPersonDescriptor.isPhotoEdited()
+            ? editPersonDescriptor.getPhoto()
                 : personToEdit.getPhoto();
 
         Person editedPerson = new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedTags,
@@ -245,6 +255,9 @@ public class EditCommand extends Command {
         private Address address;
         private Set<Tag> tags;
         private Photo photo;
+        private boolean isAddressEdited;
+        private boolean isEmailEdited;
+        private boolean isPhotoEdited;
 
         public EditPersonDescriptor() {}
 
@@ -259,13 +272,17 @@ public class EditCommand extends Command {
             setAddress(toCopy.address);
             setTags(toCopy.tags);
             setPhoto(toCopy.photo);
+            this.isEmailEdited = toCopy.isEmailEdited;
+            this.isAddressEdited = toCopy.isAddressEdited;
+            this.isPhotoEdited = toCopy.isPhotoEdited;
         }
 
         /**
          * Returns true if at least one field is edited.
          */
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags, photo);
+            return CollectionUtil.isAnyNonNull(name, phone, tags)
+                    || isEmailEdited || isAddressEdited || isPhotoEdited;
         }
 
         public void setName(Name name) {
@@ -286,26 +303,41 @@ public class EditCommand extends Command {
 
         public void setEmail(Email email) {
             this.email = email;
+            this.isEmailEdited = true;
         }
 
         public Optional<Email> getEmail() {
             return Optional.ofNullable(email);
         }
 
+        public boolean isEmailEdited() {
+            return isEmailEdited;
+        }
+
         public void setAddress(Address address) {
             this.address = address;
+            this.isAddressEdited = true;
         }
 
         public Optional<Address> getAddress() {
             return Optional.ofNullable(address);
         }
 
+        public boolean isAddressEdited() {
+            return isAddressEdited;
+        }
+
         public void setPhoto(Photo photo) {
             this.photo = photo;
+            this.isPhotoEdited = true;
         }
 
         public Optional<Photo> getPhoto() {
             return Optional.ofNullable(photo);
+        }
+
+        public boolean isPhotoEdited() {
+            return isPhotoEdited;
         }
 
         /**
@@ -340,9 +372,12 @@ public class EditCommand extends Command {
             return Objects.equals(name, otherEditPersonDescriptor.name)
                     && Objects.equals(phone, otherEditPersonDescriptor.phone)
                     && Objects.equals(email, otherEditPersonDescriptor.email)
+                    && isEmailEdited == otherEditPersonDescriptor.isEmailEdited
                     && Objects.equals(address, otherEditPersonDescriptor.address)
+                    && isAddressEdited == otherEditPersonDescriptor.isAddressEdited
                     && Objects.equals(tags, otherEditPersonDescriptor.tags)
-                    && Objects.equals(photo, otherEditPersonDescriptor.photo);
+                    && Objects.equals(photo, otherEditPersonDescriptor.photo)
+                    && isPhotoEdited == otherEditPersonDescriptor.isPhotoEdited;
         }
 
         @Override
