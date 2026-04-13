@@ -62,8 +62,8 @@ public class ImportCommand extends Command {
             + " do not match the expected format.";
     public static final String MESSAGE_ERROR_READING_FILE = "Error reading data from %1$s";
     public static final String MESSAGE_EMPTY_FILE = "The file %1$s is empty.";
-    public static final String MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED = "Successfully imported %1$s_events.csv "
-            + "and %1$s_persons.csv with %2$d contact(s) added, %3$d contact(s) skipped.";
+    public static final String MESSAGE_SUCCESS_ROWS_ADDED_SKIPPED = "Successfully imported %1$s_persons.csv "
+            + "and %1$s_events.csv with %2$d contact(s) added, %3$d contact(s) skipped.";
 
     private static final Logger logger = LogsCenter.getLogger(ImportCommand.class);
 

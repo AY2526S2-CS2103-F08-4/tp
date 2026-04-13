@@ -737,7 +737,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 **MSS**
 1. User requests to find contacts with specific tag(s).
 2. User enters the necessary tag(s).
-3. NAB checks whether the provided tag(s) are valid.
+3. NAB checks whether the provided tag(s) is/are valid.
 4. NAB retrieves a list of contacts matching the tag(s).
 5. NAB displays the list of contacts to the user.
    <br> *Use case ends.*
@@ -759,15 +759,23 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **Use case:** `UC7` - Export Contacts<br>
 **MSS**
-1. User requests to export all contacts out of NAB.
-2. NAB saves a formatted file containing the list of contacts to a file directory.
+1. User requests to export contacts and provides an export type and a filename prefix.
+2. NAB determines the set of contacts to export according to the chosen export type.
+3. NAB writes the export files.
+4. NAB informs the user of a successful export.
    <br> *Use case ends.*
 
 **Extensions**
 
-* 2a. NAB is unable to save the file to the user’s file directory.
-    * 2a1. NAB informs the user of the error.
-    <br> *Use case ends.*
+* 1a. The provided export arguments are invalid.
+    * 1a1. NAB informs the user of a command format error and aborts the export.
+      <br> *Use case ends.*
+* 2a. The selected contact set is empty.
+    * 2a1. NAB informs the user that there are no contacts to export and aborts the export.
+      <br> *Use case ends.*
+* 3a. NAB cannot write the files to the destination.
+    * 3a1. NAB informs the user about the write error and aborts the export.
+      <br> *Use case ends.*
 </box>
 
 <box type="info" seamless>
@@ -776,23 +784,28 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 
 **Use case:** `UC8` - Import Contacts<br>
-**Preconditions:** Only contact information from a specified file format can be imported<br>
+**Preconditions:** The user supplies a filename prefix identifying the expected import files which exist.<br>
 **MSS**
-1. User requests to import new contacts from an external contact list.
-2. NAB adds the list of new contacts to the existing contact list/database.
+1. User requests to import contacts specifying an import mode and a filename prefix.
+2. NAB reads the required import files and parses their contents.
+3. NAB adds or replaces contacts according to the selected import mode.
+4. NAB informs the user as to how many contacts were added and how many were skipped.
    <br> *Use case ends.*
 
 **Extensions**
 
-* 1a. NAB is unable to read the file.
-    * 1a1. NAB informs the user of the error.
-    <br> *Use case ends.*<br><br>
-* 1b. NAB finds a contact number that already exists in the database while reading the file.
-    * 1b1. NAB informs the user of the error.
-    * 1b2. User acknowledges the error.
-    * 1b3. NAB skips the contact information with the existing contact number and
-      continues reading the rest of the file.
-    <br> *Use case ends.*
+* 1a. The provided import arguments are invalid.
+    * 1a1. NAB informs the user of a command format error and aborts the import.
+      <br> *Use case ends.*
+* 2a. NAB cannot read the required files.
+    * 2a1. NAB informs the user about the read error and aborts the import.
+      <br> *Use case ends.*
+* 3a. A data row is malformed or invalid.
+    * 3a1. NAB skips the row, records the reason, and continues importing the remaining rows.
+      <br> *Use case continues from step 4.*
+* 3b. An existing contact is found when importing.
+    * 3b1. NAB skips the duplicate row and continues importing the remaining rows.
+      <br> *Use case continues from step 4.*
 </box>
 
 *{More to be added}*
@@ -801,7 +814,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ###### Portability:
 1.  Should work on any _mainstream OS_ as long as it has Java `17` or above installed.
-2.  Should be packaged as a single JAR file not exceeding size of 100MB.
+2.  Should be packaged as a single JAR file not exceeding a size of 100MB.
 3.  Should be fully functional offline and must not depend on any remote server.
 
 ###### Scalability:
