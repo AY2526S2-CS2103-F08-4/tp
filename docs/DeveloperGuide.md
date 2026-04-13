@@ -766,7 +766,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 1. User requests to pin a specific contact by providing their name and any optional fields.
 2. NAB identifies the specific contact matching the fields.
 3. NAB pins the contact.
-4. NAB updates the display to show pinned contacts first and clears the event panel.
+4. NAB updates the display to show the full contact list with pinned contacts first.
    <br> *Use case ends.*
 
 **Extensions**
@@ -847,8 +847,7 @@ This use case is analogous to `UC9` - Pin Contact.<br>
 1. User requests to assign one or more tags to one or more contacts by providing the tags and the contacts' identifying details.
 2. NAB identifies all specified contacts.
 3. NAB adds the specified tag(s) to each identified contact.
-4. NAB updates the display to show pinned contacts first and clears the event panel.
-5. NAB informs the user how many contacts were tagged, which tags were assigned, and which contacts were tagged.
+4. NAB updates the display to show the full contact list with pinned contacts first and informs the user of the tagging result.
    <br> *Use case ends.*
 
 **Extensions**
