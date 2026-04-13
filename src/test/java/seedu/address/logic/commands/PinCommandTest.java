@@ -40,6 +40,7 @@ public class PinCommandTest {
         String expectedMessage = String.format(PinCommand.MESSAGE_PIN_PERSON_SUCCESS, Messages.format(personToPin));
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.pinPerson(personToPin);
+        expectedModel.showNoEvents();
 
         assertCommandSuccess(pinCommand, model, expectedMessage, expectedModel);
     }
@@ -83,6 +84,26 @@ public class PinCommandTest {
         String expectedMessage = String.format(PinCommand.MESSAGE_PIN_PERSON_SUCCESS, Messages.format(secondMatch));
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.pinPerson(secondMatch);
+        expectedModel.showNoEvents();
+
+        assertCommandSuccess(pinCommand, model, expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_sameNameOnePinnedOneUnpinned_pinsOnlyUnpinnedMatch() {
+        Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
+        Person firstMatch = new PersonBuilder().withName("David Ng").withPhone("90001111").build();
+        Person secondMatch = new PersonBuilder().withName("David Ng").withPhone("90002222").build();
+        model.addPerson(firstMatch);
+        model.addPerson(secondMatch);
+        model.pinPerson(firstMatch);
+
+        PinCommand pinCommand = new PinCommand(createNameOnlyInfo(new Name("David Ng")));
+
+        String expectedMessage = String.format(PinCommand.MESSAGE_PIN_PERSON_SUCCESS, Messages.format(secondMatch));
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.pinPerson(secondMatch);
+        expectedModel.showNoEvents();
 
         assertCommandSuccess(pinCommand, model, expectedMessage, expectedModel);
     }
@@ -95,7 +116,9 @@ public class PinCommandTest {
 
         PinCommand pinCommand = new PinCommand(createNameOnlyInfo(personToPin.getName()));
 
-        assertCommandFailure(pinCommand, model, PinCommand.MESSAGE_ALREADY_PINNED);
+        CommandException thrown = assertThrows(CommandException.class, () -> pinCommand.execute(model));
+        assertTrue(thrown.getMessage().contains("already pinned"));
+        assertTrue(model.isPersonPinned(personToPin));
     }
 
     @Test

@@ -108,6 +108,44 @@ public class UnpinCommandTest {
     }
 
     @Test
+    public void execute_sameNameOnePinnedOneUnpinned_unpinsOnlyPinnedMatch() {
+        Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
+        Person firstMatch = new PersonBuilder().withName("David Ng").withPhone("90001111").build();
+        Person secondMatch = new PersonBuilder().withName("David Ng").withPhone("90002222").build();
+        model.addPerson(firstMatch);
+        model.addPerson(secondMatch);
+        model.pinPerson(firstMatch);
+
+        UnpinCommand unpinCommand = new UnpinCommand(createNameOnlyInfo(new Name("David Ng")));
+
+        String expectedMessage = String.format(UnpinCommand.MESSAGE_UNPIN_PERSON_SUCCESS,
+                Messages.format(firstMatch));
+
+        try {
+            CommandResult result = unpinCommand.execute(model);
+            assertEquals(new CommandResult(expectedMessage), result);
+            assertFalse(model.isPersonPinned(firstMatch));
+        } catch (CommandException ce) {
+            throw new AssertionError("Execution of command should not fail.", ce);
+        }
+    }
+
+    @Test
+    public void execute_whenEventsAreShowing_clearsFilteredEventList() throws Exception {
+        Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
+        Person displayedPerson = model.findPersons(createNameOnlyInfo(new Name("Alice Pauline"))).get(0);
+        Person personToUnpin = model.findPersons(createNameOnlyInfo(new Name("Benson Meier"))).get(0);
+        model.pinPerson(personToUnpin);
+        model.showEventsForPerson(displayedPerson);
+        assertFalse(model.getFilteredEventList().isEmpty());
+
+        UnpinCommand unpinCommand = new UnpinCommand(createNameOnlyInfo(personToUnpin.getName()));
+        unpinCommand.execute(model);
+
+        assertTrue(model.getFilteredEventList().isEmpty());
+    }
+
+    @Test
     public void equals() {
         PersonInformation firstInfo = new PersonInformation(new Name("Alex Tan"), null, null, null, null);
         PersonInformation secondInfo = new PersonInformation(new Name("Beth Lee"), null, null, null, null);
