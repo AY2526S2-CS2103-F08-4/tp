@@ -53,8 +53,6 @@
         "storage-component": "Storage component",
         "common-classes": "Common classes",
         "implementation": "Implementation",
-        "proposed-undo-redo-feature": "[Proposed] Undo/redo feature",
-        "proposed-data-archiving": "[Proposed] Data archiving",
         "retrieval-of-past-entered-commands": "Retrieval of past entered commands",
         "pin-unpin-contact-feature": "Pin/Unpin contact feature",
         "contact-disambiguating-feature": "Contact Disambiguating feature",

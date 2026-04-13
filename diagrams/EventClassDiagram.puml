@@ -1,0 +1,23 @@
+@startuml
+!include style.puml
+show fields
+hide empty members
+skinparam arrowThickness 1.1
+skinparam arrowColor MODEL_COLOR
+skinparam classBackgroundColor MODEL_COLOR
+skinparam classAttributeFontColor #FFFFFF
+
+Class Event {
+    eventId : int
+    numberOfPersonLinked : int
+}
+
+Class Title
+Class TimeRange
+Class Description
+
+Event *--> "1" Title
+Event *--> "1" TimeRange
+Event *--> "0..1" Description
+
+@enduml
