@@ -42,6 +42,5 @@ JsonSerializableAddressBook --> "*" JsonAdaptedPerson : persons
 JsonSerializableAddressBook --> "*" JsonAdaptedPerson : pinned
 JsonSerializableAddressBook --> "*" JsonAdaptedEvent
 JsonAdaptedPerson --> "*" JsonAdaptedTag
-JsonAdaptedPerson ..> JsonAdaptedEvent : resolves via ID
 
 @enduml
