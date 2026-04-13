@@ -199,7 +199,7 @@ Step 1. The user launches the application for the first time. The `VersionedAddr
 
 <puml src="diagrams/UndoRedoState0.puml" alt="UndoRedoState0" />
 
-Step 2. The user executes `delete 5` command to delete the 5th person in the address book. The `delete` command calls `Model#commitAddressBook()`, causing the modified state of the address book after the `delete 5` command executes to be saved in the `addressBookStateList`, and the `currentStatePointer` is shifted to the newly inserted address book state.
+Step 2. The user executes `delete n/Marcus` command to delete a contact named "Marcus" in the address book. The `delete` command calls `Model#commitAddressBook()`, causing the modified state of the address book after the `delete n/Marcus` command executes to be saved in the `addressBookStateList`, and the `currentStatePointer` is shifted to the newly inserted address book state.
 
 <puml src="diagrams/UndoRedoState1.puml" alt="UndoRedoState1" />
 
@@ -474,7 +474,7 @@ The required prefixes are `title/`, `start/`, and `end/` for the event, and `n/`
 
 The `java.util.Optional<T>` class is utilised to encapsulate any optional attribute of the `Event` object (i.e., `Description`), allowing the absence of a value to be represented explicitly rather than using `null`.
 
-`AddEventCommand#execute(Model)` begins with a prerequisite target resolution step, followed by a four-case resolution flow:
+`AddEventCommand#execute(Model)` begins with a prerequisite target resolution step, followed by a five-case resolution flow:
 
 1. **Target resolution** — `CommandUtil#targetPerson(Model, PersonInformation)` is called first to resolve the target contact (see [Contact Disambiguating feature](#contact-disambiguating-feature)).
 2. **Duplicate check** — If the resolved person is already linked to the same event, a `CommandException` is thrown.
@@ -602,23 +602,22 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 **Use case:** `UC1` - Add Contact<br>
 **Guarantee:** New contact is successfully saved in the system.<br>
 **MSS**
-1. User requests to add a contact.
-2. User enters the necessary contact information.
-3. NAB saves the contact into the contact list/database.
+1. User requests to add a contact by providing the necessary contact information.
+2. NAB saves the contact into the system.
+3. NAB updates the display to show the contact list and clears the event panel.
 <br> *Use case ends.*
 
 **Extensions**
 
-* 2a. NAB detects an existing contact number entered.
-  * 2a1. NAB requests for a different contact number.
-  * 2a2. User enters a new contact number.
-  * Steps 2a1 - 2a2 are repeated until a unique contact number is entered.
-<br> *Use case continues from step 3.*<br><br>
-* 2b. NAB detects invalid contact information.
-  * 2b1. NAB requests for the correct information.
-  * 2b2. User enters the correct contact information.
-  * Steps 2b1 - 2b2 are repeated until all contact information are valid entries.
-  <br> *Use case continues from step 3.*
+* 1a. NAB detects that a contact with the provided phone number exists.
+  * 1a1. NAB returns an error message stating that a contact with this phone number already exists.
+<br> *Use case ends.*<br><br>
+* 1b. NAB detects invalid or missing contact information.
+  * 1b1. NAB displays an error message specifying the correct command format.
+<br> *Use case ends.*<br><br>
+* 1c. NAB is unable to read or copy the provided photo file.
+  * 1b1. NAB returns an error message indicating the photo save failure.
+    <br> *Use case ends.*<br><br>
 </box>
 
 <box type="info" seamless>
@@ -628,23 +627,22 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **Use case:** `UC2` - Find Contact<br>
 **MSS**
-1. User requests to find a contact.
-2. User provides a keyword.
-3. NAB checks whether the entered keyword is valid.
-4. NAB identifies the specific contact matching the name.
-5. NAB displays a list of contacts matching the user’s keyword.
+1. User requests to find a contact by providing a name and any optional fields.
+2. NAB searches for all contacts matching the criteria.
+3. NAB displays a list of contacts matching the criteria specified.
    <br> *Use case ends.*
 
 **Extensions**
 
-* 3a. NAB detects invalid characters in the provided keyword
-    * 3a1. NAB returns an error message
+* 1a. NAB detects invalid characters or formats in the provided fields.
+    * 1a1. NAB displays an error message specifying the correct command format.
       <br> *Use case ends.*<br><br>
-* 4a. NAB detects finds multiple possible contacts matching the keyword provided.
-    * 4a1. User provides more information to enrich the search.
-      <br> *Use case resumes from step 3.*<br><br>
-* 4b. NAB finds no available contacts matching the keyword provided.
-    * 4b1. NAB informs the user that no matches were found.
+* 2a. NAB finds exactly one contact matching the criteria.
+    * 2a1. NAB displays the single contact.
+    * 2a2. NAB automatically retrieves and displays the event list associated with that specific contact.
+      <br> *Use case ends.*<br><br>
+* 2b. NAB finds no available contacts matching the criteria.
+    * 2b1. NAB displays an empty contact list and informs the user that 0 matches were found.
       <br> *Use case ends.*
 </box>
 
@@ -655,22 +653,22 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **Use case:** `UC3` - Delete Contact<br>
 **MSS**
-1. User requests to delete a specific contact by providing their name.
-2. NAB checks whether the provided name is valid.
-3. NAB identifies the specific contact matching the name.
-4. NAB deletes the contact.
+1. User requests to delete a specific contact by providing their name and any optional fields.
+2. NAB identifies the specific contact matching the fields.
+3. NAB deletes the contact.
+4. NAB updates the display to show the remaining contacts and clears the event panel.
    <br> *Use case ends.*
 
 **Extensions**
 
-* 2a. NAB detects invalid characters in the provided name.
-    * 2a1. NAB returns an error message.
+* 1a. NAB detects invalid characters or formats in the provided fields.
+    * 1a1. NAB displays an error message specifying the correct command format.
       <br> *Use case ends.*<br><br>
-* 3a. NAB finds multiple contacts that match the name provided.
-    * 3a1. User provides more information to enrich the search.
-      <br> *Use case resumes from step 2.*<br><br>
-* 3b. NAB finds no available contacts that match the name provided.
-    * 3b1. NAB informs the user that no matches were found.
+* 2a. NAB finds multiple contacts that match the provided fields.
+    * 2a1. NAB displays the conflicting contacts and returns an error informing the user to provide more specific details.
+      <br> *Use case ends.*<br><br>
+* 2b. NAB finds no available contacts that matches the fields provided.
+    * 2b1. NAB informs the user that no matches were found.
       <br> *Use case ends.*
 </box>
 
@@ -683,18 +681,28 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 **Preconditions:** Contact that the event will be tagged to already exists in NAB.<br>
 **Guarantees:** Event is added to the system and is tagged to the specified contact.<br>
 **MSS**
-1. User requests to create a new event for a specific contact.
-2. User enters the necessary event information and the information of the contact to be tagged to.
-3. NAB saves the event into the event list/database.
+1. User requests to add an event to a contact by providing the event details and the contact's identifying details.
+2. NAB identifies the specific contact.
+3. NAB saves the event and links it to the contact.
+4. NAB displays the updated event list for the contact.
    <br> *Use case ends.*
 
 **Extensions**
 
-* 2a. NAB finds a duplicate event that has already been registered to the contact.
-    * 2a1. NAB rejects the event from being added.
+* 1a. NAB detects invalid characters, formats, or missing required fields.
+  * 1a1. NAB displays an error message specifying the correct command format.
     <br> *Use case ends.*<br><br>
-* 2b. NAB is unable to find the specified contact.
-    * 2b1. NAB informs the user that the contact does not exist.
+* 2a. NAB finds no contacts matching the provided details.
+  * 2a1. NAB displays an error message indicating the contact does not exist.
+    <br> *Use case ends.*<br><br>
+* 2b. NAB finds multiple contacts that match the provided details.
+  * 2b1. NAB displays the conflicting contacts and prompts for more specific details.
+    <br> *Use case ends.*<br><br>
+* 3a. NAB detects that the contact is already linked to this exact event.
+  * 3a1. NAB displays an error message indicating the duplication.
+    <br> *Use case ends.*<br><br>
+* 3b. NAB detects that the event overlaps with an existing event in the calendar.
+  * 3b1. NAB displays an error message listing the clashing events.
     <br> *Use case ends.*
 </box>
 
@@ -705,26 +713,25 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **Use case:** `UC5` - View Event<br>
 **MSS**
-1. User requests to view the event list for a specific contact by providing their name.
-2. NAB checks whether the provided name is valid.
-3. NAB identifies the specific contact.
-4. NAB retrieves the event list associated with the contact.
-5. NAB displays the formatted event list to the user.
+1. User requests to view the event list for a specific contact by providing their name and any optional fields.
+2. NAB identifies the specific contact.
+3. NAB retrieves the event list associated with the contact.
+4. NAB displays the formatted event list to the user.
    <br> *Use case ends.*
 
 **Extensions**
 
-* 1a. User requests to view events without specifying a contact name (i.e. view own events).
-    * 1a1. NAB returns the user’s own event list.
-    <br> *Use case resumes from step 5.*<br><br>
-* 2a. NAB detects invalid characters in the provided name.
-    * 2a1. NAB returns an error message.
+* 1a. NAB detects invalid characters or formats in the provided fields.
+    * 1a1. NAB displays an error message specifying the correct command format.
     <br> *Use case ends.*<br><br>
-* 3a. NAB is unable to find a contact matching the provided name.
-    * 3a1. NAB informs the user that contact does not exist.
+* 2a. NAB is unable to find a contact matching the provided criteria.
+    * 2a1. NAB informs the user that contact does not exist.
     <br> *Use case ends.*<br><br>
-* 4a. NAB finds no events associated with the contact.
-    * 4a1. NAB informs the user that there are no events associated with the contact.
+* 2b. NAB finds multiple contacts that match the provided criteria.
+  * 2b1. NAB displays the conflicting contacts and returns an error prompting the user to provide more specific arguments.
+    <br> *Use case ends.*<br><br>
+* 3a. NAB finds no events associated with the contact.
+    * 3a1. NAB informs the user that there are 0 events associated with the contact.
     <br> *Use case ends.*
 </box>
 
@@ -735,20 +742,18 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **Use case:** `UC6` - Filter Contact by Tag<br>
 **MSS**
-1. User requests to find contacts with specific tag(s).
-2. User enters the necessary tag(s).
-3. NAB checks whether the provided tag(s) are valid.
-4. NAB retrieves a list of contacts matching the tag(s).
-5. NAB displays the list of contacts to the user.
+1. User requests to filter contacts by providing one or more tags.
+2. NAB filter contact(s) with the tags provided.
+3. NAB displays the list of contacts matching the tags and clears the event panel.
    <br> *Use case ends.*
 
 **Extensions**
 
-* 3a. NAB detects invalid characters in the provided tag
-    * 3a1. NAB returns an error message.
+* 1a. NAB detects invalid characters or formats in the provided fields.
+  * 1a1. NAB displays an error message specifying the correct command format.
     <br> *Use case ends.*<br><br>
-* 4a. NAB finds no available contacts matching the tag(s) provided.
-    * 4a1. NAB informs the user that no matches were found.
+* 2a. No contacts in the system contains any of the provided tags.
+  * 2a1. NAB displays an empty list and a message indicating no contacts were found with those tags.
     <br> *Use case ends.*
 </box>
 
@@ -794,8 +799,6 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
       continues reading the rest of the file.
     <br> *Use case ends.*
 </box>
-
-*{More to be added}*
 
 ### Non-Functional Requirements
 
