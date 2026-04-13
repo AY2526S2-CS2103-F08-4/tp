@@ -342,7 +342,7 @@ Format: `edit n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... -- [n/NAM
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -378,7 +378,7 @@ Format: `find n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -445,7 +445,7 @@ Pins the matching John Doe contact by name and phone number.
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -474,7 +474,7 @@ Unpins the matching John Doe contact by name and phone number.
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -520,7 +520,7 @@ Assigns 2 tags (`CS2103`, `CS2030S`) to 2 users (`John Doe` and `Betsy Crower`) 
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -559,7 +559,7 @@ Deletes the matching John Doe contact by name and phone number.
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -619,7 +619,7 @@ Format: `event add title/TITLE [desc/DESCRIPTION] start/START_DATE end/END_DATE 
 
 <box type="important">
 
-Event uniqueness and time clashes**
+**Event uniqueness and time clashes**
 
 
 - NAB treats the event list as **your schedule** (user point of view).
@@ -632,7 +632,7 @@ Event uniqueness and time clashes**
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -666,7 +666,7 @@ Format: `event view n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
@@ -700,7 +700,7 @@ Format: `event delete start/START_DATE n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDR
 
 <box type="important">
 
-Disambiguating contacts with the same name**
+**Disambiguating contacts with the same name**
 
 
 - If you encounter the error `Multiple matches identified! Please provide more arguments.`, add optional parameters immediately after n/NAME to narrow down the match — Phone number, Email, Address, or Tag.
