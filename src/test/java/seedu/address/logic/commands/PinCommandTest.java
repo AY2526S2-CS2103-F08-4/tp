@@ -116,7 +116,9 @@ public class PinCommandTest {
 
         PinCommand pinCommand = new PinCommand(createNameOnlyInfo(personToPin.getName()));
 
-        assertCommandFailure(pinCommand, model, PinCommand.MESSAGE_ALREADY_PINNED);
+        CommandException thrown = assertThrows(CommandException.class, () -> pinCommand.execute(model));
+        assertTrue(thrown.getMessage().contains("already pinned"));
+        assertTrue(model.isPersonPinned(personToPin));
     }
 
     @Test

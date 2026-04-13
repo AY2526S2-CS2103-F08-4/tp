@@ -133,8 +133,8 @@ public class UnpinCommandTest {
     @Test
     public void execute_whenEventsAreShowing_clearsFilteredEventList() throws Exception {
         Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
-        Person displayedPerson = model.findPersons(createNameOnlyInfo(new Name("Alex Yeoh"))).get(0);
-        Person personToUnpin = model.findPersons(createNameOnlyInfo(new Name("Bernice Yu"))).get(0);
+        Person displayedPerson = model.findPersons(createNameOnlyInfo(new Name("Alice Pauline"))).get(0);
+        Person personToUnpin = model.findPersons(createNameOnlyInfo(new Name("Benson Meier"))).get(0);
         model.pinPerson(personToUnpin);
         model.showEventsForPerson(displayedPerson);
         assertFalse(model.getFilteredEventList().isEmpty());

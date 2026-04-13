@@ -56,15 +56,18 @@ public class PinCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        List<Person> matches = model.findPersons(this.targetInfo);
         // Get the list of currently unpinned matches
-        List<Person> unpinnedMatches = model.findPersons(this.targetInfo).stream()
+        List<Person> unpinnedMatches = matches.stream()
                 .filter(person -> !model.isPersonPinned(person))
                 .toList();
-        // Resolve the target person from the unpinned matches
-        Person personToPin = CommandUtil.targetPersonFromMatches(model, unpinnedMatches);
-        if (model.isPersonPinned(personToPin)) {
+        if (unpinnedMatches.isEmpty()) {
+            // Validate the target exists and is unambiguous, then surface the pinned-state error.
+            CommandUtil.targetPersonFromMatches(model, matches);
             throw new CommandException(MESSAGE_ALREADY_PINNED);
         }
+        // Resolve the target person from the unpinned matches
+        Person personToPin = CommandUtil.targetPersonFromMatches(model, unpinnedMatches);
 
         model.pinPerson(personToPin);
         model.showAllPersonsPinnedFirst();
