@@ -138,7 +138,7 @@
         "adding-a-person-add": "Adding a person: add",
         "listing-all-persons-list": "Listing all persons: list",
         "editing-a-person-edit": "Editing a person: edit",
-        "finding-a-person-find": "Finding a person: find",
+        "finding-a-person-by-name-find": "Finding a person (by name): find",
         "filtering-persons-by-context-filter": "Filtering persons by context: filter",
         "pinning-a-person-pin": "Pinning a person: pin",
         "unpinning-a-person-unpin": "Unpinning a person: unpin",
