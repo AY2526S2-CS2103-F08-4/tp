@@ -31,9 +31,13 @@ deactivate AddEventCommand
 
 AddEventParser --> EventCommandParser : c
 deactivate AddEventParser
+destroy AddEventParser
 
 EventCommandParser --> AddressBookParser : c
 deactivate EventCommandParser
+destroy EventCommandParser
+
+[<-- AddressBookParser : c
 deactivate AddressBookParser
 
 [-> AddEventCommand : execute(model)
