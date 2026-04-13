@@ -185,7 +185,7 @@ Before examining the individual commands for managing contacts, please refer to 
 | `p/PHONE_NUMBER` | • Must contain strictly numbers.<br>• Must be between 7 and 15 digits long.                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `p/98765432` |
 | `e/EMAIL` | • Must be of the standard format: `local-part@domain`.<br>• **Local-part:** Can only contain alphanumeric characters and the special characters `+`, `_`, `.`, and `-`. It cannot start or end with a special character.<br>• **Domain:** Made up of domain labels separated by periods (`.`).<br>&nbsp;&nbsp;◦ Must end with a domain label at least 2 characters long.<br>&nbsp;&nbsp;◦ Each label must start and end with alphanumeric characters.<br>&nbsp;&nbsp;◦ Labels can contain hyphens (`-`), but no other special characters. | `e/johnd@example.com` |
 | `a/ADDRESS` | • Can contain alphanumeric characters, spaces, and the following special characters: `#`, `_`, `,` (comma), `-` (hyphen), `'` (apostrophe), and `.` (period).<br>• Cannot be blank or consist only of spaces (must start with an alphanumeric or allowed special character).                                                                                                                                                                                                                                                                               | `a/John street, block 123, #01-01` |
-| `t/TAG` | • Can contain letters, digits, spaces, hyphens (`-`), and underscores (`_`).<br>• Must start with an alphanumeric character (a letter or digit).<br>• Must be between 1 and 20 characters long.                                                                                                                                                                                                                                                                                                                                           | `t/friend` |
+| `t/TAG` | • Can contain letters, digits, spaces, hyphens (`-`), and underscores (`_`).<br>• Must start with an alphanumeric character (a letter or digit).<br>• Must be between 1 and 30 characters long.<br>• Tags are stored and displayed in lowercase, even if uppercase letters are entered.                                                                                                                                                                                                                                                                                                                                           | `t/friend` |
 | `pfp/PHOTO_PATH` | • File path must end with a valid image extension: `.png`, `.jpg`, or `.jpeg` (case-insensitive).<br>• Can be absolute (e.g., `C:/Users/Alex/Pictures/me.jpg`) or relative to the app folder (e.g., `images/me.png`).<br>• The specified file must exist on your computer; NAB will copy it into the `data/images/` directory<br>• File path cannot be referencing any subfolder/files residing in NAB's `data/images/` folder.                                                                                                                                                                                                             | `pfp/images/me.png` |
 
 </box>
@@ -203,6 +203,7 @@ Before examining the individual commands for managing contacts, please refer to 
     * e.g. if the command format specifies `n/NAME p/PHONE_NUMBER`, `p/PHONE_NUMBER n/NAME` is also acceptable.<br><br>
 * `NAME` and `TAG` are case-insensitive.
     * `t/Friends` and `t/friends` are treated as 1 unique tag.
+    * Tags are stored and displayed in lowercase, so `t/Friends` will appear as `friends`.
     * `n/aLeX YeOH` will match `Alex Yeoh`.<br><br>
 * Only full words will be matched
     * e.g. `Han` will not match `Hans`.
@@ -499,6 +500,8 @@ See <md>:fa-solid-circle-info:</md> [User Disambiguation](#user-disambiguation).
 
 Assigns one or more tags to one or more contacts in one command.
 
+`tag` is intended as a bulk assignment command that ensures the specified tag(s) are present on each matched contact.
+
 **Format**: `tag label/TAG_TO_ASSIGN [label/TAG_TO_ASSIGN]... n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... [n/NAME [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...]...`
 
 <div style="text-align: center;">
@@ -510,7 +513,18 @@ Assigns one or more tags to one or more contacts in one command.
 * Optional fields placed immediately after a contact's `n/NAME` (such as `p/`, `e/`, `a/`, `t/`) apply only to that contact.
 * Do not mix tag and contact segments. All `label/...` entries must come before the first `n/...`.
 * If a tag does not exist yet, NAB creates it automatically.
+* If a contact already has a given tag, NAB leaves that tag unchanged and still treats the command as successful, since the intended final state has already been satisfied.
 * If a person segment matches multiple contacts, NAB shows those matches and asks for a more specific command.
+
+<box type="important">
+
+**Tag normalization and length limit**
+
+
+- NAB stores and displays tags in lowercase to avoid confusing inconsistencies such as `Friends` and `friends` appearing as if they were different tags.
+- Tags are capped at 30 characters to keep them concise and easy to scan in the UI, while still accommodating realistic module, project, and CCA labels.
+
+</box>
 
 <box type="info">
 

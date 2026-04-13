@@ -141,6 +141,7 @@
 
                     <li><code>NAME</code> and <code>TAG</code> are case-insensitive.
                         <br>e.g. <code>t/Friends</code> and <code>t/friends</code> are treated as 1 unique tag.
+                        <br>Tags are stored and displayed in lowercase, so <code>t/Friends</code> will appear as <code>friends</code>.
                         <br>e.g. <code>n/aLeX YeOH</code> will match <code>Alex Yeoh</code>
                     </li>
 
@@ -227,7 +228,8 @@
                                     <li>Can contain letters, digits, spaces, hyphens (<code>-</code>), and underscores (<code>_</code>).
                                     </li><br>
                                     <li>Must start with an alphanumeric character (a letter or digit).</li><br>
-                                    <li>Must be between 1 and 20 characters long.</li>
+                                    <li>Must be between 1 and 30 characters long.</li><br>
+                                    <li>Tags are stored and displayed in lowercase, even if uppercase letters are entered.</li>
                                 </ul>
                             </td>
                             <td><code>t/friend</code></td>

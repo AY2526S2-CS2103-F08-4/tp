@@ -339,12 +339,12 @@ public class EditCommandParserTest {
         // duplicate update tags are case-insensitive
         userInput = TARGET_IDENTIFIER_AMY + DELIMITER + TAG_DESC_FRIEND.trim() + " t/FRIEND";
         assertParseFailure(parser, userInput,
-                String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, "FRIEND"));
+                String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, "friend"));
 
         // duplicate target tags are rejected directly
         userInput = TARGET_IDENTIFIER_BENSON + TAG_DESC_HUSBAND + " t/HUSBAND" + DELIMITER + PHONE_DESC_AMY.trim();
         assertParseFailure(parser, userInput,
-                String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, "HUSBAND"));
+                String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, "husband"));
     }
 
     @Test

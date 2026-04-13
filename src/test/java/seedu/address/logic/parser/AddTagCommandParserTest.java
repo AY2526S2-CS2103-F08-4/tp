@@ -108,7 +108,7 @@ public class AddTagCommandParserTest {
                 + PREFIX_NAME + "Alice";
         assertParseFailure(parser, input,
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT,
-                        "Duplicate tag specified in the command: CS2103\n"
+                        "Duplicate tag specified in the command: cs2103\n"
                                 + AddTagCommand.MESSAGE_USAGE));
     }
 

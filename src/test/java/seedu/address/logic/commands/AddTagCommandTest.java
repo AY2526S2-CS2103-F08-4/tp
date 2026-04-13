@@ -50,14 +50,14 @@ public class AddTagCommandTest {
         );
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
-        Person expectedAlice = new PersonBuilder(alice).withTags("CS2030S", "CS2103").build();
-        Person expectedJoe = new PersonBuilder(joe).withTags("Family", "CS2030S", "CS2103").build();
+        Person expectedAlice = new PersonBuilder(alice).withTags("cs2030s", "cs2103").build();
+        Person expectedJoe = new PersonBuilder(joe).withTags("family", "cs2030s", "cs2103").build();
         expectedModel.setPerson(alice, expectedAlice);
         expectedModel.setPerson(joe, expectedJoe);
         expectedModel.showAllPersons();
 
         assertCommandSuccess(command, model,
-                "Tagged 2 person(s) with [CS2030S, CS2103]: Alice, Joe", expectedModel);
+                "Tagged 2 person(s) with [cs2030s, cs2103]: Alice, Joe", expectedModel);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class AddTagCommandTest {
         CommandException thrown = assertThrows(CommandException.class, () -> command.execute(model));
 
         assertTrue(AddTagCommand.MESSAGE_MULTIPLE_MATCHES_FOR_TARGET.formatted(
-                "name=Alex, phone=81111111, email=alex.one@example.com, address=NUS, tags=Friends")
+                "name=Alex, phone=81111111, email=alex.one@example.com, address=NUS, tags=friends")
                 .equals(thrown.getMessage()));
     }
 

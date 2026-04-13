@@ -74,7 +74,7 @@ public class AddCommandParserTest {
                 String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, VALID_TAG_FRIEND));
 
         assertParseFailure(parser, NAME_DESC_BOB + PHONE_DESC_BOB + TAG_DESC_FRIEND + " t/FRIEND",
-                String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, "FRIEND"));
+                String.format("%s: %s", ParserUtil.MESSAGE_DUPLICATE_TAGS, "friend"));
     }
 
     @Test
