@@ -11,14 +11,14 @@ public class Address {
 
     public static final String MESSAGE_CONSTRAINTS =
             "Addresses should only contain alphanumeric characters, spaces, "
-            + "and the following special characters: #, _, comma, hyphen (-)";
+            + "and the following special characters: #, _, comma, hyphen (-), period (.), apostrophe (')";
 
     /*
-     * Address must start with an alphanumeric character or allowed special character (#, _, comma, hyphen).
-     * Subsequent characters may also include spaces.
+     * Address must start with an alphanumeric character or allowed special character (#, _, comma, hyphen, period,
+     * apostrophe). Subsequent characters may also include spaces.
      * This prevents blank or whitespace-only inputs.
      */
-    public static final String VALIDATION_REGEX = "[a-zA-Z0-9#_,\\-][a-zA-Z0-9#_,\\- ]*";
+    public static final String VALIDATION_REGEX = "[a-zA-Z0-9#_,.\\-'][a-zA-Z0-9#_,.\\-' ]*";
 
     public final String value;
 
