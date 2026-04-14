@@ -59,13 +59,7 @@ public class AddEventCommand extends Command {
             LOGGER.info("AddEvent: linking existing event " + toAdd + " to " + personToEdit.getName());
             eventToLink = model.linkPersonToEvent(toAdd);
         } else {
-            List<Event> clashingEvents = model.getOverlappingEvent(toAdd);
-            if (!clashingEvents.isEmpty()) {
-                collision(model, clashingEvents);
-            }
-            LOGGER.info("AddEvent: creating new event " + toAdd + " for " + personToEdit.getName());
-            model.addEvent(toAdd);
-            eventToLink = toAdd;
+            eventToLink = createNewEvent(model, personToEdit);
         }
 
         Person editedPerson = personToEdit.copyWithAddedEvent(eventToLink);
@@ -77,15 +71,23 @@ public class AddEventCommand extends Command {
         return new CommandResult(String.format(MESSAGE_SUCCESS, personToEdit.getName(), toAdd));
     }
 
-    private void collision(Model model, List<Event> clashingEvents) throws CommandException {
-        LOGGER.info("AddEvent: event clashes with existing event " + toAdd);
-        StringBuilder errorMessage = new StringBuilder(MESSAGE_CLASHING_EVENT + "\n");
-        for (Event conflict : clashingEvents) {
-            String linkedNames = model.getNamesLinkedToEvent(conflict);
-            errorMessage.append(String.format("• %s (Linked to %s)\n",
-                    conflict.getClashDisplayString(), linkedNames));
+    private Event createNewEvent(Model model, Person personToEdit) throws CommandException {
+        Event eventToLink;
+        List<Event> clashingEvents = model.getOverlappingEvent(toAdd);
+        if (!clashingEvents.isEmpty()) {
+            LOGGER.info("AddEvent: event clashes with existing event " + toAdd);
+            StringBuilder errorMessage = new StringBuilder(MESSAGE_CLASHING_EVENT + "\n");
+            for (Event conflict : clashingEvents) {
+                String linkedNames = model.getNamesLinkedToEvent(conflict);
+                errorMessage.append(String.format("• %s (Linked to %s)\n",
+                        conflict.getClashDisplayString(), linkedNames));
+            }
+            throw new CommandException(errorMessage.toString().trim());
         }
-        throw new CommandException(errorMessage.toString().trim());
+        LOGGER.info("AddEvent: creating new event " + toAdd + " for " + personToEdit.getName());
+        model.addEvent(toAdd);
+        eventToLink = toAdd;
+        return eventToLink;
     }
 
     @Override
