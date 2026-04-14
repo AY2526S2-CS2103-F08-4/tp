@@ -7,64 +7,72 @@ participant ":LogicManager" as LogicManager LOGIC_COLOR
 participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
 participant ":DeleteCommandParser" as DeleteCommandParser LOGIC_COLOR
 participant "d:DeleteCommand" as DeleteCommand LOGIC_COLOR
-participant "r:CommandResult" as CommandResult LOGIC_COLOR
+participant "<<utility>>\nCommandUtil" as CommandUtil LOGIC_COLOR
 end box
 
 box Model MODEL_COLOR_T1
-participant "m:Model" as Model MODEL_COLOR
+participant ":Model" as Model MODEL_COLOR
 end box
 
-[-> LogicManager : execute("delete n/David")
+[-> LogicManager : execute("delete n/David Ng p/90002222")
 activate LogicManager
 
-LogicManager -> AddressBookParser : parseCommand("delete n/David")
+LogicManager -> AddressBookParser : parseCommand("delete n/David Ng p/90002222")
 activate AddressBookParser
 
-create DeleteCommandParser
-AddressBookParser -> DeleteCommandParser
-activate DeleteCommandParser
-
-DeleteCommandParser --> AddressBookParser
-deactivate DeleteCommandParser
-
-AddressBookParser -> DeleteCommandParser : parse("n/David")
+AddressBookParser -> DeleteCommandParser : parse(arguments)
 activate DeleteCommandParser
 
 create DeleteCommand
 DeleteCommandParser -> DeleteCommand
 activate DeleteCommand
-
-DeleteCommand --> DeleteCommandParser :
+DeleteCommand --> DeleteCommandParser : d
 deactivate DeleteCommand
 
 DeleteCommandParser --> AddressBookParser : d
 deactivate DeleteCommandParser
-'Hidden arrow to position the destroy marker below the end of the activation bar.
-DeleteCommandParser -[hidden]-> AddressBookParser
 destroy DeleteCommandParser
 
 AddressBookParser --> LogicManager : d
 deactivate AddressBookParser
 
-LogicManager -> DeleteCommand : execute(m)
+LogicManager -> DeleteCommand : execute(model)
 activate DeleteCommand
 
-DeleteCommand -> Model : deletePerson(David)
-activate Model
+DeleteCommand -> CommandUtil : targetPerson(model, targetInfo)
+activate CommandUtil
+CommandUtil --> DeleteCommand : personToDelete
+deactivate CommandUtil
 
+DeleteCommand -> Model : isShowingEventsFor(personToDelete)
+activate Model
+Model --> DeleteCommand : isShowingDeletedPerson
+deactivate Model
+
+opt personToDelete has a photo
+    DeleteCommand -> CommandUtil : safelyDeletePhoto(model, personToDelete, photo, targetDirectory)
+    activate CommandUtil
+    CommandUtil --> DeleteCommand
+    deactivate CommandUtil
+end
+
+DeleteCommand -> Model : deletePerson(personToDelete)
+activate Model
 Model --> DeleteCommand
 deactivate Model
 
-create CommandResult
-DeleteCommand -> CommandResult
-activate CommandResult
+opt deleted person's events are on display
+    DeleteCommand -> Model : showNoEvents()
+    activate Model
+    Model --> DeleteCommand
+    deactivate Model
+end
 
-CommandResult --> DeleteCommand
-deactivate CommandResult
-
-DeleteCommand --> LogicManager : r
+DeleteCommand --> LogicManager : result
 deactivate DeleteCommand
+DeleteCommand -[hidden]-> DeleteCommand
+destroy DeleteCommand
 
-[<--LogicManager
+[<-- LogicManager
 deactivate LogicManager
 @enduml
