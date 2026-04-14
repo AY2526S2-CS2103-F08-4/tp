@@ -143,6 +143,32 @@ public class AddEventCommandTest {
     }
 
     @Test
+    public void execute_multipleClashingEvents_throwsCommandExceptionWithAllClashes() {
+        Event eventToAdd = eventOf(VALID_TITLE, VALID_DESC, VALID_START, VALID_END);
+        AddEventCommand addEventCommand = new AddEventCommand(infoOf(VALID_NAME), eventToAdd);
+
+        Event firstClash = eventOf("Existing Meeting",
+                "Help Me",
+                "2026-02-21 1000",
+                "2026-02-21 1200");
+        Event secondClash = eventOf("Second Meeting",
+                "Review",
+                "2026-02-21 1300",
+                "2026-02-21 1600");
+        Person person = new PersonBuilder().withName(VALID_NAME).build();
+        ModelStubWithMultipleOverlappingEvents modelStub = new ModelStubWithMultipleOverlappingEvents(person,
+                List.of(firstClash, secondClash));
+
+        String expectedMessage = AddEventCommand.MESSAGE_CLASHING_EVENT + "\n"
+                + "\u2022 " + firstClash.getClashDisplayString() + " (Linked to "
+                + modelStub.getNamesLinkedToEvent(firstClash) + ")\n"
+                + "\u2022 " + secondClash.getClashDisplayString() + " (Linked to "
+                + modelStub.getNamesLinkedToEvent(secondClash) + ")";
+
+        assertThrows(CommandException.class, expectedMessage, () -> addEventCommand.execute(modelStub));
+    }
+
+    @Test
     public void execute_contactNotFound_throwsCommandException() {
         Event eventToAdd = eventOf(VALID_TITLE, VALID_DESC, VALID_START, VALID_END);
         AddEventCommand addEventCommand = new AddEventCommand(infoOf(VALID_NAME), eventToAdd);
@@ -554,6 +580,40 @@ public class AddEventCommandTest {
         public void updateFilteredPersonList(Predicate<Person> predicate) {
         }
 
+    }
+
+    private class ModelStubWithMultipleOverlappingEvents extends ModelStub {
+        private final Person person;
+        private final List<Event> clashingEvents;
+
+        ModelStubWithMultipleOverlappingEvents(Person person, List<Event> clashingEvents) {
+            this.person = person;
+            this.clashingEvents = clashingEvents;
+        }
+
+        @Override
+        public List<Person> findPersons(PersonInformation info) {
+            return List.of(person);
+        }
+
+        @Override
+        public boolean hasEvent(Event event) {
+            return false;
+        }
+
+        @Override
+        public List<Event> getOverlappingEvent(Event event) {
+            return clashingEvents;
+        }
+
+        @Override
+        public String getNamesLinkedToEvent(Event event) {
+            return person.getNameString();
+        }
+
+        @Override
+        public void updateFilteredPersonList(Predicate<Person> predicate) {
+        }
     }
 
     private class ModelStubWithNoPerson extends ModelStub {
