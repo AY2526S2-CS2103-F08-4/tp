@@ -40,25 +40,34 @@ activate Model
 Model --> PinCommand : matches
 deactivate Model
 
-PinCommand -> CommandUtil : targetPersonFromMatches(model, matches)
-activate CommandUtil
-CommandUtil --> PinCommand : personToPin
-deactivate CommandUtil
+note right of PinCommand
+    Filter matches to unpinnedMatches
+    using model.isPersonPinned(person)
+end note
 
-PinCommand -> Model : isPersonPinned(personToPin)
-activate Model
-Model --> PinCommand : isPinned
-deactivate Model
+alt no contacts match
+    [<-- PinCommand : throw CommandException (No match)
 
-alt isPinned
-    [<-- PinCommand : throw CommandException
-else not pinned
+else all matching contacts are already pinned
+    [<-- PinCommand : throw CommandException (Already pinned)
+
+else at least one unpinned match found
+    PinCommand -> CommandUtil : targetPersonFromMatches(model, unpinnedMatches)
+    activate CommandUtil
+    CommandUtil --> PinCommand : personToPin
+    deactivate CommandUtil
+
     PinCommand -> Model : pinPerson(personToPin)
     activate Model
     Model --> PinCommand
     deactivate Model
 
     PinCommand -> Model : showAllPersonsPinnedFirst()
+    activate Model
+    Model --> PinCommand
+    deactivate Model
+
+    PinCommand -> Model : showNoEvents()
     activate Model
     Model --> PinCommand
     deactivate Model

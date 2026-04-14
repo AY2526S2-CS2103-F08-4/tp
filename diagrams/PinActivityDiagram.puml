@@ -5,30 +5,26 @@ skinparam ArrowFontSize 12
 
 start
 :Parse pin/unpin command;
-:Find matching persons using targetInfo;
+:Find all matching contacts using targetInfo;
+:Filter matches by pin status\n(unpinned contacts for pin command;\npinned contacts for unpin command);
 
-if () then ([no matches])
-  :Show no match error only;
-else ([matches found])
-  if () then ([multiple matches])
+if () then ([no filtered matches found])
+  if () then ([no contact matches])
+    :Show no match error;
+  else ([all matches already pinned/unpinned])
+    :Show already pinned/unpinned error;
+  endif
+else ([filtered matches found])
+  if () then ([multiple filtered matches])
     :Update UI to show ambiguous matches\nin list;
-    :Show error;
-  else ([single match])
+    :Show disambiguation error;
+  else ([single filtered match])
     if () then ([pin command])
-      if () then ([already pinned])
-        :Show already pinned error;
-      else ([not pinned])
-        :Pin the contact;
-        :Reorder list with pinned contacts first;
-      endif
+      :Pin the contact;
     else ([unpin command])
-      if () then ([already unpinned])
-        :Show already unpinned error;
-      else ([pinned])
-        :Unpin the contact;
-        :Reorder list with pinned contacts first;
-      endif
+      :Unpin the contact;
     endif
+    :Reorder list with pinned contacts first;
   endif
 endif
 
